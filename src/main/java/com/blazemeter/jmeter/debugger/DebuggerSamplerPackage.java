@@ -1,18 +1,17 @@
 package com.blazemeter.jmeter.debugger;
 
-import com.blazemeter.jmeter.debugger.elements.AssertionDebug;
-import com.blazemeter.jmeter.debugger.elements.PostProcessorDebug;
+import com.blazemeter.jmeter.debugger.elements.*;
 import org.apache.jmeter.assertions.Assertion;
 import org.apache.jmeter.config.ConfigTestElement;
 import org.apache.jmeter.control.Controller;
 import org.apache.jmeter.processor.PostProcessor;
 import org.apache.jmeter.processor.PreProcessor;
 import org.apache.jmeter.samplers.SampleListener;
+import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.threads.SamplePackage;
 import org.apache.jmeter.timers.Timer;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
-import com.blazemeter.jmeter.debugger.elements.PreProcessorDebug;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -67,11 +66,24 @@ public class DebuggerSamplerPackage extends SamplePackage {
 
     @Override
     public List<Timer> getTimers() {
-        return super.getTimers();
+        List<Timer> wrapped = new LinkedList<>();
+        for (Timer te : super.getTimers()) {
+            wrapped.add(new TimerDebug(te, hook));
+        }
+        return wrapped;
     }
 
     @Override
     public List<SampleListener> getSampleListeners() {
-        return super.getSampleListeners();
+        List<SampleListener> wrapped = new LinkedList<>();
+        for (SampleListener te : super.getSampleListeners()) {
+            wrapped.add(new SampleListenerDebug(te, hook));
+        }
+        return wrapped;
+    }
+
+    @Override
+    public Sampler getSampler() {
+        return new SamplerDebug(super.getSampler(), hook);
     }
 }
