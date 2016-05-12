@@ -1,5 +1,7 @@
-package org.jmeterplugins.debugger;
+package com.blazemeter.jmeter.debugger;
 
+import com.blazemeter.jmeter.debugger.elements.AssertionDebug;
+import com.blazemeter.jmeter.debugger.elements.PostProcessorDebug;
 import org.apache.jmeter.assertions.Assertion;
 import org.apache.jmeter.config.ConfigTestElement;
 import org.apache.jmeter.control.Controller;
@@ -10,6 +12,7 @@ import org.apache.jmeter.threads.SamplePackage;
 import org.apache.jmeter.timers.Timer;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
+import com.blazemeter.jmeter.debugger.elements.PreProcessorDebug;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -37,25 +40,29 @@ public class DebuggerSamplerPackage extends SamplePackage {
 
     @Override
     public List<PreProcessor> getPreProcessors() {
-        List<PreProcessor> preProcessors = new LinkedList<>();
+        List<PreProcessor> wrapped = new LinkedList<>();
         for (PreProcessor te : super.getPreProcessors()) {
-            preProcessors.add(new PreProcessorDebug(te, hook));
+            wrapped.add(new PreProcessorDebug(te, hook));
         }
-        return preProcessors;
+        return wrapped;
     }
 
     @Override
     public List<PostProcessor> getPostProcessors() {
-        List<PostProcessor> postProcessors = new LinkedList<>();
+        List<PostProcessor> wrapped = new LinkedList<>();
         for (PostProcessor te : super.getPostProcessors()) {
-            postProcessors.add(new PostProcessorDebug(te, hook));
+            wrapped.add(new PostProcessorDebug(te, hook));
         }
-        return postProcessors;
+        return wrapped;
     }
 
     @Override
     public List<Assertion> getAssertions() {
-        return super.getAssertions();
+        List<Assertion> wrapped = new LinkedList<>();
+        for (Assertion te : super.getAssertions()) {
+            wrapped.add(new AssertionDebug(te, hook));
+        }
+        return wrapped;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package org.jmeterplugins.debugger;
+package com.blazemeter.jmeter.debugger;
 
 import kg.apc.emulators.TestJMeterUtils;
 import org.apache.jmeter.save.SaveService;
@@ -11,6 +11,7 @@ import org.apache.jorphan.collections.ListedHashTree;
 import org.apache.jorphan.collections.SearchByClass;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
+import com.blazemeter.jmeter.debugger.elements.AbstractDebugElement;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -25,10 +26,10 @@ public class DebuggingThreadTest {
         public void notify(Object o) {
             if (o instanceof AbstractDebugElement) {
                 AbstractDebugElement te = (AbstractDebugElement) o;
-                log.info("Stopping before step: " + te.getWrappedElement());
+                log.info(">>> Stopping before step: " + te.getWrappedElement() + " <<<");
             }
             try {
-                Thread.sleep(3000);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -42,7 +43,7 @@ public class DebuggingThreadTest {
 
     @Test
     public void testBasic() throws IOException {
-        File file = new File(this.getClass().getResource("/org/jmeterplugins/debugger/sample1.jmx").getFile());
+        File file = new File(this.getClass().getResource("/com/blazemeter/jmeter/debugger/sample1.jmx").getFile());
         String basedir = TestJMeterUtils.fixWinPath(file.getParentFile().getAbsolutePath());
 
         File f = new File(basedir + "/sample1.jmx");

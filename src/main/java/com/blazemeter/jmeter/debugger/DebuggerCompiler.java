@@ -1,4 +1,4 @@
-package org.jmeterplugins.debugger;
+package com.blazemeter.jmeter.debugger;
 
 import org.apache.jmeter.control.Controller;
 import org.apache.jmeter.control.TransactionSampler;

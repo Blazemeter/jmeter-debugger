@@ -1,6 +1,7 @@
-package org.jmeterplugins.debugger;
+package com.blazemeter.jmeter.debugger.elements;
 
 
+import com.blazemeter.jmeter.debugger.StepTrigger;
 import org.apache.jmeter.testelement.AbstractTestElement;
 
 public class AbstractDebugElement<T> extends AbstractTestElement {
