@@ -22,6 +22,7 @@ public class DebuggerMenuItem extends JMenuItem implements ActionListener {
             dialog = new DebuggerDialog();
         }
 
+        dialog.pack();
         dialog.setVisible(true);
     }
 
