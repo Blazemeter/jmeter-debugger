@@ -12,7 +12,7 @@ public class DebuggerMenuItem extends JMenuItem implements ActionListener {
     private static DebuggerDialog dialog;
 
     public DebuggerMenuItem() {
-        super("Plugins Manager", getPluginsIcon());
+        super("Step-by-Step Debugger", getPluginsIcon());
         addActionListener(this);
     }
 
@@ -26,6 +26,6 @@ public class DebuggerMenuItem extends JMenuItem implements ActionListener {
     }
 
     public static ImageIcon getPluginsIcon() {
-        return new ImageIcon(DebuggerMenuItem.class.getResource("/org/jmeterplugins/logo.png"));
+        return new ImageIcon(DebuggerMenuItem.class.getResource("/com/blazemeter/jmeter/debugger/bug.png"));
     }
 }
