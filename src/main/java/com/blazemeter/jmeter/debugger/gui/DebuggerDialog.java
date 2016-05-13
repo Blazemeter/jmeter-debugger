@@ -1,22 +1,22 @@
 package com.blazemeter.jmeter.debugger.gui;
 
-import org.apache.jmeter.threads.AbstractThreadGroup;
+import org.apache.jmeter.gui.GuiPackage;
+import org.apache.jmeter.threads.ThreadGroup;
+import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.gui.ComponentUtil;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
 public class DebuggerDialog extends JDialog implements ComponentListener {
     private static final Logger log = LoggingManager.getLoggerForClass();
-    public static final Border SPACING = BorderFactory.createEmptyBorder(5, 5, 5, 5);
 
-    private final JComboBox<AbstractThreadGroup> tgCombo = new JComboBox<>();
-
+    private final JComboBox<ThreadGroup> tgCombo = new JComboBox<>();
+    private DebuggerEngine engine;
 
     public DebuggerDialog() {
         super((JFrame) null, "Step-by-Step Debugger", true);
@@ -68,6 +68,7 @@ public class DebuggerDialog extends JDialog implements ComponentListener {
         JToolBar res = new JToolBar();
         res.setFloatable(false);
         res.add(new JLabel("Choose Thread Group: "));
+        tgCombo.setRenderer(new ThreadGroupItemRenderer(tgCombo.getRenderer()));
         res.add(tgCombo);
         res.add(new JButton("Start"));
         res.add(new JButton("Stop"));
@@ -90,11 +91,36 @@ public class DebuggerDialog extends JDialog implements ComponentListener {
     @Override
     public void componentShown(ComponentEvent e) {
         log.debug("Showing dialog");
-        // todo: fill TG combo
+        HashTree testTree = getTestTree();
+        this.engine = new DebuggerEngine(testTree);
+        tgCombo.setModel(new DefaultComboBoxModel<ThreadGroup>());
+        for (ThreadGroup group : engine.getThreadGroups()) {
+            tgCombo.addItem(group);
+        }
+    }
+
+    protected HashTree getTestTree() {
+        GuiPackage gui = GuiPackage.getInstance();
+        return gui.getTreeModel().getTestPlan();
     }
 
     @Override
     public void componentHidden(ComponentEvent e) {
         log.debug("Closing dialog");
     }
+
+
+    public final class ThreadGroupItemRenderer implements ListCellRenderer<ThreadGroup> {
+        private final ListCellRenderer originalRenderer;
+
+        public ThreadGroupItemRenderer(final ListCellRenderer originalRenderer) {
+            this.originalRenderer = originalRenderer;
+        }
+
+        @Override
+        public Component getListCellRendererComponent(JList<? extends ThreadGroup> list, ThreadGroup value, int index, boolean isSelected, boolean cellHasFocus) {
+            return originalRenderer.getListCellRendererComponent(list, value.getName(), index, isSelected, cellHasFocus);
+        }
+    }
+
 }
