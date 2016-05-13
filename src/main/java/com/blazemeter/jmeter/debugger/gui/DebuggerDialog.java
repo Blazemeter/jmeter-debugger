@@ -1,11 +1,8 @@
 package com.blazemeter.jmeter.debugger.gui;
 
-import org.apache.jmeter.exceptions.IllegalUserActionException;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.gui.tree.JMeterCellRenderer;
 import org.apache.jmeter.gui.tree.JMeterTreeListener;
-import org.apache.jmeter.gui.tree.JMeterTreeModel;
-import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.gui.ComponentUtil;
@@ -25,7 +22,7 @@ public class DebuggerDialog extends JDialog implements ComponentListener {
 
     private final JComboBox<ThreadGroup> tgCombo = new JComboBox<>();
     private DebuggerEngine engine;
-    private JMeterTreeModel treeModel;
+    private JTree tree;
 
     public DebuggerDialog() {
         super((JFrame) null, "Step-by-Step Debugger", true);
@@ -67,8 +64,7 @@ public class DebuggerDialog extends JDialog implements ComponentListener {
     }
 
     private Component getTreePane() {
-        treeModel = new JMeterTreeModel();
-        JScrollPane panel = new JScrollPane(getTreeView(treeModel, new JMeterTreeListener()));
+        JScrollPane panel = new JScrollPane(getTreeView(new JMeterTreeListener()));
         panel.setMinimumSize(new Dimension(100, 0));
         panel.setPreferredSize(new Dimension(250, 0));
         return panel;
@@ -121,19 +117,19 @@ public class DebuggerDialog extends JDialog implements ComponentListener {
     }
 
 
-    private JTree getTreeView(TreeModel treeModel, JMeterTreeListener treeListener) {
-        JTree treevar = new JTree(treeModel);
-        treevar.setToolTipText("");
-        treevar.setCellRenderer(new JMeterCellRenderer());
-        treevar.setRootVisible(false);
-        treevar.setShowsRootHandles(true);
+    private JTree getTreeView(JMeterTreeListener treeListener) {
+        tree = new JTree(new DebuggerTreeModel(new HashTree()));
+        //tree.setToolTipText("");
+        tree.setCellRenderer(new JMeterCellRenderer());
+        tree.setRootVisible(false);
+        tree.setShowsRootHandles(true);
 
-        treeListener.setJTree(treevar);
-        //treevar.addTreeSelectionListener(treeListener);
-        //treevar.addMouseListener(treeListener);
-        //treevar.addKeyListener(treeListener);
+        treeListener.setJTree(tree);
+        //tree.addTreeSelectionListener(treeListener);
+        //tree.addMouseListener(treeListener);
+        //tree.addKeyListener(treeListener);
 
-        return treevar;
+        return tree;
     }
 
     private class ThreadGroupChoiceChanged implements ItemListener {
@@ -143,12 +139,7 @@ public class DebuggerDialog extends JDialog implements ComponentListener {
                 log.debug("Item choice changed: " + event.getItem());
                 if (event.getItem() instanceof ThreadGroup) {
                     HashTree val = engine.getThreadgroupTree((ThreadGroup) event.getItem());
-                    treeModel.clearTestPlan();
-                    try {
-                        treeModel.addSubTree(val, (JMeterTreeNode) treeModel.getRoot());
-                    } catch (IllegalUserActionException e) {
-                        throw new RuntimeException("Failed", e);
-                    }
+                    tree.setModel(new DebuggerTreeModel(val));
                 }
             }
         }

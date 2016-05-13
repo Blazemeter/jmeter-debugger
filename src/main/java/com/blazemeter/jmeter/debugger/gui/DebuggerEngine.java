@@ -5,6 +5,7 @@ import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.engine.TreeCloner;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jorphan.collections.HashTree;
+import org.apache.jorphan.collections.ListedHashTree;
 import org.apache.jorphan.collections.SearchByClass;
 
 
@@ -27,6 +28,10 @@ public class DebuggerEngine extends StandardJMeterEngine {
     public HashTree getThreadgroupTree(ThreadGroup tg) {
         TreeCloner cloner = new TreeClonerOnlyFlow(tg);
         tree.traverse(cloner);
-        return cloner.getClonedTree();
+        ListedHashTree clonedTree = cloner.getClonedTree();
+        for (Object key : clonedTree.keySet()) {
+            return clonedTree.get(key);
+        }
+        return new HashTree();
     }
 }
