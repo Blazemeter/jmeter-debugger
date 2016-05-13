@@ -1,6 +1,6 @@
 package com.blazemeter.jmeter.debugger.elements;
 
-import com.blazemeter.jmeter.debugger.StepTrigger;
+import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import org.apache.jmeter.processor.PreProcessor;
 
 public class PreProcessorDebug extends AbstractDebugElement<PreProcessor> implements PreProcessor {

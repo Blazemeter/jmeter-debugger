@@ -1,7 +1,6 @@
 package com.blazemeter.jmeter.debugger.elements;
 
-import com.blazemeter.jmeter.debugger.StepTrigger;
-import com.blazemeter.jmeter.debugger.elements.AbstractDebugElement;
+import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import org.apache.jmeter.timers.Timer;
 
 public class TimerDebug extends AbstractDebugElement<Timer> implements Timer {

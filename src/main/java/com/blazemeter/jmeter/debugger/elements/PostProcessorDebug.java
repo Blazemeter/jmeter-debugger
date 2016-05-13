@@ -1,6 +1,6 @@
 package com.blazemeter.jmeter.debugger.elements;
 
-import com.blazemeter.jmeter.debugger.StepTrigger;
+import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import org.apache.jmeter.processor.PostProcessor;
 
 public class PostProcessorDebug extends AbstractDebugElement<PostProcessor> implements PostProcessor {

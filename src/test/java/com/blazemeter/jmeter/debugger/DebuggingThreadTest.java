@@ -1,5 +1,7 @@
 package com.blazemeter.jmeter.debugger;
 
+import com.blazemeter.jmeter.debugger.engine.DebuggingThread;
+import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import kg.apc.emulators.TestJMeterUtils;
 import org.apache.jmeter.save.SaveService;
 import org.apache.jmeter.threads.AbstractThreadGroup;

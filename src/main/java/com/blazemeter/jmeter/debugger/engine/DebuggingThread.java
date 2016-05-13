@@ -1,4 +1,4 @@
-package com.blazemeter.jmeter.debugger;
+package com.blazemeter.jmeter.debugger.engine;
 
 import org.apache.jmeter.threads.JMeterThread;
 import org.apache.jmeter.threads.JMeterThreadMonitor;
