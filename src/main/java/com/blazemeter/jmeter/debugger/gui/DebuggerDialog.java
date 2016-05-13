@@ -1,6 +1,11 @@
 package com.blazemeter.jmeter.debugger.gui;
 
+import org.apache.jmeter.exceptions.IllegalUserActionException;
 import org.apache.jmeter.gui.GuiPackage;
+import org.apache.jmeter.gui.tree.JMeterCellRenderer;
+import org.apache.jmeter.gui.tree.JMeterTreeListener;
+import org.apache.jmeter.gui.tree.JMeterTreeModel;
+import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.gui.ComponentUtil;
@@ -8,15 +13,19 @@ import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
 
 import javax.swing.*;
+import javax.swing.tree.TreeModel;
 import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 public class DebuggerDialog extends JDialog implements ComponentListener {
     private static final Logger log = LoggingManager.getLoggerForClass();
 
     private final JComboBox<ThreadGroup> tgCombo = new JComboBox<>();
     private DebuggerEngine engine;
+    private JMeterTreeModel treeModel;
 
     public DebuggerDialog() {
         super((JFrame) null, "Step-by-Step Debugger", true);
@@ -58,7 +67,8 @@ public class DebuggerDialog extends JDialog implements ComponentListener {
     }
 
     private Component getTreePane() {
-        JPanel panel = new JPanel();
+        treeModel = new JMeterTreeModel();
+        JScrollPane panel = new JScrollPane(getTreeView(treeModel, new JMeterTreeListener()));
         panel.setMinimumSize(new Dimension(100, 0));
         panel.setPreferredSize(new Dimension(250, 0));
         return panel;
@@ -69,6 +79,7 @@ public class DebuggerDialog extends JDialog implements ComponentListener {
         res.setFloatable(false);
         res.add(new JLabel("Choose Thread Group: "));
         tgCombo.setRenderer(new ThreadGroupItemRenderer(tgCombo.getRenderer()));
+        tgCombo.addItemListener(new ThreadGroupChoiceChanged());
         res.add(tgCombo);
         res.add(new JButton("Start"));
         res.add(new JButton("Stop"));
@@ -93,7 +104,7 @@ public class DebuggerDialog extends JDialog implements ComponentListener {
         log.debug("Showing dialog");
         HashTree testTree = getTestTree();
         this.engine = new DebuggerEngine(testTree);
-        tgCombo.setModel(new DefaultComboBoxModel<ThreadGroup>());
+        tgCombo.removeAllItems();
         for (ThreadGroup group : engine.getThreadGroups()) {
             tgCombo.addItem(group);
         }
@@ -110,16 +121,36 @@ public class DebuggerDialog extends JDialog implements ComponentListener {
     }
 
 
-    public final class ThreadGroupItemRenderer implements ListCellRenderer<ThreadGroup> {
-        private final ListCellRenderer originalRenderer;
+    private JTree getTreeView(TreeModel treeModel, JMeterTreeListener treeListener) {
+        JTree treevar = new JTree(treeModel);
+        treevar.setToolTipText("");
+        treevar.setCellRenderer(new JMeterCellRenderer());
+        treevar.setRootVisible(false);
+        treevar.setShowsRootHandles(true);
 
-        public ThreadGroupItemRenderer(final ListCellRenderer originalRenderer) {
-            this.originalRenderer = originalRenderer;
-        }
+        treeListener.setJTree(treevar);
+        //treevar.addTreeSelectionListener(treeListener);
+        //treevar.addMouseListener(treeListener);
+        //treevar.addKeyListener(treeListener);
 
+        return treevar;
+    }
+
+    private class ThreadGroupChoiceChanged implements ItemListener {
         @Override
-        public Component getListCellRendererComponent(JList<? extends ThreadGroup> list, ThreadGroup value, int index, boolean isSelected, boolean cellHasFocus) {
-            return originalRenderer.getListCellRendererComponent(list, value.getName(), index, isSelected, cellHasFocus);
+        public void itemStateChanged(ItemEvent event) {
+            if (event.getStateChange() == ItemEvent.SELECTED) {
+                log.debug("Item choice changed: " + event.getItem());
+                if (event.getItem() instanceof ThreadGroup) {
+                    HashTree val = engine.getThreadgroupTree((ThreadGroup) event.getItem());
+                    treeModel.clearTestPlan();
+                    try {
+                        treeModel.addSubTree(val, (JMeterTreeNode) treeModel.getRoot());
+                    } catch (IllegalUserActionException e) {
+                        throw new RuntimeException("Failed", e);
+                    }
+                }
+            }
         }
     }
 
