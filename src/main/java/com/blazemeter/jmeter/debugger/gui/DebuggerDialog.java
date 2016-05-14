@@ -2,11 +2,13 @@ package com.blazemeter.jmeter.debugger.gui;
 
 import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import org.apache.jmeter.gui.GuiPackage;
+import org.apache.jmeter.gui.LoggerPanel;
 import org.apache.jmeter.gui.tree.JMeterCellRenderer;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.gui.ComponentUtil;
 import org.apache.jorphan.logging.LoggingManager;
+import org.apache.log.LogTarget;
 import org.apache.log.Logger;
 
 import javax.swing.*;
@@ -22,6 +24,7 @@ public class DebuggerDialog extends JDialog implements ComponentListener {
     private JButton start = new JButton("Start");
     private JButton step = new JButton("Step Over");
     private JButton stop = new JButton("Stop");
+    private LoggerPanel loggerPanel;
 
     public DebuggerDialog() {
         super((JFrame) null, "Step-by-Step Debugger", true);
@@ -55,7 +58,20 @@ public class DebuggerDialog extends JDialog implements ComponentListener {
         tabs.add("Variables", new JPanel());
         tabs.add("JMeter Properties", new JPanel());
         tabs.add("System Properties", new JPanel());
+        tabs.add("Log", getLogTab());
         return tabs;
+    }
+
+    private Component getLogTab() {
+        // TODO: make it word wrap
+        loggerPanel = new LoggerPanel();
+        loggerPanel.setMinimumSize(new Dimension(0, 100));
+        loggerPanel.setPreferredSize(new Dimension(0, 150));
+
+        LoggingManager.addLogTargetToRootLogger(new LogTarget[]{
+                loggerPanel,
+        });
+        return loggerPanel;
     }
 
     private Component getElementPane() {
@@ -157,6 +173,7 @@ public class DebuggerDialog extends JDialog implements ComponentListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             log.debug("Start debugging");
+            loggerPanel.clear();
             step.setEnabled(true);
             ThreadGroup tg = (ThreadGroup) tgCombo.getSelectedItem();
             engine.startDebugging(engine.getExecutionTree(tg), new StepOver());

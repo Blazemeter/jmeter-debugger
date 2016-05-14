@@ -42,7 +42,7 @@ public class DebuggerEngine extends StandardJMeterEngine implements JMeterThread
     }
 
     public HashTree getExecutionTree(ThreadGroup selectedItem) {
-        // TODO
+        return null;
     }
 
     public void startDebugging(HashTree test, StepTrigger trigger) {
