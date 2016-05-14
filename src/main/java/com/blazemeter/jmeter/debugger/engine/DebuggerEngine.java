@@ -2,7 +2,6 @@ package com.blazemeter.jmeter.debugger.engine;
 
 import org.apache.jmeter.JMeter;
 import org.apache.jmeter.engine.StandardJMeterEngine;
-import org.apache.jmeter.engine.TreeCloner;
 import org.apache.jmeter.samplers.SampleEvent;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterThreadMonitor;
@@ -14,8 +13,7 @@ import org.apache.jorphan.collections.SearchByClass;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 
 public class DebuggerEngine extends StandardJMeterEngine {
@@ -37,16 +35,13 @@ public class DebuggerEngine extends StandardJMeterEngine {
         return searcher.getSearchResults().toArray(new ThreadGroup[0]);
     }
 
-    public HashTree getExecutionTree(ThreadGroup tg) {
+    public HashTree getFullTree(ThreadGroup tg) {
         log.debug("Making execution tree for " + tg.getName());
 
-        TreeCloner cloner = new TreeCloner();
-        tree.traverse(cloner);
-        ListedHashTree test = cloner.getClonedTree();
 
-        Set<Object> testPlans = test.keySet();
+        Set<Object> testPlans = tree.keySet();
         for (Object testPlan : testPlans) {
-            HashTree tpContents = test.get(testPlan);
+            HashTree tpContents = tree.get(testPlan);
             Set<Object> toDelete = new HashSet<>();
             for (Object elm : tpContents.keySet()) {
                 if (elm instanceof ThreadGroup && !elm.equals(tg)) {
@@ -59,7 +54,7 @@ public class DebuggerEngine extends StandardJMeterEngine {
             }
         }
 
-        return test;
+        return tree;
     }
 
     public void startDebugging(ThreadGroup tg, HashTree test, StepTrigger trigger, JMeterThreadMonitor stopListener) {
@@ -69,13 +64,29 @@ public class DebuggerEngine extends StandardJMeterEngine {
         JMeterContextService.getContext().setSamplingStarted(true);
 
         ListenerNotifier note = new ListenerNotifier();
-        DebuggingThread target = new DebuggingThread(test, stopListener, note, trigger);
+        DebuggingThread target = new DebuggingThread(getThreadTestTree(test, tg), stopListener, note, trigger);
         target.setEngine(this);
         target.setThreadGroup(tg);
         thread = new Thread(target);
         thread.setName(target.getThreadName());
         thread.setDaemon(true);
         thread.start();
+    }
+
+    private HashTree getThreadTestTree(HashTree test, ThreadGroup tg) {
+        List<?> testLevelElements = new LinkedList<>(test.list(test.getArray()[0]));
+        Iterator it = testLevelElements.iterator();
+        while (it.hasNext()) {
+            if (it.next() instanceof ThreadGroup) {
+                it.remove();
+            }
+        }
+
+        SearchByClass<ThreadGroup> searcher = new SearchByClass<>(ThreadGroup.class);
+        test.traverse(searcher);
+        ListedHashTree threadGroupTree = (ListedHashTree) searcher.getSubTree(tg);
+        threadGroupTree.add(tg, testLevelElements);
+        return threadGroupTree;
     }
 
     public void stopDebugging() {
