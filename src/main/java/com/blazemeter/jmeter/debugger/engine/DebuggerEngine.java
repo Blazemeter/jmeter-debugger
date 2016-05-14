@@ -9,9 +9,13 @@ import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.collections.ListedHashTree;
 import org.apache.jorphan.collections.SearchByClass;
+import org.apache.jorphan.logging.LoggingManager;
+import org.apache.log.Logger;
 
 
 public class DebuggerEngine extends StandardJMeterEngine implements JMeterThreadMonitor {
+    private static final Logger log = LoggingManager.getLoggerForClass();
+
     private final HashTree tree;
     private Thread thread;
 
@@ -51,6 +55,7 @@ public class DebuggerEngine extends StandardJMeterEngine implements JMeterThread
     }
 
     public void startDebugging(ThreadGroup tg, HashTree test, StepTrigger trigger) {
+        log.debug("Start debugging engine");
         SampleEvent.initSampleVariables();
         JMeterContextService.startTest();
         JMeterContextService.getContext().setSamplingStarted(true);
@@ -60,11 +65,13 @@ public class DebuggerEngine extends StandardJMeterEngine implements JMeterThread
         target.setEngine(this);
         target.setThreadGroup(tg);
         thread = new Thread(target);
+        thread.setName(target.getThreadName());
         thread.setDaemon(true);
         thread.start();
     }
 
     public void stopDebugging() {
+        log.debug("Stop debugging engine");
         if (thread.isAlive() && !thread.isInterrupted()) {
             thread.interrupt();
         }
@@ -75,6 +82,7 @@ public class DebuggerEngine extends StandardJMeterEngine implements JMeterThread
 
     @Override
     public void threadFinished(JMeterThread thread) {
+        log.info("Debugger thread has finished");
         stopDebugging();
     }
 }
