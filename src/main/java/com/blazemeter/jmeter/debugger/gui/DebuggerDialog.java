@@ -1,8 +1,8 @@
 package com.blazemeter.jmeter.debugger.gui;
 
+import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.gui.tree.JMeterCellRenderer;
-import org.apache.jmeter.gui.tree.JMeterTreeListener;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.gui.ComponentUtil;
@@ -10,12 +10,8 @@ import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
 
 import javax.swing.*;
-import javax.swing.tree.TreeModel;
 import java.awt.*;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.*;
 
 public class DebuggerDialog extends JDialog implements ComponentListener {
     private static final Logger log = LoggingManager.getLoggerForClass();
@@ -23,6 +19,9 @@ public class DebuggerDialog extends JDialog implements ComponentListener {
     private final JComboBox<ThreadGroup> tgCombo = new JComboBox<>();
     private DebuggerEngine engine;
     private JTree tree;
+    private JButton start = new JButton("Start");
+    private JButton step = new JButton("Step Over");
+    private JButton stop = new JButton("Stop");
 
     public DebuggerDialog() {
         super((JFrame) null, "Step-by-Step Debugger", true);
@@ -64,7 +63,7 @@ public class DebuggerDialog extends JDialog implements ComponentListener {
     }
 
     private Component getTreePane() {
-        JScrollPane panel = new JScrollPane(getTreeView(new JMeterTreeListener()));
+        JScrollPane panel = new JScrollPane(getTreeView());
         panel.setMinimumSize(new Dimension(100, 0));
         panel.setPreferredSize(new Dimension(250, 0));
         return panel;
@@ -74,14 +73,21 @@ public class DebuggerDialog extends JDialog implements ComponentListener {
         JToolBar res = new JToolBar();
         res.setFloatable(false);
         res.add(new JLabel("Choose Thread Group: "));
+
+        res.add(tgCombo);
         tgCombo.setRenderer(new ThreadGroupItemRenderer(tgCombo.getRenderer()));
         tgCombo.addItemListener(new ThreadGroupChoiceChanged());
-        res.add(tgCombo);
-        res.add(new JButton("Start"));
-        res.add(new JButton("Stop"));
+
+        res.add(start);
+        start.addActionListener(new StartDebugging());
+
+        res.add(stop);
         res.addSeparator();
 
-        res.add(new JButton("Step Over"));
+        res.add(step);
+        step.setEnabled(false);
+        step.addActionListener(new StepOver());
+
         return res;
     }
 
@@ -117,14 +123,15 @@ public class DebuggerDialog extends JDialog implements ComponentListener {
     }
 
 
-    private JTree getTreeView(JMeterTreeListener treeListener) {
+    private JTree getTreeView() {
         tree = new JTree(new DebuggerTreeModel(new HashTree()));
         //tree.setToolTipText("");
         tree.setCellRenderer(new JMeterCellRenderer());
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
 
-        treeListener.setJTree(tree);
+        //treeListener=new JMeterTreeListener();
+        //treeListener.setJTree(tree);
         //tree.addTreeSelectionListener(treeListener);
         //tree.addMouseListener(treeListener);
         //tree.addKeyListener(treeListener);
@@ -138,11 +145,39 @@ public class DebuggerDialog extends JDialog implements ComponentListener {
             if (event.getStateChange() == ItemEvent.SELECTED) {
                 log.debug("Item choice changed: " + event.getItem());
                 if (event.getItem() instanceof ThreadGroup) {
-                    HashTree val = engine.getThreadgroupTree((ThreadGroup) event.getItem());
+                    HashTree val = engine.getThreadGroupTree((ThreadGroup) event.getItem());
                     tree.setModel(new DebuggerTreeModel(val));
+                    start.setEnabled(!val.isEmpty()); // TODO
                 }
             }
         }
     }
 
+    private class StartDebugging implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            log.debug("Start debugging");
+            step.setEnabled(true);
+            ThreadGroup tg = (ThreadGroup) tgCombo.getSelectedItem();
+            engine.startDebugging(engine.getExecutionTree(tg), new StepOver());
+        }
+    }
+
+    private class StepOver implements ActionListener, StepTrigger {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            log.debug("Step over");
+            this.notifyAll();
+        }
+
+        @Override
+        public void notify(Object t) {
+            log.debug("Stopped before: " + t);
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                engine.stopDebugging();
+            }
+        }
+    }
 }
