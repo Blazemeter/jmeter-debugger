@@ -2,6 +2,7 @@ package com.blazemeter.jmeter.debugger.gui;
 
 import org.apache.jmeter.gui.LoggerPanel;
 import org.apache.jmeter.gui.tree.JMeterCellRenderer;
+import org.apache.jmeter.gui.tree.JMeterTreeListener;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.gui.ComponentUtil;
@@ -119,12 +120,6 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
         tree.setCellRenderer(new JMeterCellRenderer());
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
-
-        //treeListener=new JMeterTreeListener();
-        //treeListener.setJTree(tree);
-        //tree.addTreeSelectionListener(treeListener);
-        //tree.addMouseListener(treeListener);
-        //tree.addKeyListener(treeListener);
 
         return tree;
     }

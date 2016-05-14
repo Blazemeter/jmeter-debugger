@@ -1,6 +1,10 @@
 package com.blazemeter.jmeter.debugger.gui;
 
 import kg.apc.emulators.TestJMeterUtils;
+import org.apache.jmeter.gui.GuiPackage;
+import org.apache.jmeter.gui.MainFrame;
+import org.apache.jmeter.gui.tree.JMeterTreeListener;
+import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.save.SaveService;
 import org.apache.jorphan.collections.HashTree;
 import org.junit.Test;
@@ -16,7 +20,9 @@ public class DebuggerDialogTest {
     public void displayGUI() throws InterruptedException {
         if (!GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance()) {
             TestJMeterUtils.createJmeterEnv();
-            JDialog frame = new DebuggerDialogMock();
+            DebuggerDialogMock frame = new DebuggerDialogMock();
+            //GuiPackage.getInstance(frame.getTreeListener(), frame.getTreeModel());
+            //GuiPackage.getInstance().setMainFrame(new MainFrame(frame.getTreeModel(), frame.getTreeListener()));
 
             frame.setPreferredSize(new Dimension(800, 600));
             frame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
@@ -38,6 +44,14 @@ public class DebuggerDialogTest {
             } catch (IOException e) {
                 throw new RuntimeException("Failed", e);
             }
+        }
+
+        public JMeterTreeListener getTreeListener() {
+            return treeListener;
+        }
+
+        public JMeterTreeModel getTreeModel() {
+            return (JMeterTreeModel) tree.getModel();
         }
     }
 }

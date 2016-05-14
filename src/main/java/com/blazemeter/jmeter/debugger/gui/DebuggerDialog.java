@@ -3,6 +3,7 @@ package com.blazemeter.jmeter.debugger.gui;
 import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
 import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import org.apache.jmeter.gui.GuiPackage;
+import org.apache.jmeter.gui.tree.JMeterTreeListener;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.logging.LoggingManager;
@@ -12,8 +13,9 @@ import java.awt.event.*;
 
 public class DebuggerDialog extends DebuggerDialogBase {
     private static final Logger log = LoggingManager.getLoggerForClass();
+    protected final JMeterTreeListener treeListener;
 
-    private DebuggerEngine engine;
+    protected DebuggerEngine engine;
 
     public DebuggerDialog() {
         super();
@@ -21,6 +23,12 @@ public class DebuggerDialog extends DebuggerDialogBase {
         start.addActionListener(new StartDebugging(stepper));
         step.addActionListener(stepper);
         tgCombo.addItemListener(new ThreadGroupChoiceChanged());
+
+        treeListener = new JMeterTreeListener();
+        treeListener.setJTree(tree);
+        //tree.addTreeSelectionListener(treeListener);
+        //tree.addMouseListener(treeListener);
+        //tree.addKeyListener(treeListener);
     }
 
     @Override
@@ -82,7 +90,6 @@ public class DebuggerDialog extends DebuggerDialogBase {
     private class StepOver implements ActionListener, StepTrigger {
         @Override
         public void actionPerformed(ActionEvent e) {
-            log.debug("Step over");
             synchronized (this) {
                 this.notifyAll();
             }
@@ -93,10 +100,12 @@ public class DebuggerDialog extends DebuggerDialogBase {
             step.setEnabled(true);
             try {
                 log.debug("Stopping before: " + t);
+                // todo: select target in tree
+                // TODO: refresh vars and properties
+                // TODO: show samples
                 synchronized (this) {
                     this.wait();
                 }
-                log.debug("Proceeding with: " + t);
             } catch (InterruptedException e) {
                 engine.stopDebugging();
             }
