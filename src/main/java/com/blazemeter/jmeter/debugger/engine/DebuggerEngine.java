@@ -1,8 +1,10 @@
 package com.blazemeter.jmeter.debugger.engine;
 
+import com.blazemeter.jmeter.debugger.elements.AbstractDebugElement;
 import org.apache.jmeter.JMeter;
 import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.samplers.SampleEvent;
+import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterThreadMonitor;
 import org.apache.jmeter.threads.ListenerNotifier;
@@ -21,6 +23,7 @@ public class DebuggerEngine extends StandardJMeterEngine {
 
     private final HashTree tree;
     private Thread thread;
+    private DebuggingThread target;
 
     public DebuggerEngine(HashTree testTree) {
         JMeter.convertSubTree(testTree);
@@ -64,7 +67,7 @@ public class DebuggerEngine extends StandardJMeterEngine {
         JMeterContextService.getContext().setSamplingStarted(true);
 
         ListenerNotifier note = new ListenerNotifier();
-        DebuggingThread target = new DebuggingThread(getThreadTestTree(test, tg), stopListener, note, trigger);
+        target = new DebuggingThread(getThreadTestTree(test, tg), stopListener, note, trigger);
         target.setEngine(this);
         target.setThreadGroup(tg);
         thread = new Thread(target);
@@ -99,5 +102,16 @@ public class DebuggerEngine extends StandardJMeterEngine {
 
         JMeterContextService.getContext().setSamplingStarted(false);
         JMeterContextService.endTest();
+    }
+
+    public Sampler getCurrentSampler() {
+        Sampler currentSampler = target.getCurrentSampler();
+        if (currentSampler instanceof AbstractDebugElement) {
+            Object wrapped = ((AbstractDebugElement) currentSampler).getWrappedElement();
+            if (wrapped instanceof Sampler) {
+                return (Sampler) wrapped;
+            }
+        }
+        return currentSampler;
     }
 }

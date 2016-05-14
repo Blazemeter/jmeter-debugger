@@ -6,6 +6,8 @@ import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.gui.tree.JMeterTreeListener;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
+import org.apache.jmeter.gui.tree.JMeterTreeNode;
+import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.threads.JMeterThread;
 import org.apache.jmeter.threads.JMeterThreadMonitor;
@@ -91,8 +93,27 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
         // TODO: show samples
     }
 
-    private void selectTargetInTree(TestElement te) {
+    private void selectTargetInTree(TestElement te, Sampler currentSampler) {
         tree.setSelectionPath(getTreePathFor(te));
+        markCurrentSampler(currentSampler);
+    }
+
+    private void markCurrentSampler(Sampler currentSampler) {
+        JMeterTreeModel model = (JMeterTreeModel) tree.getModel();
+
+        for (JMeterTreeNode jMeterTreeNode : model.getNodesOfType(Sampler.class)) {
+            if (jMeterTreeNode.getUserObject() instanceof Sampler) {
+                List<JMeterTreeNode> matchingNodes = jMeterTreeNode.getPathToThreadGroup();
+                for (JMeterTreeNode jMeterTreeNode2 : matchingNodes) {
+                    jMeterTreeNode2.setMarkedBySearch(false);
+                }
+            }
+        }
+
+        if (currentSampler != null) {
+            JMeterTreeNode treeNode = model.getNodeOf(currentSampler);
+            treeNode.setMarkedBySearch(true);
+        }
     }
 
     private TreePath getTreePathFor(TestElement te) {
@@ -147,7 +168,8 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
                 Object wrappedElement = ((AbstractDebugElement) t).getWrappedElement();
                 log.debug("Stopping before: " + wrappedElement);
                 if (wrappedElement instanceof TestElement) {
-                    selectTargetInTree((TestElement) wrappedElement);
+                    selectTargetInTree((TestElement) wrappedElement, engine.getCurrentSampler());
+
                 }
             }
             refreshStatus();

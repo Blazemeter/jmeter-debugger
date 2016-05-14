@@ -16,6 +16,8 @@ public class DebuggerCompiler extends TestCompiler {
     private static final Logger log = LoggingManager.getLoggerForClass();
     private StepTrigger hook;
 
+    private DebuggerSamplerPackage lastSamplePackage;
+
     public DebuggerCompiler(HashTree testTree, StepTrigger hook) {
         super(testTree);
         this.hook = hook;
@@ -33,7 +35,8 @@ public class DebuggerCompiler extends TestCompiler {
 
     private DebuggerSamplerPackage wrapSamplerPack(SamplePackage samplePackage) {
         try {
-            return new DebuggerSamplerPackage(samplePackage, getControllers(samplePackage), hook);
+            lastSamplePackage = new DebuggerSamplerPackage(samplePackage, getControllers(samplePackage), hook);
+            return lastSamplePackage;
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException("Failed to access controllers");
         }
@@ -47,5 +50,9 @@ public class DebuggerCompiler extends TestCompiler {
         }
         //noinspection unchecked
         return (List<Controller>) field.get(test);
+    }
+
+    public DebuggerSamplerPackage getLastSamplePackage() {
+        return lastSamplePackage;
     }
 }

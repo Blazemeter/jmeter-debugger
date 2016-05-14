@@ -1,5 +1,6 @@
 package com.blazemeter.jmeter.debugger.engine;
 
+import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.threads.JMeterThread;
 import org.apache.jmeter.threads.JMeterThreadMonitor;
 import org.apache.jmeter.threads.ListenerNotifier;
@@ -11,24 +12,33 @@ import java.lang.reflect.Field;
 
 public class DebuggingThread extends JMeterThread {
     private static final Logger log = LoggingManager.getLoggerForClass();
+    private final DebuggerCompiler compiler;
 
     public DebuggingThread(HashTree test, JMeterThreadMonitor monitor, ListenerNotifier note, StepTrigger hook) {
         super(test, monitor, note);
         setThreadName("Debugging Thread 1-1");
+        compiler = new DebuggerCompiler(test, hook);
         try {
-            replaceCompiler(test, hook);
+            replaceCompiler();
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException("Failed to replace test compiler", e);
         }
     }
 
-    private void replaceCompiler(HashTree test, StepTrigger hook) throws NoSuchFieldException, IllegalAccessException {
+    private void replaceCompiler() throws NoSuchFieldException, IllegalAccessException {
         Field field = JMeterThread.class.getDeclaredField("compiler");
         if (!field.isAccessible()) {
             log.debug("Making field accessable: " + field);
             field.setAccessible(true);
         }
-        DebuggerCompiler compiler = new DebuggerCompiler(test, hook);
         field.set(this, compiler);
+    }
+
+    public Sampler getCurrentSampler() {
+        DebuggerSamplerPackage lastSamplePackage = compiler.getLastSamplePackage();
+        if (lastSamplePackage == null) {
+            return null;
+        }
+        return lastSamplePackage.getSampler();
     }
 }
