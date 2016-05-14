@@ -1,13 +1,10 @@
-package com.blazemeter.jmeter.debugger.gui;
+package com.blazemeter.jmeter.debugger.engine;
 
-import com.blazemeter.jmeter.debugger.engine.DebuggingThread;
-import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import org.apache.jmeter.JMeter;
 import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.engine.TreeCloner;
-import org.apache.jmeter.threads.JMeterThread;
-import org.apache.jmeter.threads.JMeterThreadMonitor;
-import org.apache.jmeter.threads.ListenerNotifier;
+import org.apache.jmeter.samplers.SampleEvent;
+import org.apache.jmeter.threads.*;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.collections.ListedHashTree;
@@ -35,19 +32,34 @@ public class DebuggerEngine extends StandardJMeterEngine implements JMeterThread
         TreeCloner cloner = new TreeClonerOnlyFlow(tg);
         tree.traverse(cloner);
         ListedHashTree clonedTree = cloner.getClonedTree();
+        //noinspection LoopStatementThatDoesntLoop
         for (Object key : clonedTree.keySet()) {
             return clonedTree.get(key);
         }
         return new HashTree();
     }
 
-    public HashTree getExecutionTree(ThreadGroup selectedItem) {
-        return null;
+    public HashTree getExecutionTree(ThreadGroup tg) {
+        TreeCloner cloner = new TreeClonerSelectedThreadGroup(tg);
+        tree.traverse(cloner);
+        ListedHashTree clonedTree = cloner.getClonedTree();
+        //noinspection LoopStatementThatDoesntLoop
+        for (Object key : clonedTree.keySet()) {
+            return clonedTree.get(key);
+        }
+        return new HashTree();
     }
 
-    public void startDebugging(HashTree test, StepTrigger trigger) {
+    public void startDebugging(ThreadGroup tg, HashTree test, StepTrigger trigger) {
+        SampleEvent.initSampleVariables();
+        JMeterContextService.startTest();
+        JMeterContextService.getContext().setSamplingStarted(true);
+
         ListenerNotifier note = new ListenerNotifier();
-        thread = new Thread(new DebuggingThread(test, this, note, trigger));
+        DebuggingThread target = new DebuggingThread(test, this, note, trigger);
+        target.setEngine(this);
+        target.setThreadGroup(tg);
+        thread = new Thread(target);
         thread.setDaemon(true);
         thread.start();
     }
@@ -56,6 +68,9 @@ public class DebuggerEngine extends StandardJMeterEngine implements JMeterThread
         if (thread.isAlive() && !thread.isInterrupted()) {
             thread.interrupt();
         }
+
+        JMeterContextService.getContext().setSamplingStarted(false);
+        JMeterContextService.endTest();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.blazemeter.jmeter.debugger.gui;
 
+import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
 import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.gui.LoggerPanel;
@@ -176,7 +177,7 @@ public class DebuggerDialog extends JDialog implements ComponentListener {
             loggerPanel.clear();
             step.setEnabled(true);
             ThreadGroup tg = (ThreadGroup) tgCombo.getSelectedItem();
-            engine.startDebugging(engine.getExecutionTree(tg), new StepOver());
+            engine.startDebugging(tg, engine.getExecutionTree(tg), new StepOver());
         }
     }
 
