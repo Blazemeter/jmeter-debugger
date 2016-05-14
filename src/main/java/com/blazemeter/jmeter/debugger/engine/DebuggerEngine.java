@@ -4,7 +4,9 @@ import org.apache.jmeter.JMeter;
 import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.engine.TreeCloner;
 import org.apache.jmeter.samplers.SampleEvent;
-import org.apache.jmeter.threads.*;
+import org.apache.jmeter.threads.JMeterContextService;
+import org.apache.jmeter.threads.JMeterThreadMonitor;
+import org.apache.jmeter.threads.ListenerNotifier;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.collections.ListedHashTree;
@@ -12,8 +14,11 @@ import org.apache.jorphan.collections.SearchByClass;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
 
+import java.util.HashSet;
+import java.util.Set;
 
-public class DebuggerEngine extends StandardJMeterEngine implements JMeterThreadMonitor {
+
+public class DebuggerEngine extends StandardJMeterEngine {
     private static final Logger log = LoggingManager.getLoggerForClass();
 
     private final HashTree tree;
@@ -32,36 +37,39 @@ public class DebuggerEngine extends StandardJMeterEngine implements JMeterThread
         return searcher.getSearchResults().toArray(new ThreadGroup[0]);
     }
 
-    public HashTree getThreadGroupTree(ThreadGroup tg) {
-        TreeCloner cloner = new TreeClonerOnlyFlow(tg);
-        tree.traverse(cloner);
-        ListedHashTree clonedTree = cloner.getClonedTree();
-        //noinspection LoopStatementThatDoesntLoop
-        for (Object key : clonedTree.keySet()) {
-            return clonedTree.get(key);
-        }
-        return new HashTree();
-    }
-
     public HashTree getExecutionTree(ThreadGroup tg) {
-        TreeCloner cloner = new TreeClonerSelectedThreadGroup(tg);
+        log.debug("Making execution tree for " + tg.getName());
+
+        TreeCloner cloner = new TreeCloner();
         tree.traverse(cloner);
-        ListedHashTree clonedTree = cloner.getClonedTree();
-        //noinspection LoopStatementThatDoesntLoop
-        for (Object key : clonedTree.keySet()) {
-            return clonedTree.get(key);
+        ListedHashTree test = cloner.getClonedTree();
+
+        Set<Object> testPlans = test.keySet();
+        for (Object testPlan : testPlans) {
+            HashTree tpContents = test.get(testPlan);
+            Set<Object> toDelete = new HashSet<>();
+            for (Object elm : tpContents.keySet()) {
+                if (elm instanceof ThreadGroup && !elm.equals(tg)) {
+                    toDelete.add(elm);
+                }
+            }
+
+            for (Object del : toDelete) {
+                tpContents.remove(del);
+            }
         }
-        return new HashTree();
+
+        return test;
     }
 
-    public void startDebugging(ThreadGroup tg, HashTree test, StepTrigger trigger) {
+    public void startDebugging(ThreadGroup tg, HashTree test, StepTrigger trigger, JMeterThreadMonitor stopListener) {
         log.debug("Start debugging engine");
         SampleEvent.initSampleVariables();
         JMeterContextService.startTest();
         JMeterContextService.getContext().setSamplingStarted(true);
 
         ListenerNotifier note = new ListenerNotifier();
-        DebuggingThread target = new DebuggingThread(test, this, note, trigger);
+        DebuggingThread target = new DebuggingThread(test, stopListener, note, trigger);
         target.setEngine(this);
         target.setThreadGroup(tg);
         thread = new Thread(target);
@@ -72,17 +80,13 @@ public class DebuggerEngine extends StandardJMeterEngine implements JMeterThread
 
     public void stopDebugging() {
         log.debug("Stop debugging engine");
-        if (thread.isAlive() && !thread.isInterrupted()) {
-            thread.interrupt();
+        if (thread != null) {
+            if (thread.isAlive() && !thread.isInterrupted()) {
+                thread.interrupt();
+            }
         }
 
         JMeterContextService.getContext().setSamplingStarted(false);
         JMeterContextService.endTest();
-    }
-
-    @Override
-    public void threadFinished(JMeterThread thread) {
-        log.info("Debugger thread has finished");
-        stopDebugging();
     }
 }

@@ -4,6 +4,9 @@ import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
 import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.gui.tree.JMeterTreeListener;
+import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.threads.JMeterThread;
+import org.apache.jmeter.threads.JMeterThreadMonitor;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.logging.LoggingManager;
@@ -11,16 +14,16 @@ import org.apache.log.Logger;
 
 import java.awt.event.*;
 
-public class DebuggerDialog extends DebuggerDialogBase {
+public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMonitor {
     private static final Logger log = LoggingManager.getLoggerForClass();
     protected final JMeterTreeListener treeListener;
 
     protected DebuggerEngine engine;
+    private StepOver stepper = new StepOver();
 
     public DebuggerDialog() {
         super();
-        StepOver stepper = new StepOver();
-        start.addActionListener(new StartDebugging(stepper));
+        start.addActionListener(new StartDebugging());
         step.addActionListener(stepper);
         tgCombo.addItemListener(new ThreadGroupChoiceChanged());
 
@@ -54,36 +57,53 @@ public class DebuggerDialog extends DebuggerDialogBase {
         return gui.getTreeModel().getTestPlan();
     }
 
+    private void start() {
+        log.debug("Start debugging");
+        loggerPanel.clear();
+        tgCombo.setEnabled(false);
+        start.setEnabled(false);
+        stop.setEnabled(true);
+        ThreadGroup tg = (ThreadGroup) tgCombo.getSelectedItem();
+        engine.startDebugging(tg, engine.getExecutionTree(tg), stepper, this);
+    }
+
+    private void stop() {
+        engine.stopDebugging();
+        start.setEnabled(true);
+        stop.setEnabled(false);
+    }
+
+    @Override
+    public void threadFinished(JMeterThread thread) {
+        stop();
+    }
+
+    private void refreshStatus() {
+        // TODO: refresh vars and properties
+        // TODO: show samples
+    }
+
+    private void selectTargetInTree(TestElement te) {
+        // todo: select target in tree
+    }
+
     private class ThreadGroupChoiceChanged implements ItemListener {
         @Override
         public void itemStateChanged(ItemEvent event) {
             if (event.getStateChange() == ItemEvent.SELECTED) {
                 log.debug("Item choice changed: " + event.getItem());
                 if (event.getItem() instanceof ThreadGroup) {
-                    HashTree val = engine.getThreadGroupTree((ThreadGroup) event.getItem());
+                    HashTree val = engine.getExecutionTree((ThreadGroup) event.getItem());
                     tree.setModel(new DebuggerTreeModel(val));
-                    start.setEnabled(!val.isEmpty()); // TODO
                 }
             }
         }
     }
 
     private class StartDebugging implements ActionListener {
-        private StepOver stepper;
-
-        public StartDebugging(StepOver stepper) {
-            this.stepper = stepper;
-        }
-
         @Override
         public void actionPerformed(ActionEvent e) {
-            log.debug("Start debugging");
-            loggerPanel.clear();
-            tgCombo.setEnabled(false);
-            start.setEnabled(false);
-            stop.setEnabled(true);
-            ThreadGroup tg = (ThreadGroup) tgCombo.getSelectedItem();
-            engine.startDebugging(tg, engine.getExecutionTree(tg), stepper);
+            start();
         }
     }
 
@@ -98,18 +118,21 @@ public class DebuggerDialog extends DebuggerDialogBase {
         @Override
         public void notify(Object t) {
             step.setEnabled(true);
+            log.debug("Stopping before: " + t);
+            if (t instanceof TestElement) {
+                selectTargetInTree((TestElement) t);
+            }
+            refreshStatus();
             try {
-                log.debug("Stopping before: " + t);
-                // todo: select target in tree
-                // TODO: refresh vars and properties
-                // TODO: show samples
                 synchronized (this) {
                     this.wait();
                 }
             } catch (InterruptedException e) {
-                engine.stopDebugging();
+                stop();
             }
             step.setEnabled(false);
         }
     }
+
+
 }
