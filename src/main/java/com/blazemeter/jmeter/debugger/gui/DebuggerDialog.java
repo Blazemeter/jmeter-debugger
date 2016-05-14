@@ -1,5 +1,6 @@
 package com.blazemeter.jmeter.debugger.gui;
 
+import com.blazemeter.jmeter.debugger.elements.AbstractDebugElement;
 import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
 import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import org.apache.jmeter.gui.GuiPackage;
@@ -142,9 +143,12 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
         @Override
         public void notify(Object t) {
             step.setEnabled(true);
-            log.debug("Stopping before: " + t);
-            if (t instanceof TestElement) {
-                selectTargetInTree((TestElement) t);
+            if (t instanceof AbstractDebugElement) {
+                Object wrappedElement = ((AbstractDebugElement) t).getWrappedElement();
+                log.debug("Stopping before: " + wrappedElement);
+                if (wrappedElement instanceof TestElement) {
+                    selectTargetInTree((TestElement) wrappedElement);
+                }
             }
             refreshStatus();
             try {
