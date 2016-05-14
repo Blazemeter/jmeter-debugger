@@ -12,7 +12,7 @@ public class DebuggerMenuItem extends JMenuItem implements ActionListener {
     private static DebuggerDialog dialog;
 
     public DebuggerMenuItem() {
-        super("Step-by-Step Debugger", getPluginsIcon());
+        super("Step-by-Step Debugger", getBugIcon());
         addActionListener(this);
     }
 
@@ -26,7 +26,19 @@ public class DebuggerMenuItem extends JMenuItem implements ActionListener {
         dialog.setVisible(true);
     }
 
-    public static ImageIcon getPluginsIcon() {
+    public static ImageIcon getBugIcon() {
         return new ImageIcon(DebuggerMenuItem.class.getResource("/com/blazemeter/jmeter/debugger/bug.png"));
+    }
+
+    public static ImageIcon getStartIcon() {
+        return new ImageIcon(DebuggerMenuItem.class.getResource("/com/blazemeter/jmeter/debugger/start.png"));
+    }
+
+    public static ImageIcon getStopIcon() {
+        return new ImageIcon(DebuggerMenuItem.class.getResource("/com/blazemeter/jmeter/debugger/stop.png"));
+    }
+
+    public static ImageIcon getStepIcon() {
+        return new ImageIcon(DebuggerMenuItem.class.getResource("/com/blazemeter/jmeter/debugger/step.png"));
     }
 }

@@ -2,7 +2,6 @@ package com.blazemeter.jmeter.debugger.gui;
 
 import org.apache.jmeter.gui.LoggerPanel;
 import org.apache.jmeter.gui.tree.JMeterCellRenderer;
-import org.apache.jmeter.gui.tree.JMeterTreeListener;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.gui.ComponentUtil;
@@ -30,7 +29,7 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
         setLayout(new BorderLayout());
         setSize(new Dimension(800, 600));
         setPreferredSize(new Dimension(800, 600));
-        setIconImage(DebuggerMenuItem.getPluginsIcon().getImage());
+        setIconImage(DebuggerMenuItem.getBugIcon().getImage());
         ComponentUtil.centerComponentInWindow(this, 30);
         addComponentListener(this);
 
@@ -92,12 +91,15 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
         res.add(tgCombo);
         tgCombo.setRenderer(new ThreadGroupItemRenderer(tgCombo.getRenderer()));
 
+        start.setIcon(DebuggerMenuItem.getStartIcon());
         res.add(start);
 
+        stop.setIcon(DebuggerMenuItem.getStopIcon());
         res.add(stop);
         stop.setEnabled(false);
         res.addSeparator();
 
+        step.setIcon(DebuggerMenuItem.getStepIcon());
         res.add(step);
         step.setEnabled(false);
 

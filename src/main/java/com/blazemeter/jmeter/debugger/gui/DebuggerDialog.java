@@ -94,6 +94,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
     private void selectTargetInTree(TestElement te, Sampler currentSampler) {
         tree.setSelectionPath(getTreePathFor(te));
         markCurrentSampler(currentSampler);
+        tree.repaint();
     }
 
     private void markCurrentSampler(Sampler currentSampler) {
