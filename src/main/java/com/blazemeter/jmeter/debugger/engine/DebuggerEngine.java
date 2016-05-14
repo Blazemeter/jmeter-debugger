@@ -15,7 +15,9 @@ import org.apache.jorphan.collections.SearchByClass;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 
 public class DebuggerEngine extends StandardJMeterEngine {
@@ -24,10 +26,10 @@ public class DebuggerEngine extends StandardJMeterEngine {
     private final HashTree tree;
     private Thread thread;
     private DebuggingThread target;
+    private TreeClonerTG cloner;
 
     public DebuggerEngine(HashTree testTree) {
         JMeter.convertSubTree(testTree);
-        //testTree.add(testTree.getArray()[0], gui.getMainFrame()); // for what?
         configure(testTree);
         tree = testTree;
     }
@@ -38,45 +40,24 @@ public class DebuggerEngine extends StandardJMeterEngine {
         return searcher.getSearchResults().toArray(new ThreadGroup[0]);
     }
 
-    public HashTree getFullTree(ThreadGroup tg) {
-        log.debug("Making execution tree for " + tg.getName());
-
-
-        Set<Object> testPlans = tree.keySet();
-        for (Object testPlan : testPlans) {
-            HashTree tpContents = tree.get(testPlan);
-            Set<Object> toDelete = new HashSet<>();
-            for (Object elm : tpContents.keySet()) {
-                if (elm instanceof ThreadGroup && !elm.equals(tg)) {
-                    toDelete.add(elm);
-                }
-            }
-
-            for (Object del : toDelete) {
-                tpContents.remove(del);
-            }
-        }
-
-        return tree;
-    }
-
-    public void startDebugging(ThreadGroup tg, HashTree test, StepTrigger trigger, JMeterThreadMonitor stopListener) {
+    public void startDebugging(StepTrigger trigger, JMeterThreadMonitor stopListener) {
         log.debug("Start debugging engine");
         SampleEvent.initSampleVariables();
         JMeterContextService.startTest();
         JMeterContextService.getContext().setSamplingStarted(true);
 
         ListenerNotifier note = new ListenerNotifier();
-        target = new DebuggingThread(getThreadTestTree(test, tg), stopListener, note, trigger);
+        target = new DebuggingThread(getThreadTestTree(), stopListener, note, trigger);
         target.setEngine(this);
-        target.setThreadGroup(tg);
+        target.setThreadGroup(cloner.getClonedTG());
         thread = new Thread(target);
         thread.setName(target.getThreadName());
         thread.setDaemon(true);
         thread.start();
     }
 
-    private HashTree getThreadTestTree(HashTree test, ThreadGroup tg) {
+    private HashTree getThreadTestTree() {
+        HashTree test = cloner.getClonedTree();
         List<?> testLevelElements = new LinkedList<>(test.list(test.getArray()[0]));
         Iterator it = testLevelElements.iterator();
         while (it.hasNext()) {
@@ -87,6 +68,7 @@ public class DebuggerEngine extends StandardJMeterEngine {
 
         SearchByClass<ThreadGroup> searcher = new SearchByClass<>(ThreadGroup.class);
         test.traverse(searcher);
+        ThreadGroup tg = cloner.getClonedTG();
         ListedHashTree threadGroupTree = (ListedHashTree) searcher.getSubTree(tg);
         threadGroupTree.add(tg, testLevelElements);
         return threadGroupTree;
@@ -113,5 +95,14 @@ public class DebuggerEngine extends StandardJMeterEngine {
             }
         }
         return currentSampler;
+    }
+
+    public void selectThreadGroup(ThreadGroup tg) {
+        cloner = new TreeClonerTG(tg);
+        tree.traverse(cloner);
+    }
+
+    public HashTree getFullTree() {
+        return cloner.getClonedTree();
     }
 }

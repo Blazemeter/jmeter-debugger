@@ -54,7 +54,6 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
         }
     }
 
-
     @Override
     public void componentHidden(ComponentEvent e) {
         log.debug("Closing dialog");
@@ -72,8 +71,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
         tgCombo.setEnabled(false);
         start.setEnabled(false);
         stop.setEnabled(true);
-        ThreadGroup tg = (ThreadGroup) tgCombo.getSelectedItem();
-        engine.startDebugging(tg, engine.getFullTree(tg), stepper, this);
+        engine.startDebugging(stepper, this);
     }
 
     private void stop() {
@@ -139,8 +137,8 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
             if (event.getStateChange() == ItemEvent.SELECTED) {
                 log.debug("Item choice changed: " + event.getItem());
                 if (event.getItem() instanceof ThreadGroup) {
-                    HashTree val = engine.getFullTree((ThreadGroup) event.getItem());
-                    tree.setModel(new DebuggerTreeModel(val));
+                    engine.selectThreadGroup((ThreadGroup) event.getItem());
+                    tree.setModel(new DebuggerTreeModel(engine.getFullTree()));
                 }
             }
         }
@@ -169,7 +167,6 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
                 log.debug("Stopping before: " + wrappedElement);
                 if (wrappedElement instanceof TestElement) {
                     selectTargetInTree((TestElement) wrappedElement, engine.getCurrentSampler());
-
                 }
             }
             refreshStatus();
