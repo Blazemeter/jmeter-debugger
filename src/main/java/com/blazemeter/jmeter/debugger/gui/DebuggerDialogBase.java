@@ -2,6 +2,7 @@ package com.blazemeter.jmeter.debugger.gui;
 
 import org.apache.jmeter.gui.LoggerPanel;
 import org.apache.jmeter.gui.tree.JMeterCellRenderer;
+import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.gui.util.JSyntaxTextArea;
 import org.apache.jmeter.gui.util.JTextScrollPane;
 import org.apache.jmeter.gui.util.PowerTableModel;
@@ -60,14 +61,14 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
 
     private Component getStatusPane() {
         JTabbedPane tabs = new JTabbedPane();
-        tabs.add("Current Sample", getCurrentSampleTab());
+        //tabs.add("Samples", getSamplesTab());
         tabs.add("Variables", getVariablesTab());
         tabs.add("JMeter Properties", getPropertiesTab());
         tabs.add("Log", getLogTab());
         return tabs;
     }
 
-    private Component getCurrentSampleTab() {
+    private Component getSamplesTab() {
         return new JPanel();
     }
 
@@ -162,9 +163,9 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
     }
 
     private JTree getTreeView() {
-        tree = new JTree(new DebuggerTreeModel(new HashTree()));
+        tree = new JTree(new JMeterTreeModel());
         //tree.setToolTipText("");
-        tree.setCellRenderer(new JMeterCellRenderer());
+        tree.setCellRenderer(new FixedJMeterTreeCellRenderer());
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
 
