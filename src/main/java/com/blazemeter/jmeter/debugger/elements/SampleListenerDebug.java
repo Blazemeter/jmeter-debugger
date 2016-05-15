@@ -1,6 +1,7 @@
-package com.blazemeter.jmeter.debugger.engine;
+package com.blazemeter.jmeter.debugger.elements;
 
 import com.blazemeter.jmeter.debugger.elements.AbstractDebugElement;
+import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import org.apache.jmeter.samplers.SampleEvent;
 import org.apache.jmeter.samplers.SampleListener;
 
@@ -13,6 +14,7 @@ public class SampleListenerDebug extends AbstractDebugElement<SampleListener> im
     public void sampleOccurred(SampleEvent e) {
         hook.notify(this);
         parent.sampleOccurred(e);
+        hook.notify(this);
     }
 
     @Override

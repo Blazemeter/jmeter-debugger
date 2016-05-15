@@ -4,6 +4,7 @@ import com.blazemeter.jmeter.debugger.elements.AbstractDebugElement;
 import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
 import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import org.apache.jmeter.gui.GuiPackage;
+import org.apache.jmeter.gui.JMeterGUIComponent;
 import org.apache.jmeter.gui.tree.JMeterTreeListener;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
@@ -20,6 +21,7 @@ import org.apache.log.Logger;
 
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -119,6 +121,17 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
         tree.setSelectionPath(getTreePathFor(te));
         markCurrentSampler(currentSampler);
         tree.repaint();
+
+        GuiPackage gui = GuiPackage.getInstance();
+        if (gui != null) {
+            JMeterGUIComponent egui = gui.getGui(te);
+            elementContainer.removeAll();
+            if (egui instanceof Component) {
+                egui.setEnabled(false);
+                elementContainer.add((Component) egui, BorderLayout.CENTER);
+            }
+            elementContainer.updateUI();
+        }
     }
 
     private void markCurrentSampler(Sampler currentSampler) {

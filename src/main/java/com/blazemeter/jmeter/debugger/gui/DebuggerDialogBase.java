@@ -1,13 +1,11 @@
 package com.blazemeter.jmeter.debugger.gui;
 
 import org.apache.jmeter.gui.LoggerPanel;
-import org.apache.jmeter.gui.tree.JMeterCellRenderer;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.gui.util.JSyntaxTextArea;
 import org.apache.jmeter.gui.util.JTextScrollPane;
 import org.apache.jmeter.gui.util.PowerTableModel;
 import org.apache.jmeter.threads.ThreadGroup;
-import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.gui.ComponentUtil;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.LogTarget;
@@ -32,6 +30,7 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
     protected LoggerPanel loggerPanel;
     protected PowerTableModel varsTableModel;
     protected PowerTableModel propsTableModel;
+    protected JPanel elementContainer;
 
     public DebuggerDialogBase() {
         super((JFrame) null, "Step-by-Step Debugger", true);
@@ -119,7 +118,8 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
     }
 
     private Component getElementPane() {
-        return new JPanel();
+        elementContainer = new JPanel(new BorderLayout());
+        return elementContainer;
     }
 
     private Component getTreePane() {
@@ -154,17 +154,14 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
 
     @Override
     public void componentResized(ComponentEvent e) {
-
     }
 
     @Override
     public void componentMoved(ComponentEvent e) {
-
     }
 
     private JTree getTreeView() {
         tree = new JTree(new JMeterTreeModel());
-        //tree.setToolTipText("");
         tree.setCellRenderer(new FixedJMeterTreeCellRenderer());
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
