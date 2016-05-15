@@ -2,6 +2,9 @@ package com.blazemeter.jmeter.debugger.gui;
 
 import org.apache.jmeter.gui.LoggerPanel;
 import org.apache.jmeter.gui.tree.JMeterCellRenderer;
+import org.apache.jmeter.gui.util.JSyntaxTextArea;
+import org.apache.jmeter.gui.util.JTextScrollPane;
+import org.apache.jmeter.gui.util.PowerTableModel;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.gui.ComponentUtil;
@@ -10,9 +13,12 @@ import org.apache.log.LogTarget;
 import org.apache.log.Logger;
 
 import javax.swing.*;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.util.LinkedList;
 
 abstract public class DebuggerDialogBase extends JDialog implements ComponentListener {
     private static final Logger log = LoggingManager.getLoggerForClass();
@@ -23,6 +29,8 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
     protected JButton step = new JButton("Step Over");
     protected JButton stop = new JButton("Stop");
     protected LoggerPanel loggerPanel;
+    protected PowerTableModel varsTableModel;
+    protected PowerTableModel propsTableModel;
 
     public DebuggerDialogBase() {
         super((JFrame) null, "Step-by-Step Debugger", true);
@@ -52,23 +60,60 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
 
     private Component getStatusPane() {
         JTabbedPane tabs = new JTabbedPane();
-        tabs.add("Current Sample", new JPanel());
-        tabs.add("Variables", new JPanel());
-        tabs.add("JMeter Properties", new JPanel());
-        tabs.add("System Properties", new JPanel());
+        tabs.add("Current Sample", getCurrentSampleTab());
+        tabs.add("Variables", getVariablesTab());
+        tabs.add("JMeter Properties", getPropertiesTab());
         tabs.add("Log", getLogTab());
         return tabs;
     }
 
+    private Component getCurrentSampleTab() {
+        return new JPanel();
+    }
+
+    private Component getVariablesTab() {
+        varsTableModel = new PowerTableModel(new String[]{"Name", "Value"}, new Class[]{String.class, String.class});
+        JTable table = new JTable(varsTableModel);
+        table.setDefaultEditor(Object.class, null); // TODO: allow editing vars
+        setTableSorted(table);
+        return new JScrollPane(table);
+    }
+
+    private Component getPropertiesTab() {
+        propsTableModel = new PowerTableModel(new String[]{"Name", "Value"}, new Class[]{String.class, String.class});
+        JTable table = new JTable(propsTableModel);
+        table.setDefaultEditor(Object.class, null); // TODO: allow editing props
+        setTableSorted(table);
+        return new JScrollPane(table);
+    }
+
+    private void setTableSorted(JTable table) {
+        TableRowSorter<TableModel> sorter = new TableRowSorter<>(table.getModel());
+        sorter.setSortsOnUpdates(true);
+        LinkedList<RowSorter.SortKey> sortKeys = new LinkedList<>();
+        sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
+        sorter.setSortKeys(sortKeys);
+        sorter.sort();
+        table.setRowSorter(sorter);
+    }
+
     private Component getLogTab() {
-        // TODO: make it word wrap
         loggerPanel = new LoggerPanel();
         loggerPanel.setMinimumSize(new Dimension(0, 100));
         loggerPanel.setPreferredSize(new Dimension(0, 150));
 
-        LoggingManager.addLogTargetToRootLogger(new LogTarget[]{
-                loggerPanel,
-        });
+        Component comp = loggerPanel.getComponent(0);
+        if (comp instanceof JTextScrollPane) {
+            comp = ((JTextScrollPane) comp).getComponent(0);
+            if (comp instanceof JViewport) {
+                comp = ((JViewport) comp).getComponent(0);
+                if (comp instanceof JSyntaxTextArea) {
+                    JSyntaxTextArea area = (JSyntaxTextArea) comp;
+                    area.setLineWrap(true);
+                }
+            }
+        }
+        LoggingManager.addLogTargetToRootLogger(new LogTarget[]{loggerPanel,});
         return loggerPanel;
     }
 

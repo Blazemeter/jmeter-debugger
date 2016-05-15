@@ -5,9 +5,7 @@ import org.apache.jmeter.JMeter;
 import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.samplers.SampleEvent;
 import org.apache.jmeter.samplers.Sampler;
-import org.apache.jmeter.threads.JMeterContextService;
-import org.apache.jmeter.threads.JMeterThreadMonitor;
-import org.apache.jmeter.threads.ListenerNotifier;
+import org.apache.jmeter.threads.*;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.collections.ListedHashTree;
@@ -95,6 +93,10 @@ public class DebuggerEngine extends StandardJMeterEngine {
             }
         }
         return currentSampler;
+    }
+
+    public JMeterContext getThreadContext() {
+        return target.getThreadContext();
     }
 
     public void selectThreadGroup(ThreadGroup tg) {

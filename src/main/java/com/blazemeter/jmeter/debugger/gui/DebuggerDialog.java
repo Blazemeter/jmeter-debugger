@@ -9,9 +9,11 @@ import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterThread;
 import org.apache.jmeter.threads.JMeterThreadMonitor;
 import org.apache.jmeter.threads.ThreadGroup;
+import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
@@ -21,6 +23,7 @@ import javax.swing.tree.TreePath;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMonitor {
     private static final Logger log = LoggingManager.getLoggerForClass();
@@ -87,8 +90,29 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
     }
 
     private void refreshStatus() {
-        // TODO: refresh vars and properties
+        JMeterContext context = engine.getThreadContext();
+        refreshVars(context);
+        refreshProperties(context);
+
         // TODO: show samples
+    }
+
+    private void refreshVars(JMeterContext context) {
+        // TODO: highlight changes in vars
+        varsTableModel.clearData();
+        for (Map.Entry<String, Object> var : context.getVariables().entrySet()) {
+            varsTableModel.addRow(new String[]{var.getKey(), var.getValue().toString()});
+        }
+        varsTableModel.fireTableDataChanged();
+    }
+
+    private void refreshProperties(JMeterContext context) {
+        // TODO: highlight changes in props
+        propsTableModel.clearData();
+        for (Map.Entry<Object, Object> var : JMeterUtils.getJMeterProperties().entrySet()) {
+            propsTableModel.addRow(new String[]{var.getKey().toString(), var.getValue().toString()});
+        }
+        propsTableModel.fireTableDataChanged();
     }
 
     private void selectTargetInTree(TestElement te, Sampler currentSampler) {

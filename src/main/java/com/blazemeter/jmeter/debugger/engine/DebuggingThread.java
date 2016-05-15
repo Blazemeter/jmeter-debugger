@@ -1,9 +1,7 @@
 package com.blazemeter.jmeter.debugger.engine;
 
 import org.apache.jmeter.samplers.Sampler;
-import org.apache.jmeter.threads.JMeterThread;
-import org.apache.jmeter.threads.JMeterThreadMonitor;
-import org.apache.jmeter.threads.ListenerNotifier;
+import org.apache.jmeter.threads.*;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
@@ -13,6 +11,9 @@ import java.lang.reflect.Field;
 public class DebuggingThread extends JMeterThread {
     private static final Logger log = LoggingManager.getLoggerForClass();
     private final DebuggerCompiler compiler;
+
+    private JMeterContext threadContext;
+
 
     public DebuggingThread(HashTree test, JMeterThreadMonitor monitor, ListenerNotifier note, StepTrigger hook) {
         super(test, monitor, note);
@@ -40,5 +41,15 @@ public class DebuggingThread extends JMeterThread {
             return null;
         }
         return lastSamplePackage.getSampler();
+    }
+
+    public JMeterContext getThreadContext() {
+        return threadContext;
+    }
+
+    @Override
+    public void run() {
+        threadContext = JMeterContextService.getContext();
+        super.run();
     }
 }
