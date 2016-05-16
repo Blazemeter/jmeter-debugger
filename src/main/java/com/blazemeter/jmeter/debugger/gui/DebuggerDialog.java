@@ -170,7 +170,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
 
             JMeterTreeNode treeNode = model.getNodeOf(currentSampler);
             if (treeNode != null) {
-                treeNode.setMarkedBySearch(true);
+                treeNode.setMarkedBySearch(true); // TODO: find better display for it
             } else {
                 log.warn("Failed to find tree node for " + currentSampler.getName());
             }

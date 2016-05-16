@@ -20,6 +20,13 @@ public class FixedJMeterTreeCellRenderer extends JMeterCellRenderer {
         if (property == null || property instanceof NullProperty) {
             mc.setProperty(new StringProperty(TestElement.GUI_CLASS, this.getClass().getName()));
         }
-        return super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, p_hasFocus);
+        Component treeCellRendererComponent = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, p_hasFocus);
+        if (node.isMarkedBySearch()) {
+            setBorder(null);
+            setFont(getFont().deriveFont(Font.BOLD | Font.ITALIC));
+        } else {
+            setFont(getFont().deriveFont(~Font.BOLD).deriveFont(~Font.ITALIC));
+        }
+        return treeCellRendererComponent;
     }
 }
