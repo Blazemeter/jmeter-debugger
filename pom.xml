@@ -8,8 +8,8 @@
     <artifactId>jmeter-debugger</artifactId>
     <version>0.0</version>
 
-    <name>JMeter Plugins Manager</name>
-    <description>UI-based plugins management</description>
+    <name>Step-by-Step Debugger for JMeter</name>
+    <description>Step-by-Step Debugger for JMeter</description>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -26,8 +26,8 @@
     <developers>
         <developer>
             <id>team</id>
-            <name>jmeter-plugins.org</name>
-            <email>jmeter-plugins@googlegroups.com</email>
+            <name>blazemeter.com</name>
+            <email>support@blazemeter.com</email>
         </developer>
     </developers>
 
