@@ -94,7 +94,7 @@ public class DebuggerDialogTest {
         TestJMeterUtils.createJmeterEnv();
 
         ThreadGroupSelector sel = new ThreadGroupSelector(getHashTree());
-        HashTree hashTree = sel.getFullTree();
+        HashTree hashTree = sel.getSelectedTree();
         JMeter.convertSubTree(hashTree);
 
         DebuggerEngine engine = new DebuggerEngine();
@@ -105,7 +105,7 @@ public class DebuggerDialogTest {
         while (engine.isActive()) {
             Thread.sleep(1000);
         }
-        Assert.assertEquals(10, hook.cnt);
+        Assert.assertEquals(32, hook.cnt);
     }
 
     private class StepTriggerCounter implements StepTrigger {

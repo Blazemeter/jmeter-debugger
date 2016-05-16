@@ -10,14 +10,18 @@ import java.lang.reflect.Field;
 
 public class DebuggingThread extends JMeterThread {
     private static final Logger log = LoggingManager.getLoggerForClass();
-    private final DebuggerCompiler compiler;
+    private DebuggerCompiler compiler;
+    private final HashTree test;
 
     private JMeterContext threadContext;
 
 
-    public DebuggingThread(HashTree test, JMeterThreadMonitor monitor, ListenerNotifier note, StepTrigger hook) {
+    public DebuggingThread(HashTree test, JMeterThreadMonitor monitor, ListenerNotifier note) {
         super(test, monitor, note);
-        setThreadName("Debugging Thread 1-1");
+        this.test = test;
+    }
+
+    public void setHook(StepTrigger hook) {
         compiler = new DebuggerCompiler(test, hook);
         try {
             replaceCompiler();
@@ -49,6 +53,9 @@ public class DebuggingThread extends JMeterThread {
 
     @Override
     public void run() {
+        if (compiler == null) {
+            throw new IllegalStateException("Compiler was not overridden");
+        }
         threadContext = JMeterContextService.getContext();
         super.run();
     }

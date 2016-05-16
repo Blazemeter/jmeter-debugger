@@ -178,7 +178,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
                 log.debug("Item choice changed: " + event.getItem());
                 if (event.getItem() instanceof AbstractThreadGroup) {
                     tgSelector.selectThreadGroup((AbstractThreadGroup) event.getItem());
-                    tree.setModel(new DebuggerTreeModel(tgSelector.getFullTree()));
+                    tree.setModel(new DebuggerTreeModel(tgSelector.getSelectedTree()));
                 }
             }
         }

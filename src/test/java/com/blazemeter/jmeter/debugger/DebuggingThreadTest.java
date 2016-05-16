@@ -61,7 +61,8 @@ public class DebuggingThreadTest {
         Collection<AbstractThreadGroup> iter = searcher.getSearchResults();
         for (AbstractThreadGroup tg : iter) {
             ListedHashTree tgTree = (ListedHashTree) searcher.getSubTree(tg);
-            DebuggingThread thread = new DebuggingThread(tgTree, monitor, note, hook);
+            DebuggingThread thread = new DebuggingThread(tgTree, monitor, note);
+            thread.setHook(hook);
             thread.setThreadGroup(tg);
             thread.run();
         }

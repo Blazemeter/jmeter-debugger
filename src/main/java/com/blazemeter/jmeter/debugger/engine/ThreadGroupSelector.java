@@ -26,23 +26,24 @@ public class ThreadGroupSelector {
         }
     }
 
-    public void selectThreadGroup(AbstractThreadGroup tg) {
-        log.debug("Selecting thread group " + tg.getName() + ": " + tg);
-        cloner = new TreeClonerTG(tg);
-        tree.traverse(cloner);
-    }
-
     public AbstractThreadGroup[] getThreadGroups() {
         SearchByClass<AbstractThreadGroup> searcher = new SearchByClass<>(AbstractThreadGroup.class);
         tree.traverse(searcher);
         return searcher.getSearchResults().toArray(new AbstractThreadGroup[0]);
     }
 
-    public HashTree getFullTree() {
+    public void selectThreadGroup(AbstractThreadGroup tg) {
+        log.debug("Selecting thread group " + tg.getName() + ": " + tg);
+        cloner = new TreeClonerTG(tg);
+        tree.traverse(cloner);
+    }
+
+    public HashTree getSelectedTree() {
         return cloner.getClonedTree();
     }
 
-    private HashTree getThreadTestTree() {
+    @Deprecated
+    public HashTree getThreadTestTree() {
         HashTree test = cloner.getClonedTree();
         List<?> testLevelElements = new LinkedList<>(test.list(test.getArray()[0]));
         Iterator it = testLevelElements.iterator();

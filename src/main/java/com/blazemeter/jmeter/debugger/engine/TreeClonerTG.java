@@ -3,7 +3,6 @@ package com.blazemeter.jmeter.debugger.engine;
 import com.blazemeter.jmeter.debugger.elements.DebuggingThreadGroup;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.threads.AbstractThreadGroup;
-import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.collections.HashTreeTraverser;
 import org.apache.jorphan.collections.ListedHashTree;
@@ -39,7 +38,10 @@ public class TreeClonerTG implements HashTreeTraverser {
         if (node instanceof TestElement) {
             Object cloned = ((TestElement) node).clone();
             if (node instanceof AbstractThreadGroup && node.equals(onlyTG)) {
-                clonedOnlyTG = new DebuggingThreadGroup((AbstractThreadGroup) cloned);
+                AbstractThreadGroup orig = (AbstractThreadGroup) cloned;
+                clonedOnlyTG = new DebuggingThreadGroup();
+                clonedOnlyTG.setName(orig.getName());
+                cloned = clonedOnlyTG;
             }
             node = cloned;
             newTree.add(stack, node);

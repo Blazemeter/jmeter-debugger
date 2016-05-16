@@ -79,4 +79,8 @@ public class DebuggerEngine extends StandardJMeterEngine {
     public void setStepper(StepTrigger stepper) {
         this.stepper = stepper;
     }
+
+    public StepTrigger getStepper() {
+        return stepper;
+    }
 }
