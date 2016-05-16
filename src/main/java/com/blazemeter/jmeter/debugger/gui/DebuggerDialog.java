@@ -3,6 +3,7 @@ package com.blazemeter.jmeter.debugger.gui;
 import com.blazemeter.jmeter.debugger.elements.AbstractDebugElement;
 import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
 import com.blazemeter.jmeter.debugger.engine.StepTrigger;
+import com.blazemeter.jmeter.debugger.engine.ThreadGroupSelector;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.gui.JMeterGUIComponent;
 import org.apache.jmeter.gui.tree.JMeterTreeListener;
@@ -10,10 +11,10 @@ import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.threads.AbstractThreadGroup;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterThread;
 import org.apache.jmeter.threads.JMeterThreadMonitor;
-import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.logging.LoggingManager;
@@ -33,6 +34,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
 
     protected DebuggerEngine engine;
     private StepOver stepper = new StepOver();
+    private ThreadGroupSelector tgSelector = new ThreadGroupSelector(new HashTree());
 
     public DebuggerDialog() {
         super();
@@ -52,9 +54,9 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
     public void componentShown(ComponentEvent e) {
         log.debug("Showing dialog");
         HashTree testTree = getTestTree();
-        this.engine = new DebuggerEngine(testTree);
+        this.tgSelector = new ThreadGroupSelector(testTree);
         tgCombo.removeAllItems();
-        for (ThreadGroup group : engine.getThreadGroups()) {
+        for (AbstractThreadGroup group : tgSelector.getThreadGroups()) {
             tgCombo.addItem(group);
         }
     }
@@ -62,7 +64,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
     @Override
     public void componentHidden(ComponentEvent e) {
         log.debug("Closing dialog");
-        engine.stopDebugging();
+        //TODO engine.stopDebugging();
     }
 
     protected HashTree getTestTree() {
@@ -76,11 +78,11 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
         tgCombo.setEnabled(false);
         start.setEnabled(false);
         stop.setEnabled(true);
-        engine.startDebugging(stepper, this);
+        // TODO engine.startDebugging(stepper, this);
     }
 
     private void stop() {
-        engine.stopDebugging();
+        //TODO engine.stopDebugging();
         start.setEnabled(true);
         stop.setEnabled(false);
         tgCombo.setEnabled(true);
@@ -94,7 +96,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
     private void refreshStatus() {
         JMeterContext context = engine.getThreadContext();
         refreshVars(context);
-        refreshProperties(context);
+        refreshProperties();
 
         // TODO: show samples
     }
@@ -108,7 +110,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
         varsTableModel.fireTableDataChanged();
     }
 
-    private void refreshProperties(JMeterContext context) {
+    private void refreshProperties() {
         // TODO: highlight changes in props
         propsTableModel.clearData();
         for (Map.Entry<Object, Object> var : JMeterUtils.getJMeterProperties().entrySet()) {
@@ -174,9 +176,9 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
         public void itemStateChanged(ItemEvent event) {
             if (event.getStateChange() == ItemEvent.SELECTED) {
                 log.debug("Item choice changed: " + event.getItem());
-                if (event.getItem() instanceof ThreadGroup) {
-                    engine.selectThreadGroup((ThreadGroup) event.getItem());
-                    tree.setModel(new DebuggerTreeModel(engine.getFullTree()));
+                if (event.getItem() instanceof AbstractThreadGroup) {
+                    tgSelector.selectThreadGroup((AbstractThreadGroup) event.getItem());
+                    tree.setModel(new DebuggerTreeModel(tgSelector.getFullTree()));
                 }
             }
         }
@@ -198,14 +200,12 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
         }
 
         @Override
-        public void notify(Object t) {
+        public void notify(AbstractDebugElement t) {
             step.setEnabled(true);
-            if (t instanceof AbstractDebugElement) {
-                Object wrappedElement = ((AbstractDebugElement) t).getWrappedElement();
-                log.debug("Stopping before: " + wrappedElement);
-                if (wrappedElement instanceof TestElement) {
-                    selectTargetInTree((TestElement) wrappedElement, engine.getCurrentSampler());
-                }
+            Object wrappedElement = t.getWrappedElement();
+            log.debug("Stopping before: " + wrappedElement);
+            if (wrappedElement instanceof TestElement) {
+                selectTargetInTree((TestElement) wrappedElement, engine.getCurrentSampler());
             }
             refreshStatus();
             try {

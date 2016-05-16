@@ -5,7 +5,7 @@ import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.gui.util.JSyntaxTextArea;
 import org.apache.jmeter.gui.util.JTextScrollPane;
 import org.apache.jmeter.gui.util.PowerTableModel;
-import org.apache.jmeter.threads.ThreadGroup;
+import org.apache.jmeter.threads.AbstractThreadGroup;
 import org.apache.jorphan.gui.ComponentUtil;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.LogTarget;
@@ -22,7 +22,7 @@ import java.util.LinkedList;
 abstract public class DebuggerDialogBase extends JDialog implements ComponentListener {
     private static final Logger log = LoggingManager.getLoggerForClass();
 
-    protected JComboBox<ThreadGroup> tgCombo = new JComboBox<>();
+    protected JComboBox<AbstractThreadGroup> tgCombo = new JComboBox<>();
     protected JTree tree;
     protected JButton start = new JButton("Start");
     protected JButton step = new JButton("Step Over");

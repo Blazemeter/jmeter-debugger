@@ -1,5 +1,6 @@
 package com.blazemeter.jmeter.debugger;
 
+import com.blazemeter.jmeter.debugger.elements.AbstractDebugElement;
 import com.blazemeter.jmeter.debugger.engine.DebuggingThread;
 import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import kg.apc.emulators.TestJMeterUtils;
@@ -13,7 +14,6 @@ import org.apache.jorphan.collections.ListedHashTree;
 import org.apache.jorphan.collections.SearchByClass;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
-import com.blazemeter.jmeter.debugger.elements.AbstractDebugElement;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -23,13 +23,11 @@ import java.util.Collection;
 
 public class DebuggingThreadTest {
     private static final Logger log = LoggingManager.getLoggerForClass();
-    private final StepTrigger hook = new StepTrigger() {
+    public static final StepTrigger hook = new StepTrigger() {
         @Override
-        public void notify(Object o) {
-            if (o instanceof AbstractDebugElement) {
-                AbstractDebugElement te = (AbstractDebugElement) o;
-                log.info(">>> Stopping before step: " + te.getWrappedElement() + " <<<");
-            }
+        public void notify(AbstractDebugElement o) {
+            AbstractDebugElement te = (AbstractDebugElement) o;
+            log.info(">>> Stopping before step: " + te.getWrappedElement() + " <<<");
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {

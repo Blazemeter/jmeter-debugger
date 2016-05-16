@@ -1,6 +1,8 @@
 package com.blazemeter.jmeter.debugger.engine;
 
+import com.blazemeter.jmeter.debugger.elements.DebuggingThreadGroup;
 import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.threads.AbstractThreadGroup;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.collections.HashTreeTraverser;
@@ -9,20 +11,20 @@ import org.apache.jorphan.collections.ListedHashTree;
 import java.util.LinkedList;
 
 public class TreeClonerTG implements HashTreeTraverser {
-    private ThreadGroup onlyTG;
+    private AbstractThreadGroup onlyTG;
 
-    private ThreadGroup clonedOnlyTG;
+    private AbstractThreadGroup clonedOnlyTG;
     private final ListedHashTree newTree = new ListedHashTree();
     private final LinkedList<Object> stack = new LinkedList<>();
     private boolean ignoring = false;
 
-    public TreeClonerTG(ThreadGroup tg) {
+    public TreeClonerTG(AbstractThreadGroup tg) {
         this.onlyTG = tg;
     }
 
     @Override
     public final void addNode(Object node, HashTree subTree) {
-        if (!ignoring && node instanceof ThreadGroup && !node.equals(onlyTG)) {
+        if (!ignoring && node instanceof AbstractThreadGroup && !node.equals(onlyTG)) {
             ignoring = true;
         }
 
@@ -36,8 +38,8 @@ public class TreeClonerTG implements HashTreeTraverser {
     protected Object addNodeToTree(Object node) {
         if (node instanceof TestElement) {
             Object cloned = ((TestElement) node).clone();
-            if (node instanceof ThreadGroup && node.equals(onlyTG)) {
-                clonedOnlyTG = (ThreadGroup) cloned;
+            if (node instanceof AbstractThreadGroup && node.equals(onlyTG)) {
+                clonedOnlyTG = new DebuggingThreadGroup((AbstractThreadGroup) cloned);
             }
             node = cloned;
             newTree.add(stack, node);
@@ -49,7 +51,7 @@ public class TreeClonerTG implements HashTreeTraverser {
 
     @Override
     public void subtractNode() {
-        if (stack.getLast() instanceof ThreadGroup && !stack.getLast().equals(onlyTG)) {
+        if (stack.getLast() instanceof AbstractThreadGroup && !stack.getLast().equals(onlyTG)) {
             ignoring = false;
         }
         stack.removeLast();
@@ -63,7 +65,7 @@ public class TreeClonerTG implements HashTreeTraverser {
         return newTree;
     }
 
-    public ThreadGroup getClonedTG() {
+    public AbstractThreadGroup getClonedTG() {
         return clonedOnlyTG;
     }
 
