@@ -20,55 +20,8 @@ public class DebuggerEngine extends StandardJMeterEngine {
         }
     };
 
-    /*
-        public void startDebugging(StepTrigger trigger, JMeterThreadMonitor stopListener) {
-            log.debug("Start debugging engine");
-            SampleEvent.initSampleVariables();
-
-            JMeterContextService.startTest();
-
-            // enable variable resolve
-            HashTree test = getThreadTestTree();
-            PreCompiler compiler = new PreCompiler();
-            test.traverse(compiler);
-
-            test.traverse(new TurnElementsOn());
-
-            JMeterContextService.getContext().setSamplingStarted(true);
-
-            ListenerNotifier note = new ListenerNotifier();
-            target = new DebuggingThread(test, stopListener, note, trigger);
-            target.setEngine(this);
-            target.setThreadGroup(cloner.getClonedTG());
-
-            thread = new Thread(target);
-            thread.setName(target.getThreadName());
-            thread.setDaemon(true);
-            thread.start();
-        }
-
-
-        public void stopDebugging() {
-            log.debug("Stop debugging engine");
-            if (thread != null) {
-                if (thread.isAlive() && !thread.isInterrupted()) {
-                    thread.interrupt();
-                }
-            }
-
-            JMeterContextService.getContext().setSamplingStarted(false);
-            JMeterContextService.endTest();
-        }
-    */
     public Sampler getCurrentSampler() {
-        Sampler currentSampler = target.getCurrentSampler();
-        if (currentSampler instanceof AbstractDebugElement) {
-            Object wrapped = ((AbstractDebugElement) currentSampler).getWrappedElement();
-            if (wrapped instanceof Sampler) {
-                return (Sampler) wrapped;
-            }
-        }
-        return currentSampler;
+        return target.getCurrentSampler();
     }
 
     public JMeterContext getThreadContext() {
@@ -82,5 +35,19 @@ public class DebuggerEngine extends StandardJMeterEngine {
 
     public StepTrigger getStepper() {
         return stepper;
+    }
+
+    public void setTarget(DebuggingThread target) {
+        if (this.target != null) {
+            throw new IllegalStateException();
+        }
+        this.target = target;
+    }
+
+    public void setThread(Thread thread) {
+        if (this.thread != null) {
+            throw new IllegalStateException();
+        }
+        this.thread = thread;
     }
 }

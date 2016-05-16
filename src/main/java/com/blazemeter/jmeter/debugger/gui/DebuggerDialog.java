@@ -4,6 +4,8 @@ import com.blazemeter.jmeter.debugger.elements.AbstractDebugElement;
 import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
 import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import com.blazemeter.jmeter.debugger.engine.ThreadGroupSelector;
+import org.apache.jmeter.JMeter;
+import org.apache.jmeter.engine.JMeterEngineException;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.gui.JMeterGUIComponent;
 import org.apache.jmeter.gui.tree.JMeterTreeListener;
@@ -78,11 +80,24 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
         tgCombo.setEnabled(false);
         start.setEnabled(false);
         stop.setEnabled(true);
-        // TODO engine.startDebugging(stepper, this);
+
+        HashTree hashTree = tgSelector.getSelectedTree();
+        JMeter.convertSubTree(hashTree);
+        engine = new DebuggerEngine();
+        engine.setStepper(stepper);
+        engine.configure(hashTree);
+        try {
+            engine.runTest();
+        } catch (JMeterEngineException e) {
+            log.error("Failed to run debug", e);
+            stop();
+        }
     }
 
     private void stop() {
-        //TODO engine.stopDebugging();
+        if (engine.isActive()) {
+            engine.stopTest(true);
+        }
         start.setEnabled(true);
         stop.setEnabled(false);
         tgCombo.setEnabled(true);
@@ -149,8 +164,16 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
         }
 
         if (currentSampler != null) {
+            if (currentSampler instanceof AbstractDebugElement) {
+                currentSampler = (Sampler) ((AbstractDebugElement) currentSampler).getWrappedElement();
+            }
+
             JMeterTreeNode treeNode = model.getNodeOf(currentSampler);
-            treeNode.setMarkedBySearch(true);
+            if (treeNode != null) {
+                treeNode.setMarkedBySearch(true);
+            } else {
+                log.warn("Failed to find tree node for " + currentSampler.getName());
+            }
         }
     }
 
