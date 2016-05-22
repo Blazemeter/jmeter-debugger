@@ -3,7 +3,6 @@ package com.blazemeter.jmeter.debugger.gui;
 import com.blazemeter.jmeter.debugger.elements.AbstractDebugElement;
 import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
 import com.blazemeter.jmeter.debugger.engine.StepTrigger;
-import com.blazemeter.jmeter.debugger.engine.ThreadGroupSelector;
 import org.apache.jmeter.JMeter;
 import org.apache.jmeter.engine.JMeterEngineException;
 import org.apache.jmeter.exceptions.IllegalUserActionException;
@@ -190,21 +189,25 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
         return nodes.isEmpty() ? null : new TreePath(nodes.toArray());
     }
 
+    private void selectThreadGroup(ItemEvent event) {
+        tgSelector.selectThreadGroup((AbstractThreadGroup) event.getItem());
+        treeModel.clearTestPlan();
+        HashTree selectedTree = tgSelector.getSelectedTree();
+        JMeter.convertSubTree(selectedTree);
+        try {
+            treeModel.addSubTree(selectedTree, (JMeterTreeNode) treeModel.getRoot());
+        } catch (IllegalUserActionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private class ThreadGroupChoiceChanged implements ItemListener {
         @Override
         public void itemStateChanged(ItemEvent event) {
             if (event.getStateChange() == ItemEvent.SELECTED) {
                 log.debug("Item choice changed: " + event.getItem());
                 if (event.getItem() instanceof AbstractThreadGroup) {
-                    tgSelector.selectThreadGroup((AbstractThreadGroup) event.getItem());
-                    treeModel.clearTestPlan();
-                    HashTree selectedTree = tgSelector.getSelectedTree();
-                    JMeter.convertSubTree(selectedTree);
-                    try {
-                        treeModel.addSubTree(selectedTree, (JMeterTreeNode) treeModel.getRoot());
-                    } catch (IllegalUserActionException e) {
-                        throw new RuntimeException(e);
-                    }
+                    selectThreadGroup(event);
                 }
             }
         }
@@ -244,7 +247,6 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
             step.setEnabled(false);
         }
     }
-
 
     private class StopDebugging implements ActionListener {
         @Override

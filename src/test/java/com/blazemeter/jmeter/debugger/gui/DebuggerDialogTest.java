@@ -3,7 +3,6 @@ package com.blazemeter.jmeter.debugger.gui;
 import com.blazemeter.jmeter.debugger.elements.AbstractDebugElement;
 import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
 import com.blazemeter.jmeter.debugger.engine.StepTrigger;
-import com.blazemeter.jmeter.debugger.engine.ThreadGroupSelector;
 import kg.apc.emulators.TestJMeterUtils;
 import org.apache.jmeter.JMeter;
 import org.apache.jmeter.engine.StandardJMeterEngine;
