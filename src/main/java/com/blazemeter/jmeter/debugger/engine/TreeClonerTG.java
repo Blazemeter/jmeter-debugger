@@ -1,5 +1,6 @@
 package com.blazemeter.jmeter.debugger.engine;
 
+import com.blazemeter.jmeter.debugger.elements.DebuggingThreadGroupGui;
 import com.blazemeter.jmeter.debugger.elements.DebuggingThreadGroup;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.testelement.TestElement;
@@ -60,6 +61,7 @@ public class TreeClonerTG implements HashTreeTraverser {
         if (te instanceof AbstractThreadGroup) {
             AbstractThreadGroup orig = (AbstractThreadGroup) cloned;
             clonedOnlyTG = new DebuggingThreadGroup();
+            clonedOnlyTG.setProperty(TestElement.GUI_CLASS, DebuggingThreadGroupGui.class.getCanonicalName());
             clonedOnlyTG.setName(orig.getName());
             res.setUserObject(clonedOnlyTG);
         } else {
