@@ -189,8 +189,8 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
         return nodes.isEmpty() ? null : new TreePath(nodes.toArray());
     }
 
-    private void selectThreadGroup(ItemEvent event) {
-        tgSelector.selectThreadGroup((AbstractThreadGroup) event.getItem());
+    private void selectThreadGroup(AbstractThreadGroup tg) {
+        tgSelector.selectThreadGroup(tg);
         treeModel.clearTestPlan();
         HashTree selectedTree = tgSelector.getSelectedTree();
         JMeter.convertSubTree(selectedTree);
@@ -207,7 +207,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
             if (event.getStateChange() == ItemEvent.SELECTED) {
                 log.debug("Item choice changed: " + event.getItem());
                 if (event.getItem() instanceof AbstractThreadGroup) {
-                    selectThreadGroup(event);
+                    selectThreadGroup((AbstractThreadGroup) event.getItem());
                 }
             }
         }
