@@ -4,13 +4,13 @@ import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
 import com.blazemeter.jmeter.debugger.engine.DebuggingThread;
 import org.apache.jmeter.control.LoopController;
 import org.apache.jmeter.engine.StandardJMeterEngine;
-import org.apache.jmeter.threads.JMeterContext;
-import org.apache.jmeter.threads.JMeterContextService;
-import org.apache.jmeter.threads.ListenerNotifier;
+import org.apache.jmeter.threads.*;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jorphan.collections.ListedHashTree;
 
 public class DebuggingThreadGroup extends ThreadGroup {
+    private DebuggerEngine dbgEngine;
+
     public DebuggingThreadGroup() {
         super();
         setDelay(0);
@@ -28,8 +28,10 @@ public class DebuggingThreadGroup extends ThreadGroup {
         DebuggingThread jmThread = makeThread(groupCount, notifier, threadGroupTree, engine, 0, context);
         Thread newThread = new Thread(jmThread, jmThread.getThreadName());
         if (engine instanceof DebuggerEngine) {
-            ((DebuggerEngine) engine).setTarget(jmThread);
-            ((DebuggerEngine) engine).setThread(newThread);
+            dbgEngine = (DebuggerEngine) engine;
+            dbgEngine.setTarget(jmThread);
+            dbgEngine.setThread(newThread);
+            
         }
         newThread.start();
     }
@@ -58,5 +60,13 @@ public class DebuggingThreadGroup extends ThreadGroup {
         jmeterThread.setOnErrorStopThread(onErrorStopThread);
         jmeterThread.setOnErrorStartNextLoop(onErrorStartNextLoop);
         return jmeterThread;
+    }
+
+    @Override
+    public void threadFinished(JMeterThread thread) {
+        super.threadFinished(thread);
+        if (dbgEngine!=null) {
+            dbgEngine.threadFinished(thread);
+        }
     }
 }

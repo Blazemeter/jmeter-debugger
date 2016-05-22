@@ -44,21 +44,28 @@ public class TreeClonerTG implements HashTreeTraverser {
     }
 
     protected Object addNodeToTree(Object node) {
-        if (node instanceof TestElement) {
-            Object cloned = ((TestElement) node).clone();
-            if (node instanceof AbstractThreadGroup)
-                if (node.equals(onlyTG)) {
-                    AbstractThreadGroup orig = (AbstractThreadGroup) cloned;
-                    clonedOnlyTG = new DebuggingThreadGroup();
-                    clonedOnlyTG.setName(orig.getName());
-                    cloned = clonedOnlyTG;
-                }
-            node = cloned;
-            newTree.add(stack, node);
+        if (node instanceof JMeterTreeNode) {
+            newTree.add(stack, getClonedNode((JMeterTreeNode) node));
         } else {
-            newTree.add(stack, node);
+            throw new IllegalArgumentException();
         }
         return node;
+    }
+
+    private JMeterTreeNode getClonedNode(JMeterTreeNode node) {
+        TestElement te = (TestElement) (node).getUserObject();
+        TestElement cloned = (TestElement) te.clone();
+        JMeterTreeNode res = (JMeterTreeNode) node.clone();
+        res.setUserObject(cloned);
+
+        if (te instanceof AbstractThreadGroup) {
+            AbstractThreadGroup orig = (AbstractThreadGroup) cloned;
+            clonedOnlyTG = new DebuggingThreadGroup();
+            clonedOnlyTG.setName(orig.getName());
+            res.setUserObject(clonedOnlyTG);
+        }
+
+        return res;
     }
 
     @Override

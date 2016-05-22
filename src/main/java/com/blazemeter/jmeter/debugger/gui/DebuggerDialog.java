@@ -78,6 +78,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
         HashTree hashTree = tgSelector.getSelectedTree();
         engine = new DebuggerEngine();
         engine.setStepper(stepper);
+        engine.setStopNotifier(this);
         JMeter.convertSubTree(hashTree);
         engine.configure(hashTree);
         try {

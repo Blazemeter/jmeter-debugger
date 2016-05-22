@@ -39,7 +39,6 @@ public class ThreadGroupSelector {
         if (cloner == null) {
             throw new IllegalStateException();
         }
-        HashTree clonedTree = cloner.getClonedTree();
-        return clonedTree;
+        return cloner.getClonedTree();
     }
 }
