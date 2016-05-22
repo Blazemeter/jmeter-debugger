@@ -9,6 +9,7 @@ import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.exceptions.IllegalUserActionException;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
+import org.apache.jmeter.sampler.DebugSampler;
 import org.apache.jmeter.save.SaveService;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.logging.LoggingManager;
@@ -25,6 +26,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Properties;
 
 
 public class DebuggerDialogTest {
@@ -34,11 +36,15 @@ public class DebuggerDialogTest {
     public static void setUp() {
         PrintWriter writer = new PrintWriter(System.out, true);
         LoggingManager.addLogTargetToRootLogger(new LogTarget[]{new WriterTarget(writer, new PatternFormatter(LoggingManager.DEFAULT_PATTERN))});
+        Properties props = new Properties();
+        props.setProperty(LoggingManager.LOG_FILE, "");
+        LoggingManager.initializeLogging(props);
     }
 
     @Test
     public void displayGUI() throws InterruptedException, IOException {
         if (!GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance()) {
+            DebugSampler s=new DebugSampler();
             TestJMeterUtils.createJmeterEnv();
             DebuggerDialogMock frame = new DebuggerDialogMock();
             //GuiPackage.getInstance(frame.getTreeListener(), frame.getTreeModel());

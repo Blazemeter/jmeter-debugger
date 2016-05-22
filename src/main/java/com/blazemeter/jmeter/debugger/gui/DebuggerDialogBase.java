@@ -5,6 +5,7 @@ import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.gui.util.JSyntaxTextArea;
 import org.apache.jmeter.gui.util.JTextScrollPane;
 import org.apache.jmeter.gui.util.PowerTableModel;
+import org.apache.jmeter.testelement.TestStateListener;
 import org.apache.jmeter.threads.AbstractThreadGroup;
 import org.apache.jorphan.gui.ComponentUtil;
 import org.apache.jorphan.logging.LoggingManager;
@@ -19,7 +20,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.util.LinkedList;
 
-abstract public class DebuggerDialogBase extends JDialog implements ComponentListener {
+abstract public class DebuggerDialogBase extends JDialog implements ComponentListener, TestStateListener {
     private static final Logger log = LoggingManager.getLoggerForClass();
 
     protected JComboBox<AbstractThreadGroup> tgCombo = new JComboBox<>();
@@ -170,4 +171,21 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
 
         return tree;
     }
+
+    @Override
+    public void testStarted() {
+
+    }
+
+    @Override
+    public void testStarted(String host) {
+
+    }
+
+
+    @Override
+    public void testEnded(String host) {
+
+    }
 }
+

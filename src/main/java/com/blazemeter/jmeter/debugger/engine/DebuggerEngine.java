@@ -4,13 +4,11 @@ import com.blazemeter.jmeter.debugger.elements.AbstractDebugElement;
 import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.threads.JMeterContext;
-import org.apache.jmeter.threads.JMeterThread;
-import org.apache.jmeter.threads.JMeterThreadMonitor;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
 
 
-public class DebuggerEngine extends StandardJMeterEngine implements JMeterThreadMonitor {
+public class DebuggerEngine extends StandardJMeterEngine {
     private static final Logger log = LoggingManager.getLoggerForClass();
 
     private Thread thread;
@@ -21,7 +19,6 @@ public class DebuggerEngine extends StandardJMeterEngine implements JMeterThread
             throw new RuntimeException("Not initialized stepper");
         }
     };
-    private JMeterThreadMonitor stopNotifier;
 
     public Sampler getCurrentSampler() {
         return target.getCurrentSampler();
@@ -54,11 +51,24 @@ public class DebuggerEngine extends StandardJMeterEngine implements JMeterThread
     }
 
     @Override
-    public void threadFinished(JMeterThread thread) {
-        stopNotifier.threadFinished(thread);
+    public synchronized void stopTest(boolean now) {
+        super.stopTest(now);
+
+        if (thread != null && thread.isAlive()) {
+            log.debug("Joining thread: " + thread);
+            try {
+                thread.join(60000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            if (thread.isAlive()) {
+                log.warn("Thread not finished: " + thread);
+            } else {
+                log.debug("Thread finished: " + thread);
+            }
+        }
     }
 
-    public void setStopNotifier(JMeterThreadMonitor stopNotifier) {
-        this.stopNotifier = stopNotifier;
-    }
+
 }

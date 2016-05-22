@@ -5,6 +5,7 @@ import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
 import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import org.apache.jmeter.JMeter;
 import org.apache.jmeter.engine.JMeterEngineException;
+import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.exceptions.IllegalUserActionException;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.gui.JMeterGUIComponent;
@@ -14,11 +15,10 @@ import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.threads.AbstractThreadGroup;
 import org.apache.jmeter.threads.JMeterContext;
-import org.apache.jmeter.threads.JMeterThread;
-import org.apache.jmeter.threads.JMeterThreadMonitor;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.logging.LoggingManager;
+import org.apache.jorphan.util.JMeterStopThreadException;
 import org.apache.log.Logger;
 
 import javax.swing.tree.TreeNode;
@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMonitor {
+public class DebuggerDialog extends DebuggerDialogBase {
     private static final Logger log = LoggingManager.getLoggerForClass();
 
     protected DebuggerEngine engine;
@@ -76,9 +76,9 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
         stop.setEnabled(true);
 
         HashTree hashTree = tgSelector.getSelectedTree();
+        StandardJMeterEngine.register(this); // oh, dear, they use static field then clean it...
         engine = new DebuggerEngine();
         engine.setStepper(stepper);
-        engine.setStopNotifier(this);
         JMeter.convertSubTree(hashTree);
         engine.configure(hashTree);
         try {
@@ -90,17 +90,26 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
     }
 
     private void stop() {
-        log.debug("Start debugging");
-        if (engine != null && engine.isActive()) {
-            engine.stopTest(true);
+        log.debug("Stop debugging");
+
+        synchronized (this) {
+            if (stepper.isStopping()) {
+                throw new IllegalStateException("Already stopping");
+            }
+
+            stepper.setStopping(true);
+            if (engine != null && engine.isActive()) {
+                engine.stopTest(true);
+            }
+            stepper.setStopping(false);
+            start.setEnabled(true);
+            stop.setEnabled(false);
+            tgCombo.setEnabled(true);
         }
-        start.setEnabled(true);
-        stop.setEnabled(false);
-        tgCombo.setEnabled(true);
     }
 
     @Override
-    public void threadFinished(JMeterThread thread) {
+    public void testEnded() {
         stop();
     }
 
@@ -222,6 +231,8 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
     }
 
     private class StepOver implements ActionListener, StepTrigger {
+        private boolean stopping;
+
         @Override
         public void actionPerformed(ActionEvent e) {
             synchronized (this) {
@@ -238,14 +249,28 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
                 selectTargetInTree((TestElement) wrappedElement, engine.getCurrentSampler());
             }
             refreshStatus();
-            try {
-                synchronized (this) {
-                    this.wait();
+            if (!stopping) {
+                try {
+                    synchronized (this) {
+                        this.wait();
+                    }
+                } catch (InterruptedException e) {
+                    log.debug("Interrupted", e);
+                    throw new JMeterStopThreadException(e);
+                } finally {
+                    step.setEnabled(false);
                 }
-            } catch (InterruptedException e) {
-                stop();
+            } else {
+                throw new JMeterStopThreadException();
             }
-            step.setEnabled(false);
+        }
+
+        public void setStopping(boolean stopping) {
+            this.stopping = stopping;
+        }
+
+        public boolean isStopping() {
+            return stopping;
         }
     }
 

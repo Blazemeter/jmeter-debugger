@@ -58,7 +58,8 @@
             <hashTree/>
           </hashTree>
           <BeanShellSampler guiclass="BeanShellSamplerGui" testclass="BeanShellSampler" testname="BeanShell Sampler" enabled="true">
-            <stringProp name="BeanShellSampler.query">log.info(&quot;${__setProperty(testprop,value,)}&quot;);</stringProp>
+            <stringProp name="BeanShellSampler.query">log.info(&quot;Set prop ${__setProperty(testprop,${cnt},)}&quot;);
+</stringProp>
             <stringProp name="BeanShellSampler.filename"></stringProp>
             <stringProp name="BeanShellSampler.parameters"></stringProp>
             <boolProp name="BeanShellSampler.resetInterpreter">false</boolProp>

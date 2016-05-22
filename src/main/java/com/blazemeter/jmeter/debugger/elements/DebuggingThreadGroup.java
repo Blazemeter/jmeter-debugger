@@ -4,12 +4,21 @@ import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
 import com.blazemeter.jmeter.debugger.engine.DebuggingThread;
 import org.apache.jmeter.control.LoopController;
 import org.apache.jmeter.engine.StandardJMeterEngine;
-import org.apache.jmeter.threads.*;
+import org.apache.jmeter.threads.JMeterContext;
+import org.apache.jmeter.threads.JMeterContextService;
+import org.apache.jmeter.threads.ListenerNotifier;
 import org.apache.jmeter.threads.ThreadGroup;
+import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.collections.ListedHashTree;
+import org.apache.jorphan.logging.LoggingManager;
+import org.apache.log.Logger;
 
 public class DebuggingThreadGroup extends ThreadGroup {
-    private DebuggerEngine dbgEngine;
+    private static final Logger log = LoggingManager.getLoggerForClass();
+    private Thread osThread;
+    private DebuggingThread jmeterThread;
+    private final long waitTime = JMeterUtils.getPropDefault("jmeterengine.threadstop.wait", 5 * 1000);
+
 
     public DebuggingThreadGroup() {
         super();
@@ -17,8 +26,8 @@ public class DebuggingThreadGroup extends ThreadGroup {
         setNumThreads(1);
         setRampUp(0);
         LoopController ctl = new LoopController();
-        ctl.setContinueForever(false);
-        ctl.setLoops(1);
+        ctl.setContinueForever(true);
+        ctl.setLoops(-1);
         setSamplerController(ctl);
     }
 
@@ -28,10 +37,12 @@ public class DebuggingThreadGroup extends ThreadGroup {
         DebuggingThread jmThread = makeThread(groupCount, notifier, threadGroupTree, engine, 0, context);
         Thread newThread = new Thread(jmThread, jmThread.getThreadName());
         if (engine instanceof DebuggerEngine) {
-            dbgEngine = (DebuggerEngine) engine;
+            DebuggerEngine dbgEngine = (DebuggerEngine) engine;
             dbgEngine.setTarget(jmThread);
             dbgEngine.setThread(newThread);
-            
+
+            this.jmeterThread = jmThread;
+            this.osThread = newThread;
         }
         newThread.start();
     }
@@ -63,10 +74,52 @@ public class DebuggingThreadGroup extends ThreadGroup {
     }
 
     @Override
-    public void threadFinished(JMeterThread thread) {
-        super.threadFinished(thread);
-        if (dbgEngine!=null) {
-            dbgEngine.threadFinished(thread);
+    public void waitThreadsStopped() {
+        super.waitThreadsStopped();
+        if (osThread != null) {
+            while (osThread.isAlive()) {
+                log.debug("Joining thread: " + osThread);
+                try {
+                    osThread.join(waitTime);
+                } catch (InterruptedException e) {
+                    log.debug("Interrupted: " + e);
+                }
+            }
+            log.debug("Thread is done: " + osThread);
         }
+    }
+
+    @Override
+    public void tellThreadsToStop() {
+        super.tellThreadsToStop();
+        if (jmeterThread != null) {
+            log.debug("Interrupting JMeter thread: " + jmeterThread);
+            jmeterThread.interrupt();
+        }
+
+        if (osThread != null) {
+            log.debug("Interrupting OS thread: " + osThread);
+            osThread.interrupt();
+        }
+    }
+
+    @Override
+    public boolean verifyThreadsStopped() {
+        boolean stopped = super.verifyThreadsStopped();
+        if (osThread != null) {
+            if (osThread.isAlive()) {
+                log.debug("Joining thread: " + osThread);
+                try {
+                    osThread.join(waitTime);
+                } catch (InterruptedException e) {
+                    log.debug("Interrupted: " + e);
+                }
+                if (osThread.isAlive()) {
+                    stopped = false;
+                    log.warn("Thread didn't exit: " + osThread);
+                }
+            }
+        }
+        return stopped;
     }
 }
