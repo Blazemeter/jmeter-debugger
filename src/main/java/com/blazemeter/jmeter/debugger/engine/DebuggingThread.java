@@ -10,23 +10,23 @@ import java.lang.reflect.Field;
 
 public class DebuggingThread extends JMeterThread {
     private static final Logger log = LoggingManager.getLoggerForClass();
-    private DebuggerCompiler compiler;
+    private DebuggerCompiler replacedCompiler;
     private final HashTree test;
 
     private JMeterContext threadContext;
 
 
     public DebuggingThread(HashTree test, JMeterThreadMonitor monitor, ListenerNotifier note) {
-        super(test, monitor, note);
+        super(test, monitor, note);                                 
         this.test = test;
     }
 
     public void setHook(StepTrigger hook) {
-        compiler = new DebuggerCompiler(test, hook);
+        replacedCompiler = new DebuggerCompiler(test, hook);
         try {
             replaceCompiler();
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException("Failed to replace test compiler", e);
+            throw new RuntimeException("Failed to replace test replacedCompiler", e);
         }
     }
 
@@ -36,11 +36,11 @@ public class DebuggingThread extends JMeterThread {
             log.debug("Making field accessable: " + field);
             field.setAccessible(true);
         }
-        field.set(this, compiler);
+        field.set(this, replacedCompiler);
     }
 
     public Sampler getCurrentSampler() {
-        DebuggerSamplerPackage lastSamplePackage = compiler.getLastSamplePackage();
+        DebuggerSamplerPackage lastSamplePackage = replacedCompiler.getLastSamplePackage();
         if (lastSamplePackage == null) {
             return null;
         }
@@ -53,7 +53,7 @@ public class DebuggingThread extends JMeterThread {
 
     @Override
     public void run() {
-        if (compiler == null) {
+        if (replacedCompiler == null) {
             throw new IllegalStateException("Compiler was not overridden");
         }
         threadContext = JMeterContextService.getContext();

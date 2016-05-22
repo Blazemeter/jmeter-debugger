@@ -31,7 +31,6 @@ public class TreeClonerTG implements HashTreeTraverser {
         if (!ignoring) {
             node = addNodeToTree(node);
         }
-
         stack.addLast(node);
     }
 
@@ -45,7 +44,8 @@ public class TreeClonerTG implements HashTreeTraverser {
 
     protected Object addNodeToTree(Object node) {
         if (node instanceof JMeterTreeNode) {
-            newTree.add(stack, getClonedNode((JMeterTreeNode) node));
+            node = getClonedNode((JMeterTreeNode) node);
+            newTree.add(stack, node);
         } else {
             throw new IllegalArgumentException();
         }
@@ -55,14 +55,15 @@ public class TreeClonerTG implements HashTreeTraverser {
     private JMeterTreeNode getClonedNode(JMeterTreeNode node) {
         TestElement te = (TestElement) (node).getUserObject();
         TestElement cloned = (TestElement) te.clone();
-        JMeterTreeNode res = (JMeterTreeNode) node.clone();
-        res.setUserObject(cloned);
+        JMeterTreeNode res = new JMeterTreeNode();
 
         if (te instanceof AbstractThreadGroup) {
             AbstractThreadGroup orig = (AbstractThreadGroup) cloned;
             clonedOnlyTG = new DebuggingThreadGroup();
             clonedOnlyTG.setName(orig.getName());
             res.setUserObject(clonedOnlyTG);
+        } else {
+            res.setUserObject(cloned);
         }
 
         return res;
