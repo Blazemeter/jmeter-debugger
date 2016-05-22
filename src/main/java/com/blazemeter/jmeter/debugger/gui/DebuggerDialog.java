@@ -6,9 +6,9 @@ import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import com.blazemeter.jmeter.debugger.engine.ThreadGroupSelector;
 import org.apache.jmeter.JMeter;
 import org.apache.jmeter.engine.JMeterEngineException;
+import org.apache.jmeter.exceptions.IllegalUserActionException;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.gui.JMeterGUIComponent;
-import org.apache.jmeter.gui.tree.JMeterTreeListener;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.samplers.Sampler;
@@ -32,7 +32,6 @@ import java.util.Map;
 
 public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMonitor {
     private static final Logger log = LoggingManager.getLoggerForClass();
-    protected final JMeterTreeListener treeListener;
 
     protected DebuggerEngine engine;
     private StepOver stepper = new StepOver();
@@ -44,12 +43,6 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
         stop.addActionListener(new StopDebugging());
         step.addActionListener(stepper);
         tgCombo.addItemListener(new ThreadGroupChoiceChanged());
-
-        treeListener = new JMeterTreeListener();
-        treeListener.setJTree(tree);
-        //tree.addTreeSelectionListener(treeListener);
-        //tree.addMouseListener(treeListener);
-        //tree.addKeyListener(treeListener);
     }
 
     @Override
@@ -61,12 +54,14 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
         for (AbstractThreadGroup group : tgSelector.getThreadGroups()) {
             tgCombo.addItem(group);
         }
+        tgCombo.setEnabled(tgCombo.getItemCount() > 0);
+        start.setEnabled(tgCombo.getItemCount() > 0);
     }
 
     @Override
     public void componentHidden(ComponentEvent e) {
         log.debug("Closing dialog");
-        //TODO engine.stopDebugging();
+        stop();
     }
 
     protected HashTree getTestTree() {
@@ -82,9 +77,9 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
         stop.setEnabled(true);
 
         HashTree hashTree = tgSelector.getSelectedTree();
-        JMeter.convertSubTree(hashTree);
         engine = new DebuggerEngine();
         engine.setStepper(stepper);
+        JMeter.convertSubTree(hashTree);
         engine.configure(hashTree);
         try {
             engine.runTest();
@@ -95,7 +90,8 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
     }
 
     private void stop() {
-        if (engine.isActive()) {
+        log.debug("Start debugging");
+        if (engine != null && engine.isActive()) {
             engine.stopTest(true);
         }
         start.setEnabled(true);
@@ -170,7 +166,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
 
             JMeterTreeNode treeNode = model.getNodeOf(currentSampler);
             if (treeNode != null) {
-                treeNode.setMarkedBySearch(true); // TODO: find better display for it
+                treeNode.setMarkedBySearch(true);
             } else {
                 log.warn("Failed to find tree node for " + currentSampler.getName());
             }
@@ -201,7 +197,14 @@ public class DebuggerDialog extends DebuggerDialogBase implements JMeterThreadMo
                 log.debug("Item choice changed: " + event.getItem());
                 if (event.getItem() instanceof AbstractThreadGroup) {
                     tgSelector.selectThreadGroup((AbstractThreadGroup) event.getItem());
-                    tree.setModel(new DebuggerTreeModel(tgSelector.getSelectedTree()));
+                    treeModel.clearTestPlan();
+                    HashTree selectedTree = tgSelector.getSelectedTree();
+                    JMeter.convertSubTree(selectedTree);
+                    try {
+                        treeModel.addSubTree(selectedTree, (JMeterTreeNode) treeModel.getRoot());
+                    } catch (IllegalUserActionException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         }

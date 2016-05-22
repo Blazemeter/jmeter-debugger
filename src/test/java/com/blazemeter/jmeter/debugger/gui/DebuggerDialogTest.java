@@ -7,16 +7,18 @@ import com.blazemeter.jmeter.debugger.engine.ThreadGroupSelector;
 import kg.apc.emulators.TestJMeterUtils;
 import org.apache.jmeter.JMeter;
 import org.apache.jmeter.engine.StandardJMeterEngine;
-import org.apache.jmeter.gui.tree.JMeterTreeListener;
+import org.apache.jmeter.exceptions.IllegalUserActionException;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
+import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.save.SaveService;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.LogTarget;
 import org.apache.log.Logger;
-import org.apache.log.format.SyslogFormatter;
+import org.apache.log.format.PatternFormatter;
 import org.apache.log.output.io.WriterTarget;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.swing.*;
@@ -29,10 +31,14 @@ import java.io.PrintWriter;
 public class DebuggerDialogTest {
     private static final Logger log = LoggingManager.getLoggerForClass();
 
+    @BeforeClass
+    public static void setUp() {
+        PrintWriter writer = new PrintWriter(System.out, true);
+        LoggingManager.addLogTargetToRootLogger(new LogTarget[]{new WriterTarget(writer, new PatternFormatter(LoggingManager.DEFAULT_PATTERN))});
+    }
+
     @Test
     public void displayGUI() throws InterruptedException, IOException {
-        PrintWriter writer = new PrintWriter(System.out);
-        LoggingManager.addLogTargetToRootLogger(new LogTarget[]{new WriterTarget(writer, new SyslogFormatter())});
         if (!GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance()) {
             TestJMeterUtils.createJmeterEnv();
             DebuggerDialogMock frame = new DebuggerDialogMock();
@@ -62,15 +68,13 @@ public class DebuggerDialogTest {
     private class DebuggerDialogMock extends DebuggerDialog {
         @Override
         protected HashTree getTestTree() {
-            return getHashTree();
-        }
-
-        public JMeterTreeListener getTreeListener() {
-            return treeListener;
-        }
-
-        public JMeterTreeModel getTreeModel() {
-            return (JMeterTreeModel) tree.getModel();
+            JMeterTreeModel mdl = new JMeterTreeModel();
+            try {
+                mdl.addSubTree(getHashTree(), (JMeterTreeNode) mdl.getRoot());
+            } catch (IllegalUserActionException e) {
+                throw new RuntimeException(e);
+            }
+            return mdl.getTestPlan();
         }
     }
 

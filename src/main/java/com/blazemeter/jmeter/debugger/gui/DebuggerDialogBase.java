@@ -24,6 +24,7 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
 
     protected JComboBox<AbstractThreadGroup> tgCombo = new JComboBox<>();
     protected JTree tree;
+    protected JMeterTreeModel treeModel;
     protected JButton start = new JButton("Start");
     protected JButton step = new JButton("Step Over");
     protected JButton stop = new JButton("Stop");
@@ -161,7 +162,8 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
     }
 
     private JTree getTreeView() {
-        tree = new JTree(new JMeterTreeModel());
+        treeModel = new JMeterTreeModel();
+        tree = new JTree(treeModel);
         tree.setCellRenderer(new FixedJMeterTreeCellRenderer());
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
