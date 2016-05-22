@@ -147,9 +147,11 @@ public class DebuggerDialog extends DebuggerDialogBase {
         GuiPackage gui = GuiPackage.getInstance();
         if (gui != null) {
             JMeterGUIComponent egui = gui.getGui(te);
+            egui.configure(te);
             elementContainer.removeAll();
             if (egui instanceof Component) {
                 egui.setEnabled(false);
+                
                 elementContainer.add((Component) egui, BorderLayout.CENTER);
             }
             elementContainer.updateUI();

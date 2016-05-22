@@ -16,8 +16,7 @@ import javax.swing.*;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
+import java.awt.event.*;
 import java.util.LinkedList;
 
 abstract public class DebuggerDialogBase extends JDialog implements ComponentListener, TestStateListener {
@@ -139,18 +138,45 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
         res.add(tgCombo);
         tgCombo.setRenderer(new ThreadGroupItemRenderer(tgCombo.getRenderer()));
 
+        AbstractAction toggle = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (start.isEnabled()) {
+                    start.doClick();
+                } else {
+                    stop.doClick();
+                }
+            }
+        };
+        KeyStroke f5 = KeyStroke.getKeyStroke(KeyEvent.VK_F5, InputEvent.SHIFT_DOWN_MASK);
+
         start.setIcon(DebuggerMenuItem.getStartIcon());
         res.add(start);
+        start.setToolTipText(f5.toString());
+        start.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(f5, f5);
+        start.getActionMap().put(f5, toggle);
 
         stop.setIcon(DebuggerMenuItem.getStopIcon());
         res.add(stop);
         stop.setEnabled(false);
+        stop.setToolTipText(f5.toString());
+        stop.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(f5, f5);
+        stop.getActionMap().put(f5, toggle);
+
         res.addSeparator();
 
         step.setIcon(DebuggerMenuItem.getStepIcon());
         res.add(step);
         step.setEnabled(false);
-
+        KeyStroke f8 = KeyStroke.getKeyStroke(KeyEvent.VK_F8, InputEvent.SHIFT_DOWN_MASK);
+        step.setToolTipText(f8.toString());
+        step.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(f8, f8);
+        step.getActionMap().put(f8, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                step.doClick();
+            }
+        });
         return res;
     }
 
