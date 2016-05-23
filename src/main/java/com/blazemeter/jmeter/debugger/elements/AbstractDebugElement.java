@@ -5,6 +5,7 @@ import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
 import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.testelement.AbstractTestElement;
+import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.threads.JMeterContextService;
 
 public class AbstractDebugElement<T> extends AbstractTestElement {
@@ -25,4 +26,13 @@ public class AbstractDebugElement<T> extends AbstractTestElement {
         }
         throw new IllegalStateException();
     }
+
+    @Override
+    public void addTestElement(TestElement el) {
+        if (wrapped instanceof TestElement) {
+            ((TestElement) wrapped).addTestElement(el);
+        }
+    }
+    
+    
 }

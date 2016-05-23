@@ -63,12 +63,14 @@ public class TreeClonerTG implements HashTreeTraverser {
             AbstractThreadGroup orig = (AbstractThreadGroup) cloned;
             AbstractThreadGroup wrapped = new DebuggingThreadGroup();
             wrapped.setProperty(TestElement.GUI_CLASS, cloned.getPropertyAsString(TestElement.GUI_CLASS));
-            wrapped.setName(orig.getName());
+            wrapped.setName(cloned.getName());
+            wrapped.setEnabled(cloned.isEnabled());
             res.setUserObject(wrapped);
         } else if (cloned instanceof Controller && !(cloned instanceof TestFragmentController)) {
             ControllerDebug wrapped = new ControllerDebug((Controller) cloned);
             wrapped.setProperty(TestElement.GUI_CLASS, cloned.getPropertyAsString(TestElement.GUI_CLASS));
             wrapped.setName(cloned.getName());
+            wrapped.setEnabled(cloned.isEnabled());
             res.setUserObject(wrapped);
         } else {
             res.setUserObject(cloned);
