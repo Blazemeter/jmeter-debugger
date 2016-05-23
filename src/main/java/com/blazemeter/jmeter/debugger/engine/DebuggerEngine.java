@@ -57,7 +57,7 @@ public class DebuggerEngine extends StandardJMeterEngine {
         if (thread != null && thread.isAlive()) {
             log.debug("Joining thread: " + thread);
             try {
-                thread.join(60000);
+                thread.join(10000); // last resort wait
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -69,6 +69,4 @@ public class DebuggerEngine extends StandardJMeterEngine {
             }
         }
     }
-
-
 }

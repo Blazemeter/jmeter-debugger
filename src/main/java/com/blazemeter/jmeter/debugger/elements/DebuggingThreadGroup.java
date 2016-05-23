@@ -18,6 +18,7 @@ public class DebuggingThreadGroup extends ThreadGroup {
     private Thread osThread;
     private DebuggingThread jmeterThread;
     private final long waitTime = JMeterUtils.getPropDefault("jmeterengine.threadstop.wait", 5 * 1000);
+    private boolean stopping = false;
 
 
     public DebuggingThreadGroup() {
@@ -78,11 +79,18 @@ public class DebuggingThreadGroup extends ThreadGroup {
         super.waitThreadsStopped();
         if (osThread != null) {
             while (osThread.isAlive()) {
-                log.debug("Joining thread: " + osThread);
+                if (stopping) {
+                    log.debug("Interrupting thread: " + osThread);
+                    osThread.interrupt();
+                }
+
+                log.debug("Joining thread 1: " + osThread + " " + stopping + " " + osThread.isInterrupted());
+
                 try {
                     osThread.join(waitTime);
                 } catch (InterruptedException e) {
                     log.debug("Interrupted: " + e);
+                    break;
                 }
             }
             log.debug("Thread is done: " + osThread);
@@ -91,6 +99,7 @@ public class DebuggingThreadGroup extends ThreadGroup {
 
     @Override
     public void tellThreadsToStop() {
+        stopping = true;
         super.tellThreadsToStop();
         if (jmeterThread != null) {
             log.debug("Interrupting JMeter thread: " + jmeterThread);
@@ -108,7 +117,7 @@ public class DebuggingThreadGroup extends ThreadGroup {
         boolean stopped = super.verifyThreadsStopped();
         if (osThread != null) {
             if (osThread.isAlive()) {
-                log.debug("Joining thread: " + osThread);
+                log.debug("Joining thread 2: " + osThread);
                 try {
                     osThread.join(waitTime);
                 } catch (InterruptedException e) {

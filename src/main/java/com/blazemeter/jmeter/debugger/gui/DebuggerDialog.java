@@ -35,6 +35,7 @@ public class DebuggerDialog extends DebuggerDialogBase {
     protected DebuggerEngine engine;
     private StepOver stepper = new StepOver();
     private ThreadGroupSelector tgSelector = new ThreadGroupSelector(new HashTree());
+    private boolean savedDirty = false;
 
     public DebuggerDialog() {
         super();
@@ -47,6 +48,9 @@ public class DebuggerDialog extends DebuggerDialogBase {
     @Override
     public void componentShown(ComponentEvent e) {
         log.debug("Showing dialog");
+        if (GuiPackage.getInstance() != null) {
+            savedDirty = GuiPackage.getInstance().isDirty();
+        }
         HashTree testTree = getTestTree();
         this.tgSelector = new ThreadGroupSelector(testTree);
         tgCombo.removeAllItems();
@@ -61,6 +65,9 @@ public class DebuggerDialog extends DebuggerDialogBase {
     public void componentHidden(ComponentEvent e) {
         log.debug("Closing dialog");
         stop();
+        if (GuiPackage.getInstance() != null) {
+            GuiPackage.getInstance().setDirty(savedDirty);
+        }
     }
 
     protected HashTree getTestTree() {
@@ -92,15 +99,16 @@ public class DebuggerDialog extends DebuggerDialogBase {
     private void stop() {
         log.debug("Stop debugging");
 
-        synchronized (this) {
-            if (stepper.isStopping()) {
-                throw new IllegalStateException("Already stopping");
-            }
+        if (stepper.isStopping()) {
+            throw new IllegalStateException("Already stopping");
+        }
 
-            stepper.setStopping(true);
+        stepper.setStopping(true);
+        try {
             if (engine != null && engine.isActive()) {
                 engine.stopTest(true);
             }
+        } finally {
             stepper.setStopping(false);
             start.setEnabled(true);
             stop.setEnabled(false);
@@ -117,8 +125,6 @@ public class DebuggerDialog extends DebuggerDialogBase {
         JMeterContext context = engine.getThreadContext();
         refreshVars(context);
         refreshProperties();
-
-        // TODO: show samples
     }
 
     private void refreshVars(JMeterContext context) {
@@ -151,7 +157,7 @@ public class DebuggerDialog extends DebuggerDialogBase {
             elementContainer.removeAll();
             if (egui instanceof Component) {
                 egui.setEnabled(false);
-                
+
                 elementContainer.add((Component) egui, BorderLayout.CENTER);
             }
             elementContainer.updateUI();

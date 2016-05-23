@@ -15,13 +15,17 @@ public class DebuggingThreadGroupGui extends AbstractJMeterGuiComponent {
     }
 
     @Override
+    public String getStaticLabel() {
+        return getClass().getCanonicalName();
+    }
+
+    @Override
     public TestElement createTestElement() {
         return new DebuggingThreadGroup();
     }
 
     @Override
     public void modifyTestElement(TestElement element) {
-
     }
 
     @Override
