@@ -61,28 +61,24 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
 
     private Component getStatusPane() {
         JTabbedPane tabs = new JTabbedPane();
-        //tabs.add("Samples", getSamplesTab());
         tabs.add("Variables", getVariablesTab());
         tabs.add("JMeter Properties", getPropertiesTab());
+        //tabs.add("Evaluate", getSamplesTab());
         tabs.add("Log", getLogTab());
         return tabs;
     }
 
-    private Component getSamplesTab() {
-        return new JPanel();
-    }
-
     private Component getVariablesTab() {
-        varsTableModel = new PowerTableModel(new String[]{"Name", "Value"}, new Class[]{String.class, String.class});
-        JTable table = new JTable(varsTableModel);
+        varsTableModel = new HighlightTableModel(new String[]{"Name", "Value"}, new Class[]{String.class, String.class});
+        JTable table = new HighlightTable(varsTableModel);
         table.setDefaultEditor(Object.class, null); // TODO: allow editing vars
         setTableSorted(table);
         return new JScrollPane(table);
     }
 
     private Component getPropertiesTab() {
-        propsTableModel = new PowerTableModel(new String[]{"Name", "Value"}, new Class[]{String.class, String.class});
-        JTable table = new JTable(propsTableModel);
+        propsTableModel = new HighlightTableModel(new String[]{"Name", "Value"}, new Class[]{String.class, String.class});
+        JTable table = new HighlightTable(propsTableModel);
         table.setDefaultEditor(Object.class, null); // TODO: allow editing props
         setTableSorted(table);
         return new JScrollPane(table);

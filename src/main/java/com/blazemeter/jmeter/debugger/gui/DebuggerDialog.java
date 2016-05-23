@@ -128,7 +128,6 @@ public class DebuggerDialog extends DebuggerDialogBase {
     }
 
     private void refreshVars(JMeterContext context) {
-        // TODO: highlight changes in vars
         varsTableModel.clearData();
         for (Map.Entry<String, Object> var : context.getVariables().entrySet()) {
             varsTableModel.addRow(new String[]{var.getKey(), var.getValue().toString()});
@@ -137,7 +136,6 @@ public class DebuggerDialog extends DebuggerDialogBase {
     }
 
     private void refreshProperties() {
-        // TODO: highlight changes in props
         propsTableModel.clearData();
         for (Map.Entry<Object, Object> var : JMeterUtils.getJMeterProperties().entrySet()) {
             propsTableModel.addRow(new String[]{var.getKey().toString(), var.getValue().toString()});
