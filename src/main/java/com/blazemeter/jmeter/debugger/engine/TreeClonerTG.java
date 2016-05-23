@@ -5,7 +5,6 @@ import com.blazemeter.jmeter.debugger.elements.ControllerDebugGui;
 import com.blazemeter.jmeter.debugger.elements.DebuggingThreadGroup;
 import com.blazemeter.jmeter.debugger.elements.DebuggingThreadGroupGui;
 import org.apache.jmeter.control.Controller;
-import org.apache.jmeter.control.TestFragmentController;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.threads.AbstractThreadGroup;
@@ -62,7 +61,6 @@ public class TreeClonerTG implements HashTreeTraverser {
         JMeterTreeNode res = new JMeterTreeNode();
 
         if (cloned instanceof AbstractThreadGroup) {
-            AbstractThreadGroup orig = (AbstractThreadGroup) cloned;
             AbstractThreadGroup wrapped = new DebuggingThreadGroup();
             wrapped.setProperty(TestElement.GUI_CLASS, DebuggingThreadGroupGui.class.getCanonicalName());
             wrapped.setName(cloned.getName());

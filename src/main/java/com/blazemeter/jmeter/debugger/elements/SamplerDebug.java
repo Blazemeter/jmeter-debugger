@@ -13,6 +13,7 @@ public class SamplerDebug extends AbstractDebugElement<Sampler> implements Sampl
 
     @Override
     public SampleResult sample(Entry e) {
+        prepareBean();
         getHook().notify(this);
         return wrapped.sample(e);
     }

@@ -33,7 +33,7 @@ public class DebuggerDialog extends DebuggerDialogBase {
     private static final Logger log = LoggingManager.getLoggerForClass();
 
     protected DebuggerEngine engine;
-    private StepOver stepper = new StepOver();
+    private final StepOver stepper = new StepOver();
     private ThreadGroupSelector tgSelector = new ThreadGroupSelector(new HashTree());
     private boolean savedDirty = false;
 

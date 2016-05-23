@@ -25,6 +25,7 @@ public class ControllerDebug extends AbstractDebugElement<Controller> implements
 
     @Override
     public void addIterationListener(LoopIterationListener listener) {
+        prepareBean();
         wrapped.addIterationListener(listener);
     }
 

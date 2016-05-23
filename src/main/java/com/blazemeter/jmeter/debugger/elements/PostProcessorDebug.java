@@ -10,6 +10,7 @@ public class PostProcessorDebug extends AbstractDebugElement<PostProcessor> impl
 
     @Override
     public void process() {
+        prepareBean();
         getHook().notify(this);
         wrapped.process();
     }

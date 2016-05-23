@@ -47,7 +47,7 @@ public class DebuggerDialogTest {
     public void displayGUI() throws InterruptedException, IOException {
         if (!GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance()) {
             TestJMeterUtils.createJmeterEnv();
-            
+
             long now = System.currentTimeMillis();
             JMeterUtils.setProperty("START.MS", Long.toString(now));
             Date today = new Date(now);
@@ -108,7 +108,10 @@ public class DebuggerDialogTest {
     public void runDebugEngine() throws Exception {
         TestJMeterUtils.createJmeterEnv();
 
-        ThreadGroupSelector sel = new ThreadGroupSelector(getHashTree());
+        JMeterTreeModel mdl = new JMeterTreeModel();
+        mdl.addSubTree(getHashTree(), (JMeterTreeNode) mdl.getRoot());
+
+        ThreadGroupSelector sel = new ThreadGroupSelector(mdl.getTestPlan());
         HashTree hashTree = sel.getSelectedTree();
         JMeter.convertSubTree(hashTree);
 

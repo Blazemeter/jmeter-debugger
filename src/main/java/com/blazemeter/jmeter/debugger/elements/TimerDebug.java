@@ -13,6 +13,7 @@ public class TimerDebug extends AbstractDebugElement<Timer> implements Timer {
 
     @Override
     public long delay() {
+        prepareBean();
         getHook().notify(this);
         long delay = wrapped.delay();
         log.debug("Drop delay because of debug: " + delay);
