@@ -68,7 +68,7 @@ public class TreeClonerTG implements HashTreeTraverser {
             wrapped.setName(cloned.getName());
             wrapped.setEnabled(cloned.isEnabled());
             res.setUserObject(wrapped);
-        } else if (cloned instanceof Controller && !(cloned instanceof TestFragmentController)) {
+        } else if (cloned instanceof Controller) {
             ControllerDebug wrapped = new ControllerDebug((Controller) cloned);
             wrapped.setProperty(TestElement.GUI_CLASS, ControllerDebugGui.class.getCanonicalName());
             wrapped.setName(cloned.getName());
