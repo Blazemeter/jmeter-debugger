@@ -10,7 +10,7 @@ import java.util.Map;
 public class HighlightTableModel extends PowerTableModel {
     private static final Logger log = LoggingManager.getLoggerForClass();
 
-    private Map<String, Object> oldData = new HashMap<>();
+    private Map<String, Object> oldData = null;
 
     public HighlightTableModel(String[] strings, Class[] classes) {
         super(strings, classes);
@@ -35,7 +35,7 @@ public class HighlightTableModel extends PowerTableModel {
         if (oldData == null && getData().size() == 0) {
             super.clearData();
         } else {
-            oldData.clear();
+            oldData = new HashMap<>();
             for (int row = 0; row < getRowCount(); row++) {
                 Object[] rowData = getRowData(row);
                 oldData.put(rowData[0].toString(), rowData[1]);
