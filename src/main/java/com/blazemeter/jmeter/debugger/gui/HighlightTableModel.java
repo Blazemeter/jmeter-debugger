@@ -1,28 +1,33 @@
 package com.blazemeter.jmeter.debugger.gui;
 
 import org.apache.jmeter.gui.util.PowerTableModel;
-import org.apache.jorphan.collections.Data;
+import org.apache.jorphan.logging.LoggingManager;
+import org.apache.log.Logger;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class HighlightTableModel extends PowerTableModel {
+    private static final Logger log = LoggingManager.getLoggerForClass();
 
-    private Data oldData = null;
+    private Map<String, Object> oldData = new HashMap<>();
 
     public HighlightTableModel(String[] strings, Class[] classes) {
         super(strings, classes);
     }
 
-    public boolean isRowHighlighted(int rowN) {
+    public boolean isRowHighlighted(String curName, Object curValue) {
         if (oldData == null) {
             return false;
         }
 
-        String nameCol = getColumnName(0);
-        Object curName = getValueAt(rowN, 0);
-        int rowOfValue = oldData.findValue(nameCol, curName);
-        Object curValue = getValueAt(rowN, 1);
-        Object oldValue = oldData.getColumnValue(1, rowOfValue);
-        boolean changed = !curValue.equals(oldValue);
-        return rowOfValue < 0 || changed;
+        Object oldValue = oldData.get(curName);
+        if (!curValue.equals(oldValue)) {
+            log.debug("Highlight change " + curName + " '" + oldValue + "' to '" + curValue + "'");
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
@@ -30,7 +35,11 @@ public class HighlightTableModel extends PowerTableModel {
         if (oldData == null && getData().size() == 0) {
             super.clearData();
         } else {
-            oldData = getData();
+            oldData.clear();
+            for (int row = 0; row < getRowCount(); row++) {
+                Object[] rowData = getRowData(row);
+                oldData.put(rowData[0].toString(), rowData[1]);
+            }
             super.clearData();
         }
     }

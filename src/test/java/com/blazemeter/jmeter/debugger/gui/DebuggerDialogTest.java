@@ -9,8 +9,8 @@ import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.exceptions.IllegalUserActionException;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
-import org.apache.jmeter.sampler.DebugSampler;
 import org.apache.jmeter.save.SaveService;
+import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.LogTarget;
@@ -26,6 +26,8 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Properties;
 
 
@@ -44,11 +46,15 @@ public class DebuggerDialogTest {
     @Test
     public void displayGUI() throws InterruptedException, IOException {
         if (!GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance()) {
-            DebugSampler s=new DebugSampler();
             TestJMeterUtils.createJmeterEnv();
+            
+            long now = System.currentTimeMillis();
+            JMeterUtils.setProperty("START.MS", Long.toString(now));
+            Date today = new Date(now);
+            JMeterUtils.setProperty("START.YMD", new SimpleDateFormat("yyyyMMdd").format(today));
+            JMeterUtils.setProperty("START.HMS", new SimpleDateFormat("HHmmss").format(today));
+
             DebuggerDialogMock frame = new DebuggerDialogMock();
-            //GuiPackage.getInstance(frame.getTreeListener(), frame.getTreeModel());
-            //GuiPackage.getInstance().setMainFrame(new MainFrame(frame.getTreeModel(), frame.getTreeListener()));
 
             frame.setPreferredSize(new Dimension(800, 600));
             frame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
