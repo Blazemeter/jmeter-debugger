@@ -1,7 +1,9 @@
 package com.blazemeter.jmeter.debugger.engine;
 
-import com.blazemeter.jmeter.debugger.elements.DebuggingThreadGroupGui;
+import com.blazemeter.jmeter.debugger.elements.ControllerDebug;
 import com.blazemeter.jmeter.debugger.elements.DebuggingThreadGroup;
+import org.apache.jmeter.control.Controller;
+import org.apache.jmeter.control.TestFragmentController;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.threads.AbstractThreadGroup;
@@ -14,7 +16,6 @@ import java.util.LinkedList;
 public class TreeClonerTG implements HashTreeTraverser {
     private AbstractThreadGroup onlyTG;
 
-    private AbstractThreadGroup clonedOnlyTG;
     private final ListedHashTree newTree = new ListedHashTree();
     private final LinkedList<Object> stack = new LinkedList<>();
     private boolean ignoring = false;
@@ -58,12 +59,17 @@ public class TreeClonerTG implements HashTreeTraverser {
         TestElement cloned = (TestElement) te.clone();
         JMeterTreeNode res = new JMeterTreeNode();
 
-        if (te instanceof AbstractThreadGroup) {
+        if (cloned instanceof AbstractThreadGroup) {
             AbstractThreadGroup orig = (AbstractThreadGroup) cloned;
-            clonedOnlyTG = new DebuggingThreadGroup();
-            clonedOnlyTG.setProperty(TestElement.GUI_CLASS, DebuggingThreadGroupGui.class.getCanonicalName());
-            clonedOnlyTG.setName(orig.getName());
-            res.setUserObject(clonedOnlyTG);
+            AbstractThreadGroup wrapped = new DebuggingThreadGroup();
+            wrapped.setProperty(TestElement.GUI_CLASS, cloned.getPropertyAsString(TestElement.GUI_CLASS));
+            wrapped.setName(orig.getName());
+            res.setUserObject(wrapped);
+        } else if (cloned instanceof Controller && !(cloned instanceof TestFragmentController)) {
+            ControllerDebug wrapped = new ControllerDebug((Controller) cloned);
+            wrapped.setProperty(TestElement.GUI_CLASS, cloned.getPropertyAsString(TestElement.GUI_CLASS));
+            wrapped.setName(cloned.getName());
+            res.setUserObject(wrapped);
         } else {
             res.setUserObject(cloned);
         }
@@ -86,9 +92,4 @@ public class TreeClonerTG implements HashTreeTraverser {
     public HashTree getClonedTree() {
         return newTree;
     }
-
-    public AbstractThreadGroup getClonedTG() {
-        return clonedOnlyTG;
-    }
-
 }

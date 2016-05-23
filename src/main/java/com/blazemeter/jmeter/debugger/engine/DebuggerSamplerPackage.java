@@ -18,9 +18,8 @@ import java.util.List;
 
 public class DebuggerSamplerPackage extends SamplePackage {
     private static final Logger log = LoggingManager.getLoggerForClass();
-    private StepTrigger hook;
 
-    public DebuggerSamplerPackage(SamplePackage origin, List<Controller> controller, StepTrigger hook) {
+    public DebuggerSamplerPackage(SamplePackage origin, List<Controller> controller) {
         super(origin.getConfigs(),
                 origin.getSampleListeners(),
                 origin.getTimers(),
@@ -28,7 +27,6 @@ public class DebuggerSamplerPackage extends SamplePackage {
                 origin.getPostProcessors(),
                 origin.getPreProcessors(),
                 controller);
-        this.hook = hook;
         setSampler(origin.getSampler());
     }
 
@@ -41,7 +39,7 @@ public class DebuggerSamplerPackage extends SamplePackage {
     public List<PreProcessor> getPreProcessors() {
         List<PreProcessor> wrapped = new LinkedList<>();
         for (PreProcessor te : super.getPreProcessors()) {
-            wrapped.add(new PreProcessorDebug(te, hook));
+            wrapped.add(new PreProcessorDebug(te));
         }
         return wrapped;
     }
@@ -50,7 +48,7 @@ public class DebuggerSamplerPackage extends SamplePackage {
     public List<PostProcessor> getPostProcessors() {
         List<PostProcessor> wrapped = new LinkedList<>();
         for (PostProcessor te : super.getPostProcessors()) {
-            wrapped.add(new PostProcessorDebug(te, hook));
+            wrapped.add(new PostProcessorDebug(te));
         }
         return wrapped;
     }
@@ -59,7 +57,7 @@ public class DebuggerSamplerPackage extends SamplePackage {
     public List<Assertion> getAssertions() {
         List<Assertion> wrapped = new LinkedList<>();
         for (Assertion te : super.getAssertions()) {
-            wrapped.add(new AssertionDebug(te, hook));
+            wrapped.add(new AssertionDebug(te));
         }
         return wrapped;
     }
@@ -68,7 +66,7 @@ public class DebuggerSamplerPackage extends SamplePackage {
     public List<Timer> getTimers() {
         List<Timer> wrapped = new LinkedList<>();
         for (Timer te : super.getTimers()) {
-            wrapped.add(new TimerDebug(te, hook));
+            wrapped.add(new TimerDebug(te));
         }
         return wrapped;
     }
@@ -77,13 +75,13 @@ public class DebuggerSamplerPackage extends SamplePackage {
     public List<SampleListener> getSampleListeners() {
         List<SampleListener> wrapped = new LinkedList<>();
         for (SampleListener te : super.getSampleListeners()) {
-            wrapped.add(new SampleListenerDebug(te, hook));
+            wrapped.add(new SampleListenerDebug(te));
         }
         return wrapped;
     }
 
     @Override
     public Sampler getSampler() {
-        return new SamplerDebug(super.getSampler(), hook);
+        return new SamplerDebug(super.getSampler());
     }
 }

@@ -1,6 +1,5 @@
 package com.blazemeter.jmeter.debugger.elements;
 
-import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import org.apache.jmeter.samplers.Entry;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.samplers.Sampler;
@@ -8,13 +7,13 @@ import org.apache.jmeter.threads.JMeterContext;
 
 
 public class SamplerDebug extends AbstractDebugElement<Sampler> implements Sampler {
-    public SamplerDebug(Sampler te, StepTrigger hook) {
-        super(te, hook);
+    public SamplerDebug(Sampler te) {
+        super(te);
     }
 
     @Override
     public SampleResult sample(Entry e) {
-        hook.notify(this);
+        getHook().notify(this);
         return wrapped.sample(e);
     }
 

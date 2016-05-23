@@ -7,13 +7,13 @@ import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 
 
 public class AssertionDebug extends AbstractDebugElement<Assertion> implements Assertion {
-    public AssertionDebug(Assertion te, StepTrigger hook) {
-        super(te, hook);
+    public AssertionDebug(Assertion te) {
+        super(te);
     }
 
     @Override
     public AssertionResult getResult(SampleResult sampleResult) {
-        hook.notify(this);
+        getHook().notify(this);
         return wrapped.getResult(sampleResult);
     }
 }

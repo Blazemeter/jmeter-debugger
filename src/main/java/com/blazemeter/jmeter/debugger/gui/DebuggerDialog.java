@@ -144,15 +144,25 @@ public class DebuggerDialog extends DebuggerDialogBase {
         propsTableModel.fireTableDataChanged();
     }
 
-    private void selectTargetInTree(TestElement te, Sampler currentSampler) {
-        tree.setSelectionPath(getTreePathFor(te));
+    private void selectTargetInTree(AbstractDebugElement dbgElm, Sampler currentSampler) {
+        TestElement wrpElm = (TestElement) dbgElm.getWrappedElement();
+        TreePath treePath = getTreePathFor(wrpElm);
+        if (treePath == null) {
+            treePath = getTreePathFor(dbgElm);
+        }
+
+        if (treePath == null) {
+            log.debug("Did not find tree path for element");
+        } else {
+            tree.setSelectionPath(treePath);
+        }
         markCurrentSampler(currentSampler);
         tree.repaint();
 
         GuiPackage gui = GuiPackage.getInstance();
         if (gui != null) {
-            JMeterGUIComponent egui = gui.getGui(te);
-            egui.configure(te);
+            JMeterGUIComponent egui = gui.getGui(wrpElm);
+            egui.configure(wrpElm);
             elementContainer.removeAll();
             if (egui instanceof Component) {
                 egui.setEnabled(false);
@@ -252,9 +262,7 @@ public class DebuggerDialog extends DebuggerDialogBase {
             step.setEnabled(true);
             Object wrappedElement = t.getWrappedElement();
             log.debug("Stopping before: " + wrappedElement);
-            if (wrappedElement instanceof TestElement) {
-                selectTargetInTree((TestElement) wrappedElement, engine.getCurrentSampler());
-            }
+            selectTargetInTree(t, engine.getCurrentSampler());
             refreshStatus();
             if (!stopping) {
                 try {

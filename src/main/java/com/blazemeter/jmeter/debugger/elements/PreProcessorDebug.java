@@ -5,13 +5,13 @@ import org.apache.jmeter.processor.PreProcessor;
 
 public class PreProcessorDebug extends AbstractDebugElement<PreProcessor> implements PreProcessor {
 
-    public PreProcessorDebug(PreProcessor te, StepTrigger hook) {
-        super(te, hook);
+    public PreProcessorDebug(PreProcessor te) {
+        super(te);
     }
 
     @Override
     public void process() {
-        hook.notify(this);
+        getHook().notify(this);
         wrapped.process();
     }
 }

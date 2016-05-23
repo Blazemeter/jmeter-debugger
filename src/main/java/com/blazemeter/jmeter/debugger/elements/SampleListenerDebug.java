@@ -1,19 +1,18 @@
 package com.blazemeter.jmeter.debugger.elements;
 
-import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import org.apache.jmeter.samplers.SampleEvent;
 import org.apache.jmeter.samplers.SampleListener;
 
 public class SampleListenerDebug extends AbstractDebugElement<SampleListener> implements SampleListener {
-    public SampleListenerDebug(SampleListener te, StepTrigger hook) {
-        super(te, hook);
+    public SampleListenerDebug(SampleListener te) {
+        super(te);
     }
 
     @Override
     public void sampleOccurred(SampleEvent e) {
-        hook.notify(this);
+        getHook().notify(this);
         wrapped.sampleOccurred(e);
-        hook.notify(this);
+        getHook().notify(this); // special case for reporters to see the result
     }
 
     @Override

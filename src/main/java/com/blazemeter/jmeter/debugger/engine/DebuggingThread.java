@@ -22,7 +22,7 @@ public class DebuggingThread extends JMeterThread {
     }
 
     public void setHook(StepTrigger hook) {
-        replacedCompiler = new DebuggerCompiler(test, hook);
+        replacedCompiler = new DebuggerCompiler(test);
         try {
             replaceCompiler();
         } catch (NoSuchFieldException | IllegalAccessException e) {

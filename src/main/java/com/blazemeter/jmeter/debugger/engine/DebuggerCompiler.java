@@ -14,13 +14,11 @@ import java.util.List;
 
 public class DebuggerCompiler extends TestCompiler {
     private static final Logger log = LoggingManager.getLoggerForClass();
-    private StepTrigger hook;
 
     private DebuggerSamplerPackage lastSamplePackage;
 
-    public DebuggerCompiler(HashTree testTree, StepTrigger hook) {
+    public DebuggerCompiler(HashTree testTree) {
         super(testTree);
-        this.hook = hook;
     }
 
     @Override
@@ -35,7 +33,7 @@ public class DebuggerCompiler extends TestCompiler {
 
     private DebuggerSamplerPackage wrapSamplerPack(SamplePackage samplePackage) {
         try {
-            lastSamplePackage = new DebuggerSamplerPackage(samplePackage, getControllers(samplePackage), hook);
+            lastSamplePackage = new DebuggerSamplerPackage(samplePackage, getControllers(samplePackage));
             return lastSamplePackage;
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException("Failed to access controllers");
