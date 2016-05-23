@@ -12,6 +12,6 @@ public class PreProcessorDebug extends AbstractDebugElement<PreProcessor> implem
     @Override
     public void process() {
         hook.notify(this);
-        parent.process();
+        wrapped.process();
     }
 }

@@ -13,6 +13,6 @@ public class PostProcessorDebug extends AbstractDebugElement<PostProcessor> impl
     @Override
     public void process() {
         hook.notify(this);
-        parent.process();
+        wrapped.process();
     }
 }

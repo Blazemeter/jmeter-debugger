@@ -15,16 +15,16 @@ public class SamplerDebug extends AbstractDebugElement<Sampler> implements Sampl
     @Override
     public SampleResult sample(Entry e) {
         hook.notify(this);
-        return parent.sample(e);
+        return wrapped.sample(e);
     }
 
     @Override
     public void setThreadContext(JMeterContext inthreadContext) {
-        parent.setThreadContext(inthreadContext);
+        wrapped.setThreadContext(inthreadContext);
     }
 
     @Override
     public void setThreadName(String inthreadName) {
-        parent.setThreadName(inthreadName);
+        wrapped.setThreadName(inthreadName);
     }
 }

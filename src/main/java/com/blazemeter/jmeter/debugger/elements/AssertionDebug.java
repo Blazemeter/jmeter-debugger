@@ -14,6 +14,6 @@ public class AssertionDebug extends AbstractDebugElement<Assertion> implements A
     @Override
     public AssertionResult getResult(SampleResult sampleResult) {
         hook.notify(this);
-        return parent.getResult(sampleResult);
+        return wrapped.getResult(sampleResult);
     }
 }
