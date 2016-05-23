@@ -113,6 +113,7 @@ public class DebuggerDialog extends DebuggerDialogBase {
             start.setEnabled(true);
             stop.setEnabled(false);
             tgCombo.setEnabled(true);
+            elementContainer.removeAll();
         }
     }
 
