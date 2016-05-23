@@ -1,6 +1,6 @@
 package com.blazemeter.jmeter.debugger.elements;
 
-import org.apache.jmeter.gui.AbstractJMeterGuiComponent;
+import org.apache.jmeter.control.gui.AbstractControllerGui;
 import org.apache.jmeter.gui.util.MenuFactory;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.threads.gui.AbstractThreadGroupGui;
@@ -9,7 +9,7 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class DebuggingThreadGroupGui extends AbstractThreadGroupGui {
+public class ControllerDebugGui extends AbstractControllerGui {
     @Override
     public String getLabelResource() {
         return getClass().getCanonicalName();

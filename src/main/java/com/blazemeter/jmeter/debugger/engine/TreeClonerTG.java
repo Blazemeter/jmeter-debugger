@@ -1,7 +1,9 @@
 package com.blazemeter.jmeter.debugger.engine;
 
 import com.blazemeter.jmeter.debugger.elements.ControllerDebug;
+import com.blazemeter.jmeter.debugger.elements.ControllerDebugGui;
 import com.blazemeter.jmeter.debugger.elements.DebuggingThreadGroup;
+import com.blazemeter.jmeter.debugger.elements.DebuggingThreadGroupGui;
 import org.apache.jmeter.control.Controller;
 import org.apache.jmeter.control.TestFragmentController;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
@@ -62,13 +64,13 @@ public class TreeClonerTG implements HashTreeTraverser {
         if (cloned instanceof AbstractThreadGroup) {
             AbstractThreadGroup orig = (AbstractThreadGroup) cloned;
             AbstractThreadGroup wrapped = new DebuggingThreadGroup();
-            wrapped.setProperty(TestElement.GUI_CLASS, cloned.getPropertyAsString(TestElement.GUI_CLASS));
+            wrapped.setProperty(TestElement.GUI_CLASS, DebuggingThreadGroupGui.class.getCanonicalName());
             wrapped.setName(cloned.getName());
             wrapped.setEnabled(cloned.isEnabled());
             res.setUserObject(wrapped);
         } else if (cloned instanceof Controller && !(cloned instanceof TestFragmentController)) {
             ControllerDebug wrapped = new ControllerDebug((Controller) cloned);
-            wrapped.setProperty(TestElement.GUI_CLASS, cloned.getPropertyAsString(TestElement.GUI_CLASS));
+            wrapped.setProperty(TestElement.GUI_CLASS, ControllerDebugGui.class.getCanonicalName());
             wrapped.setName(cloned.getName());
             wrapped.setEnabled(cloned.isEnabled());
             res.setUserObject(wrapped);
