@@ -32,6 +32,7 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
     protected PowerTableModel varsTableModel;
     protected PowerTableModel propsTableModel;
     protected JPanel elementContainer;
+    protected EvaluatePanel evaluatePanel;
 
     public DebuggerDialogBase() {
         super((JFrame) null, "Step-by-Step Debugger", true);
@@ -63,9 +64,15 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
         JTabbedPane tabs = new JTabbedPane();
         tabs.add("Variables", getVariablesTab());
         tabs.add("JMeter Properties", getPropertiesTab());
-        //tabs.add("Evaluate", getSamplesTab());
+        tabs.add("Evaluate", getEvaluateTab());
         tabs.add("Log", getLogTab());
         return tabs;
+    }
+
+    private Component getEvaluateTab() {
+        evaluatePanel=new EvaluatePanel();
+        evaluatePanel.setEnabled(false);
+        return evaluatePanel;
     }
 
     private Component getVariablesTab() {
@@ -95,21 +102,9 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
     }
 
     private Component getLogTab() {
-        loggerPanel = new LoggerPanel();
+        loggerPanel = new LoggerPanelWrapping();
         loggerPanel.setMinimumSize(new Dimension(0, 100));
         loggerPanel.setPreferredSize(new Dimension(0, 150));
-
-        Component comp = loggerPanel.getComponent(0);
-        if (comp instanceof JTextScrollPane) {
-            comp = ((JTextScrollPane) comp).getComponent(0);
-            if (comp instanceof JViewport) {
-                comp = ((JViewport) comp).getComponent(0);
-                if (comp instanceof JSyntaxTextArea) {
-                    JSyntaxTextArea area = (JSyntaxTextArea) comp;
-                    area.setLineWrap(true);
-                }
-            }
-        }
         LoggingManager.addLogTargetToRootLogger(new LogTarget[]{loggerPanel,});
         return loggerPanel;
     }
@@ -121,7 +116,7 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
 
     private Component getTreePane() {
         JScrollPane panel = new JScrollPane(getTreeView());
-        panel.setMinimumSize(new Dimension(100, 0));
+        panel.setMinimumSize(new Dimension(200, 0));
         panel.setPreferredSize(new Dimension(250, 0));
         return panel;
     }

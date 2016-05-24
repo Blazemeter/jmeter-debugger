@@ -7,6 +7,7 @@ import kg.apc.emulators.TestJMeterUtils;
 import org.apache.jmeter.JMeter;
 import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.exceptions.IllegalUserActionException;
+import org.apache.jmeter.functions.TimeFunction;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.save.SaveService;
@@ -48,6 +49,7 @@ public class DebuggerDialogTest {
         if (!GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance()) {
             TestJMeterUtils.createJmeterEnv();
 
+            new TimeFunction();
             long now = System.currentTimeMillis();
             JMeterUtils.setProperty("START.MS", Long.toString(now));
             Date today = new Date(now);

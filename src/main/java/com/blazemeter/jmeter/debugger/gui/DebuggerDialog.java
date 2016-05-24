@@ -81,6 +81,7 @@ public class DebuggerDialog extends DebuggerDialogBase {
         tgCombo.setEnabled(false);
         start.setEnabled(false);
         stop.setEnabled(true);
+        evaluatePanel.setEnabled(true);
 
         HashTree hashTree = tgSelector.getSelectedTree();
         StandardJMeterEngine.register(this); // oh, dear, they use static field then clean it...
@@ -113,6 +114,7 @@ public class DebuggerDialog extends DebuggerDialogBase {
             start.setEnabled(true);
             stop.setEnabled(false);
             tgCombo.setEnabled(true);
+            evaluatePanel.setEnabled(false);
             elementContainer.removeAll();
         }
     }
@@ -126,6 +128,7 @@ public class DebuggerDialog extends DebuggerDialogBase {
         JMeterContext context = engine.getThreadContext();
         refreshVars(context);
         refreshProperties();
+        evaluatePanel.refresh(context);
     }
 
     private void refreshVars(JMeterContext context) {
