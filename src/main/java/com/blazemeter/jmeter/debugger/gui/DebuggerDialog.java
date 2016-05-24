@@ -1,6 +1,6 @@
 package com.blazemeter.jmeter.debugger.gui;
 
-import com.blazemeter.jmeter.debugger.elements.AbstractDebugElement;
+import com.blazemeter.jmeter.debugger.elements.Wrapper;
 import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
 import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import org.apache.jmeter.JMeter;
@@ -150,7 +150,7 @@ public class DebuggerDialog extends DebuggerDialogBase {
         propsTableModel.fireTableDataChanged();
     }
 
-    private void selectTargetInTree(AbstractDebugElement dbgElm, Sampler currentSampler) {
+    private void selectTargetInTree(Wrapper dbgElm, Sampler currentSampler) {
         TestElement wrpElm = (TestElement) dbgElm.getWrappedElement();
         TreePath treePath = getTreePathFor(wrpElm);
         if (treePath == null) {
@@ -192,8 +192,8 @@ public class DebuggerDialog extends DebuggerDialogBase {
         }
 
         if (currentSampler != null) {
-            if (currentSampler instanceof AbstractDebugElement) {
-                currentSampler = (Sampler) ((AbstractDebugElement) currentSampler).getWrappedElement();
+            if (currentSampler instanceof Wrapper) {
+                currentSampler = (Sampler) ((Wrapper) currentSampler).getWrappedElement();
             }
 
             JMeterTreeNode treeNode = model.getNodeOf(currentSampler);
@@ -264,7 +264,7 @@ public class DebuggerDialog extends DebuggerDialogBase {
         }
 
         @Override
-        public void notify(AbstractDebugElement t) {
+        public void notify(Wrapper t) {
             step.setEnabled(true);
             Object wrappedElement = t.getWrappedElement();
             log.debug("Stopping before: " + wrappedElement);

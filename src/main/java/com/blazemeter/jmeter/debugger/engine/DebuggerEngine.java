@@ -1,6 +1,6 @@
 package com.blazemeter.jmeter.debugger.engine;
 
-import com.blazemeter.jmeter.debugger.elements.AbstractDebugElement;
+import com.blazemeter.jmeter.debugger.elements.Wrapper;
 import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.threads.JMeterContext;
@@ -17,7 +17,7 @@ public class DebuggerEngine extends StandardJMeterEngine {
     private DebuggingThread target;
     private StepTrigger stepper = new StepTrigger() {
         @Override
-        public void notify(AbstractDebugElement t) {
+        public void notify(Wrapper t) {
             throw new RuntimeException("Not initialized stepper");
         }
     };

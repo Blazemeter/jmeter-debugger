@@ -1,6 +1,6 @@
 package com.blazemeter.jmeter.debugger.gui;
 
-import com.blazemeter.jmeter.debugger.elements.AbstractDebugElement;
+import com.blazemeter.jmeter.debugger.elements.Wrapper;
 import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
 import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import kg.apc.emulators.TestJMeterUtils;
@@ -11,7 +11,6 @@ import org.apache.jmeter.functions.TimeFunction;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.save.SaveService;
-import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.collections.HashTree;
@@ -134,7 +133,7 @@ public class DebuggerDialogTest {
         public int cnt;
 
         @Override
-        public void notify(AbstractDebugElement t) {
+        public void notify(Wrapper t) {
             log.warn("Stop before: " + t.getWrappedElement());
             cnt += 1;
         }

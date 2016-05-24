@@ -11,18 +11,19 @@ import org.apache.jmeter.testelement.TestIterationListener;
 import org.apache.jmeter.testelement.TestStateListener;
 import org.apache.jmeter.threads.TestCompilerHelper;
 
-public class GenericControllerDebug extends GenericController implements Controller, TestCompilerHelper, LoopIterationListener, TestIterationListener, TestStateListener {
-    private final ControllerDebug helper;
-    private final Controller wrapped;
+public class GenericControllerDebug extends GenericController implements Wrapper<GenericController>, Controller, TestCompilerHelper, LoopIterationListener, TestIterationListener, TestStateListener {
+    private final AbstractDebugElement<GenericController> helper;
+    private final GenericController wrapped;
 
     public GenericControllerDebug(GenericController te) {
-        helper = new ControllerDebug(te);
-        this.wrapped = helper.getWrappedElement();
+        helper = new AbstractDebugElement<GenericController>(te) {
+        };
+        this.wrapped = te;
     }
 
     @Override
     public Sampler next() {
-        helper.getHook().notify(helper);
+        helper.getHook().notify(this);
         return wrapped.next();
     }
 
@@ -55,11 +56,9 @@ public class GenericControllerDebug extends GenericController implements Control
     @Override
     public void addTestElement(TestElement child) {
         StackTraceElement[] stack = Thread.currentThread().getStackTrace();
-        if (stack[2].getMethodName().equals("addTestElementOnce")) {
-            if (wrapped instanceof TestCompilerHelper) {
-                TestCompilerHelper wrapped = (TestCompilerHelper) this.wrapped;
-                wrapped.addTestElementOnce(child);
-            }
+        if (stack[2].getMethodName().equals("addTestElementOnce")) { // final method with no reason, again
+            TestCompilerHelper wrapped = this.wrapped;
+            wrapped.addTestElementOnce(child);
         } else {
             wrapped.addTestElement(child);
         }
@@ -105,5 +104,10 @@ public class GenericControllerDebug extends GenericController implements Control
         if (wrapped instanceof TestStateListener) {
             ((TestStateListener) wrapped).testEnded(host);
         }
+    }
+
+    @Override
+    public GenericController getWrappedElement() {
+        return wrapped;
     }
 }

@@ -10,7 +10,7 @@ import org.apache.jmeter.testelement.AbstractTestElement;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.threads.JMeterContextService;
 
-public class AbstractDebugElement<T> extends AbstractTestElement {
+public abstract class AbstractDebugElement<T> extends AbstractTestElement implements Wrapper {
     protected final T wrapped;
 
     public AbstractDebugElement(T te) {
