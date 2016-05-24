@@ -1,10 +1,10 @@
 package com.blazemeter.jmeter.debugger.engine;
 
-import com.blazemeter.jmeter.debugger.elements.ControllerDebug;
-import com.blazemeter.jmeter.debugger.elements.ControllerDebugGui;
-import com.blazemeter.jmeter.debugger.elements.DebuggingThreadGroup;
-import com.blazemeter.jmeter.debugger.elements.DebuggingThreadGroupGui;
+import com.blazemeter.jmeter.debugger.elements.*;
 import org.apache.jmeter.control.Controller;
+import org.apache.jmeter.control.GenericController;
+import org.apache.jmeter.control.TestFragmentController;
+import org.apache.jmeter.control.TransactionController;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.threads.AbstractThreadGroup;
@@ -58,6 +58,7 @@ public class TreeClonerTG implements HashTreeTraverser {
     private JMeterTreeNode getClonedNode(JMeterTreeNode node) {
         TestElement te = (TestElement) (node).getUserObject();
         TestElement cloned = (TestElement) te.clone();
+        boolean isWrappable = !(cloned instanceof TransactionController) && !(cloned instanceof TestFragmentController);
         JMeterTreeNode res = new JMeterTreeNode();
 
         if (cloned instanceof AbstractThreadGroup) {
@@ -66,8 +67,13 @@ public class TreeClonerTG implements HashTreeTraverser {
             wrapped.setName(cloned.getName());
             wrapped.setEnabled(cloned.isEnabled());
             res.setUserObject(wrapped);
-        } else if (cloned instanceof Controller) {
-            ControllerDebug wrapped = new ControllerDebug((Controller) cloned);
+        } else if (cloned instanceof Controller && isWrappable) {
+            TestElement wrapped;
+            if (cloned instanceof GenericController) {
+                wrapped = new GenericControllerDebug((GenericController) cloned);
+            } else {
+                wrapped = new ControllerDebug((Controller) cloned);
+            }
             wrapped.setProperty(TestElement.GUI_CLASS, ControllerDebugGui.class.getCanonicalName());
             wrapped.setName(cloned.getName());
             wrapped.setEnabled(cloned.isEnabled());
