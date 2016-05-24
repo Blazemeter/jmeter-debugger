@@ -129,6 +129,9 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
     private Component getToolbar() {
         JToolBar res = new JToolBar();
         res.setFloatable(false);
+        JLabel logo = new BlazeMeterLogo();
+        res.add(logo);
+        res.addSeparator(new Dimension(48, 26));
         res.add(new JLabel("Choose Thread Group: "));
 
         res.add(tgCombo);
