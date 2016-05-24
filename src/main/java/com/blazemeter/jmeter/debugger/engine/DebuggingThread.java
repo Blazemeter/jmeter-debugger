@@ -16,12 +16,10 @@ public class DebuggingThread extends JMeterThread {
     private JMeterContext threadContext;
 
 
-    public DebuggingThread(HashTree test, JMeterThreadMonitor monitor, ListenerNotifier note) {
-        super(test, monitor, note);                                 
+    public DebuggingThread(HashTree test, JMeterThreadMonitor monitor, ListenerNotifier note, JMeterContext ctx) {
+        super(test, monitor, note);
         this.test = test;
-    }
-
-    public void setHook(StepTrigger hook) {
+        threadContext = ctx;
         replacedCompiler = new DebuggerCompiler(test);
         try {
             replaceCompiler();
@@ -47,16 +45,12 @@ public class DebuggingThread extends JMeterThread {
         return lastSamplePackage.getSampler();
     }
 
-    public JMeterContext getThreadContext() {
-        return threadContext;
-    }
-
     @Override
     public void run() {
         if (replacedCompiler == null) {
             throw new IllegalStateException("Compiler was not overridden");
         }
-        threadContext = JMeterContextService.getContext();
+        JMeterContextService.replaceContext(threadContext);
         super.run();
     }
 }

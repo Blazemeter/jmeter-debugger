@@ -1,14 +1,12 @@
 package com.blazemeter.jmeter.debugger;
 
 import com.blazemeter.jmeter.debugger.elements.AbstractDebugElement;
+import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
 import com.blazemeter.jmeter.debugger.engine.DebuggingThread;
 import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import kg.apc.emulators.TestJMeterUtils;
 import org.apache.jmeter.save.SaveService;
-import org.apache.jmeter.threads.AbstractThreadGroup;
-import org.apache.jmeter.threads.JMeterThread;
-import org.apache.jmeter.threads.JMeterThreadMonitor;
-import org.apache.jmeter.threads.ListenerNotifier;
+import org.apache.jmeter.threads.*;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.collections.ListedHashTree;
 import org.apache.jorphan.collections.SearchByClass;
@@ -61,8 +59,11 @@ public class DebuggingThreadTest {
         Collection<AbstractThreadGroup> iter = searcher.getSearchResults();
         for (AbstractThreadGroup tg : iter) {
             ListedHashTree tgTree = (ListedHashTree) searcher.getSubTree(tg);
-            DebuggingThread thread = new DebuggingThread(tgTree, monitor, note);
-            thread.setHook(hook);
+            JMeterContext context = JMeterContextService.getContext();
+            DebuggerEngine engine = new DebuggerEngine(context);
+            engine.setStepper(hook);
+            context.setEngine(engine);
+            DebuggingThread thread = new DebuggingThread(tgTree, monitor, note, context);
             thread.setThreadGroup(tg);
             thread.run();
         }

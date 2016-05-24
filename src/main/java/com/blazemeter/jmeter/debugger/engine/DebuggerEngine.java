@@ -4,12 +4,14 @@ import com.blazemeter.jmeter.debugger.elements.AbstractDebugElement;
 import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.threads.JMeterContext;
+import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
 
 
 public class DebuggerEngine extends StandardJMeterEngine {
     private static final Logger log = LoggingManager.getLoggerForClass();
+    private final JMeterContext context;
 
     private Thread thread;
     private DebuggingThread target;
@@ -20,12 +22,16 @@ public class DebuggerEngine extends StandardJMeterEngine {
         }
     };
 
+    public DebuggerEngine(JMeterContext context) {
+        this.context = context;
+    }
+
     public Sampler getCurrentSampler() {
         return target.getCurrentSampler();
     }
 
     public JMeterContext getThreadContext() {
-        return target.getThreadContext();
+        return context;
     }
 
     public void setStepper(StepTrigger stepper) {
@@ -68,5 +74,11 @@ public class DebuggerEngine extends StandardJMeterEngine {
                 log.debug("Thread finished: " + thread);
             }
         }
+    }
+
+    @Override
+    public void run() {
+        JMeterContextService.replaceContext(context);
+        super.run();
     }
 }

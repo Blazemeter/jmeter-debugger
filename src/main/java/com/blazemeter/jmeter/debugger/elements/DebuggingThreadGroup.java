@@ -49,11 +49,8 @@ public class DebuggingThreadGroup extends ThreadGroup {
     }
 
     private DebuggingThread makeThread(int groupCount, ListenerNotifier notifier, ListedHashTree threadGroupTree, StandardJMeterEngine engine, int i, JMeterContext context) {
-        // had to copy whole method because of these lines
-        DebuggingThread jmeterThread = new DebuggingThread(threadGroupTree, this, notifier);
-        if (engine instanceof DebuggerEngine) {
-            jmeterThread.setHook(((DebuggerEngine) engine).getStepper());
-        }
+        // had to copy whole method because of this line
+        DebuggingThread jmeterThread = new DebuggingThread(threadGroupTree, this, notifier, context);
 
         boolean onErrorStopTest = getOnErrorStopTest();
         boolean onErrorStopTestNow = getOnErrorStopTestNow();

@@ -11,6 +11,8 @@ import org.apache.jmeter.functions.TimeFunction;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.save.SaveService;
+import org.apache.jmeter.threads.JMeterContext;
+import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.logging.LoggingManager;
@@ -117,7 +119,7 @@ public class DebuggerDialogTest {
         HashTree hashTree = sel.getSelectedTree();
         JMeter.convertSubTree(hashTree);
 
-        DebuggerEngine engine = new DebuggerEngine();
+        DebuggerEngine engine = new DebuggerEngine(JMeterContextService.getContext());
         StepTriggerCounter hook = new StepTriggerCounter();
         engine.setStepper(hook);
         engine.configure(hashTree);

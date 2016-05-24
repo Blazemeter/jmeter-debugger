@@ -15,6 +15,8 @@ import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.threads.AbstractThreadGroup;
 import org.apache.jmeter.threads.JMeterContext;
+import org.apache.jmeter.threads.JMeterContextService;
+import org.apache.jmeter.threads.JMeterContextServiceAccessor;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.logging.LoggingManager;
@@ -85,7 +87,7 @@ public class DebuggerDialog extends DebuggerDialogBase {
 
         HashTree hashTree = tgSelector.getSelectedTree();
         StandardJMeterEngine.register(this); // oh, dear, they use static field then clean it...
-        engine = new DebuggerEngine();
+        engine = new DebuggerEngine(JMeterContextService.getContext());
         engine.setStepper(stepper);
         JMeter.convertSubTree(hashTree);
         engine.configure(hashTree);
@@ -116,6 +118,7 @@ public class DebuggerDialog extends DebuggerDialogBase {
             tgCombo.setEnabled(true);
             evaluatePanel.setEnabled(false);
             elementContainer.removeAll();
+            JMeterContextServiceAccessor.removeContext();
         }
     }
 
