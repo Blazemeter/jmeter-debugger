@@ -1,14 +1,11 @@
 package com.blazemeter.jmeter.debugger.gui;
 
 import org.apache.jmeter.gui.util.PowerTableModel;
-import org.apache.jorphan.logging.LoggingManager;
-import org.apache.log.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class HighlightTableModel extends PowerTableModel {
-    private static final Logger log = LoggingManager.getLoggerForClass();
 
     private Map<String, Object> oldData = null;
 
@@ -22,12 +19,7 @@ public class HighlightTableModel extends PowerTableModel {
         }
 
         Object oldValue = oldData.get(curName);
-        if (!curValue.equals(oldValue)) {
-            log.debug("Highlight change " + curName + " '" + oldValue + "' to '" + curValue + "'");
-            return true;
-        } else {
-            return false;
-        }
+        return !curValue.equals(oldValue);
     }
 
     @Override
