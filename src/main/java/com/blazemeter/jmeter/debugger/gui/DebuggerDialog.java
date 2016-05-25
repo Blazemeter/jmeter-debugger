@@ -1,5 +1,6 @@
 package com.blazemeter.jmeter.debugger.gui;
 
+import com.blazemeter.jmeter.debugger.ThreadGroupWrapper;
 import com.blazemeter.jmeter.debugger.elements.Wrapper;
 import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
 import com.blazemeter.jmeter.debugger.engine.StepTrigger;
@@ -232,6 +233,8 @@ public class DebuggerDialog extends DebuggerDialogBase {
         } catch (IllegalUserActionException e) {
             throw new RuntimeException(e);
         }
+
+        selectTargetInTree(new ThreadGroupWrapper(tgSelector.getThreadGroupClone()), null);
     }
 
     private class ThreadGroupChoiceChanged implements ItemListener {

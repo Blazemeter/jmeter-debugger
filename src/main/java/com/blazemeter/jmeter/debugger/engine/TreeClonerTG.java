@@ -20,6 +20,7 @@ public class TreeClonerTG implements HashTreeTraverser {
     private final ListedHashTree newTree = new ListedHashTree();
     private final LinkedList<Object> stack = new LinkedList<>();
     private boolean ignoring = false;
+    private AbstractThreadGroup clonedTG;
 
     public TreeClonerTG(AbstractThreadGroup tg) {
         this.onlyTG = tg;
@@ -63,6 +64,7 @@ public class TreeClonerTG implements HashTreeTraverser {
 
         if (cloned instanceof AbstractThreadGroup) {
             AbstractThreadGroup wrapped = new DebuggingThreadGroup();
+            clonedTG = wrapped;
             wrapped.setProperty(TestElement.GUI_CLASS, DebuggingThreadGroupGui.class.getCanonicalName());
             wrapped.setName(cloned.getName());
             wrapped.setEnabled(cloned.isEnabled());
@@ -99,5 +101,9 @@ public class TreeClonerTG implements HashTreeTraverser {
 
     public HashTree getClonedTree() {
         return newTree;
+    }
+
+    public AbstractThreadGroup getClonedTG() {
+        return clonedTG;
     }
 }

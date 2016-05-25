@@ -41,4 +41,8 @@ public class ThreadGroupSelector {
         }
         return cloner.getClonedTree();
     }
+
+    public AbstractThreadGroup getThreadGroupClone() {
+        return cloner.getClonedTG();
+    }
 }
