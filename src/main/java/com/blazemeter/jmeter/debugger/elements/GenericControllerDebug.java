@@ -1,7 +1,6 @@
 package com.blazemeter.jmeter.debugger.elements;
 
 
-import org.apache.jmeter.control.Controller;
 import org.apache.jmeter.control.GenericController;
 import org.apache.jmeter.engine.event.LoopIterationEvent;
 import org.apache.jmeter.engine.event.LoopIterationListener;
@@ -11,9 +10,9 @@ import org.apache.jmeter.testelement.TestIterationListener;
 import org.apache.jmeter.testelement.TestStateListener;
 import org.apache.jmeter.threads.TestCompilerHelper;
 
-public class GenericControllerDebug extends GenericController implements Wrapper<GenericController>, Controller, TestCompilerHelper, LoopIterationListener, TestIterationListener, TestStateListener {
+public class GenericControllerDebug extends GenericController implements FullController, Wrapper<GenericController> {
     private final AbstractDebugElement<GenericController> helper;
-    private final GenericController wrapped;
+    protected final GenericController wrapped;
 
     public GenericControllerDebug(GenericController te) {
         helper = new AbstractDebugElement<GenericController>(te) {

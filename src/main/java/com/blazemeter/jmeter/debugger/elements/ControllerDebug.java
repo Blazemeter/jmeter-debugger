@@ -1,16 +1,19 @@
 package com.blazemeter.jmeter.debugger.elements;
 
 import org.apache.jmeter.control.Controller;
+import org.apache.jmeter.control.ReplaceableController;
 import org.apache.jmeter.engine.event.LoopIterationEvent;
 import org.apache.jmeter.engine.event.LoopIterationListener;
+import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.TestIterationListener;
 import org.apache.jmeter.testelement.TestStateListener;
 import org.apache.jmeter.threads.TestCompilerHelper;
+import org.apache.jorphan.collections.HashTree;
 
 
-public class ControllerDebug extends AbstractDebugElement<Controller> implements Controller, TestCompilerHelper, LoopIterationListener, TestIterationListener, TestStateListener {
+public class ControllerDebug extends AbstractDebugElement<Controller> implements FullController {
     public ControllerDebug(Controller te) {
         super(te);
     }

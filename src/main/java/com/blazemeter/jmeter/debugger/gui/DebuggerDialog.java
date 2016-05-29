@@ -3,8 +3,10 @@ package com.blazemeter.jmeter.debugger.gui;
 import com.blazemeter.jmeter.debugger.ThreadGroupWrapper;
 import com.blazemeter.jmeter.debugger.elements.Wrapper;
 import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
+import com.blazemeter.jmeter.debugger.engine.SearchClass;
 import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import org.apache.jmeter.JMeter;
+import org.apache.jmeter.control.ReplaceableController;
 import org.apache.jmeter.engine.JMeterEngineException;
 import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.exceptions.IllegalUserActionException;
@@ -20,6 +22,7 @@ import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterContextServiceAccessor;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.collections.HashTree;
+import org.apache.jorphan.collections.SearchByClass;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.jorphan.util.JMeterStopThreadException;
 import org.apache.log.Logger;
@@ -29,6 +32,7 @@ import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -227,6 +231,15 @@ public class DebuggerDialog extends DebuggerDialogBase {
         tgSelector.selectThreadGroup(tg);
         treeModel.clearTestPlan();
         HashTree selectedTree = tgSelector.getSelectedTree();
+
+        // Hack to resolve ModuleControllers from JMeter.java
+        SearchClass<ReplaceableController> replaceableControllers = new SearchClass<>(ReplaceableController.class);
+        selectedTree.traverse(replaceableControllers);
+        Collection<ReplaceableController> replaceableControllersRes = replaceableControllers.getSearchResults();
+        for (ReplaceableController replaceableController : replaceableControllersRes) {
+            replaceableController.resolveReplacementSubTree((JMeterTreeNode) treeModel.getRoot());
+        }
+
         JMeter.convertSubTree(selectedTree);
         try {
             treeModel.addSubTree(selectedTree, (JMeterTreeNode) treeModel.getRoot());

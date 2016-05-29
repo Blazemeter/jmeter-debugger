@@ -1,20 +1,20 @@
 package com.blazemeter.jmeter.debugger.engine;
 
 import com.blazemeter.jmeter.debugger.elements.*;
-import org.apache.jmeter.control.Controller;
-import org.apache.jmeter.control.GenericController;
-import org.apache.jmeter.control.TestFragmentController;
-import org.apache.jmeter.control.TransactionController;
+import org.apache.jmeter.control.*;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.threads.AbstractThreadGroup;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.collections.HashTreeTraverser;
 import org.apache.jorphan.collections.ListedHashTree;
+import org.apache.jorphan.logging.LoggingManager;
+import org.apache.log.Logger;
 
 import java.util.LinkedList;
 
 public class TreeClonerTG implements HashTreeTraverser {
+    private static final Logger log = LoggingManager.getLoggerForClass();
     private AbstractThreadGroup onlyTG;
 
     private final ListedHashTree newTree = new ListedHashTree();
@@ -72,8 +72,16 @@ public class TreeClonerTG implements HashTreeTraverser {
         } else if (cloned instanceof Controller && isWrappable) {
             TestElement wrapped;
             if (cloned instanceof GenericController) {
-                wrapped = new GenericControllerDebug((GenericController) cloned);
+                if (cloned instanceof ReplaceableController) {
+                    log.warn("Not supported!: " + cloned);
+                    wrapped = new ReplaceableGenericControllerDebug((GenericController) cloned);
+                } else {
+                    wrapped = new GenericControllerDebug((GenericController) cloned);
+                }
             } else {
+                if (cloned instanceof ReplaceableController) {
+                    log.warn("Controller+Replaceable is unsupported: " + cloned);
+                }
                 wrapped = new ControllerDebug((Controller) cloned);
             }
             wrapped.setProperty(TestElement.GUI_CLASS, ControllerDebugGui.class.getCanonicalName());
