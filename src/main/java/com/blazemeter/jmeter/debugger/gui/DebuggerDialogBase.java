@@ -11,13 +11,14 @@ import org.apache.log.LogTarget;
 import org.apache.log.Logger;
 
 import javax.swing.*;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.LinkedList;
 
-abstract public class DebuggerDialogBase extends JDialog implements ComponentListener, TestStateListener, NodeHiliter {
+abstract public class DebuggerDialogBase extends JDialog implements ComponentListener, TestStateListener, NodeHiliter, TreeSelectionListener {
     private static final Logger log = LoggingManager.getLoggerForClass();
 
     protected JComboBox<AbstractThreadGroup> tgCombo = new JComboBox<>();
@@ -186,6 +187,7 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
         tree.setCellRenderer(new FixedJMeterTreeCellRenderer(this));
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
+        tree.addTreeSelectionListener(this);
 
         return tree;
     }

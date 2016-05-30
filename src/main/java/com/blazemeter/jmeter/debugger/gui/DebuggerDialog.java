@@ -26,6 +26,7 @@ import org.apache.jorphan.logging.LoggingManager;
 import org.apache.jorphan.util.JMeterStopThreadException;
 import org.apache.log.Logger;
 
+import javax.swing.event.TreeSelectionEvent;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
@@ -174,19 +175,6 @@ public class DebuggerDialog extends DebuggerDialogBase {
             tree.setSelectionPath(treePath);
         }
         tree.repaint();
-
-        GuiPackage gui = GuiPackage.getInstance();
-        if (gui != null) {
-            JMeterGUIComponent egui = gui.getGui(wrpElm);
-            egui.configure(wrpElm);
-            elementContainer.removeAll();
-            if (egui instanceof Component) {
-                egui.setEnabled(false);
-
-                elementContainer.add((Component) egui, BorderLayout.CENTER);
-            }
-            elementContainer.updateUI();
-        }
     }
 
     private TreePath getTreePathFor(TestElement te) {
@@ -233,12 +221,12 @@ public class DebuggerDialog extends DebuggerDialogBase {
     @Override
     public void highlightNode(Component component, JMeterTreeNode node, TestElement mc) {
         component.setFont(component.getFont().deriveFont(~Font.BOLD).deriveFont(~Font.ITALIC));
-        if (engine != null) {
+        if (engine != null && currentElement!=null) {
             if (mc.equals(currentElement) || mc.equals(currentElement.getWrappedElement())) {
                 component.setFont(component.getFont().deriveFont(Font.BOLD));
                 component.setForeground(Color.BLUE);
-            } 
-            
+            }
+
             Sampler currentSampler = engine.getCurrentSampler();
             if (mc.equals(currentSampler)) { // can this ever happen?
                 component.setFont(component.getFont().deriveFont(Font.ITALIC));
@@ -247,6 +235,27 @@ public class DebuggerDialog extends DebuggerDialogBase {
                 component.setFont(component.getFont().deriveFont(Font.ITALIC));
                 component.setForeground(Color.BLUE);
             }
+        }
+    }
+
+    @Override
+    public void valueChanged(TreeSelectionEvent treeSelectionEvent) {
+        JMeterTreeNode node = (JMeterTreeNode) treeSelectionEvent.getPath().getLastPathComponent();
+        TestElement wrpElm = node.getTestElement();
+        if (wrpElm instanceof Wrapper) {
+            wrpElm = (TestElement) ((Wrapper) wrpElm).getWrappedElement();
+        }
+
+        GuiPackage gui = GuiPackage.getInstance();
+        if (gui != null) {
+            JMeterGUIComponent egui = gui.getGui(wrpElm);
+            egui.configure(wrpElm);
+            elementContainer.removeAll();
+            if (egui instanceof Component) {
+                egui.setEnabled(false);
+                elementContainer.add((Component) egui, BorderLayout.CENTER);
+            }
+            elementContainer.updateUI();
         }
     }
 
