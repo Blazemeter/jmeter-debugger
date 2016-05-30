@@ -1,6 +1,5 @@
 package com.blazemeter.jmeter.debugger.elements;
 
-import org.apache.jmeter.gui.AbstractJMeterGuiComponent;
 import org.apache.jmeter.gui.util.MenuFactory;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.threads.gui.AbstractThreadGroupGui;
@@ -17,7 +16,7 @@ public class DebuggingThreadGroupGui extends AbstractThreadGroupGui {
 
     @Override
     public String getStaticLabel() {
-        return getClass().getCanonicalName();
+        return "Debugging Thread Group";
     }
 
     @Override

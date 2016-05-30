@@ -227,26 +227,30 @@ public class DebuggerDialog extends DebuggerDialogBase {
     public void highlightNode(Component component, JMeterTreeNode node, TestElement mc) {
         component.setFont(component.getFont().deriveFont(~Font.BOLD).deriveFont(~Font.ITALIC));
 
-        if (node.getUserObject() instanceof TestElement) {
-            if (breakpoints.contains(node.getUserObject())) {
-                component.setForeground(Color.RED);
-            }
+        TestElement userObject = (TestElement) node.getUserObject();
+
+        if (breakpoints.contains(userObject)) {
+            component.setForeground(Color.RED);
         }
 
-        if (engine != null && currentElement != null) {
-            if (mc.equals(currentElement) || mc.equals(currentElement.getWrappedElement())) {
-                component.setFont(component.getFont().deriveFont(Font.BOLD));
-                component.setForeground(Color.BLUE);
-            }
+        if (engine == null || currentElement == null) {
+            return;
+        }
 
-            Sampler currentSampler = engine.getCurrentSampler();
-            if (mc.equals(currentSampler)) { // can this ever happen?
-                component.setFont(component.getFont().deriveFont(Font.ITALIC));
-                component.setForeground(Color.BLUE);
-            } else if (currentSampler instanceof Wrapper && mc.equals(((Wrapper) currentSampler).getWrappedElement())) {
-                component.setFont(component.getFont().deriveFont(Font.ITALIC));
-                component.setForeground(Color.BLUE);
-            }
+        TestElement currentWrapped = (TestElement) currentElement.getWrappedElement();
+        if (mc.equals(currentElement) || mc.equals(currentWrapped)) {
+            component.setFont(component.getFont().deriveFont(Font.BOLD));
+            component.setForeground(Color.BLUE);
+        }
+
+        Sampler currentSampler = engine.getCurrentSampler();
+        Font font = component.getFont();
+        if (mc.equals(currentSampler)) { // can this ever happen?
+            component.setFont(font.deriveFont(font.getStyle() | Font.ITALIC));
+            component.setForeground(Color.BLUE);
+        } else if (currentSampler instanceof Wrapper && mc.equals(((Wrapper) currentSampler).getWrappedElement())) {
+            component.setFont(font.deriveFont(font.getStyle() | Font.ITALIC));
+            component.setForeground(Color.BLUE);
         }
     }
 
