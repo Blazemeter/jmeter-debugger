@@ -31,6 +31,7 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
     protected JButton start = new JButton("Start");
     protected JButton step = new JButton("Step Over");
     protected JButton stop = new JButton("Stop");
+    protected JButton run = new JButton("Continue");
     protected LoggerPanel loggerPanel;
     protected PowerTableModel varsTableModel;
     protected PowerTableModel propsTableModel;
@@ -130,7 +131,7 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
         res.setFloatable(false);
         JLabel logo = new BlazeMeterLogo();
         res.add(logo);
-        res.addSeparator(new Dimension(48, 26));
+        res.addSeparator(new Dimension(32, 26));
         res.add(new JLabel("Choose Thread Group: "));
 
         res.add(tgCombo);
@@ -173,6 +174,19 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 step.doClick();
+            }
+        });
+
+        run.setIcon(DebuggerMenuItem.getContinueIcon());
+        res.add(run);
+        run.setEnabled(false);
+        KeyStroke f9 = KeyStroke.getKeyStroke(KeyEvent.VK_F9, InputEvent.SHIFT_DOWN_MASK);
+        run.setToolTipText(f9.toString());
+        run.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(f9, f9);
+        run.getActionMap().put(f8, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                run.doClick();
             }
         });
         return res;

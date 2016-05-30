@@ -50,4 +50,8 @@ public class DebuggerMenuItem extends JMenuItem implements ActionListener {
     public static ImageIcon getBPIcon() {
         return new ImageIcon(DebuggerMenuItem.class.getResource("/com/blazemeter/jmeter/debugger/breakpoint.png"));
     }
+
+    public static ImageIcon getContinueIcon() {
+        return new ImageIcon(DebuggerMenuItem.class.getResource("/com/blazemeter/jmeter/debugger/continue.png"));
+    }
 }
