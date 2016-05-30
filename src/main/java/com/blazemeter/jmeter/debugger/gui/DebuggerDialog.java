@@ -177,6 +177,9 @@ public class DebuggerDialog extends DebuggerDialogBase {
         if (treePath == null) {
             log.debug("Did not find tree path for element");
         } else {
+            if (treePath.equals(tree.getSelectionPath())) {
+                tree.setSelectionPath(treePath.getParentPath());
+            }
             tree.setSelectionPath(treePath);
         }
         tree.repaint();
@@ -262,6 +265,10 @@ public class DebuggerDialog extends DebuggerDialogBase {
             wrpElm = (TestElement) ((Wrapper) wrpElm).getWrappedElement();
         }
 
+        displayElementGui(wrpElm);
+    }
+
+    private void displayElementGui(TestElement wrpElm) {
         GuiPackage gui = GuiPackage.getInstance();
         if (gui != null) {
             JMeterGUIComponent egui = gui.getGui(wrpElm);

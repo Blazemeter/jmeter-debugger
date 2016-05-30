@@ -43,7 +43,6 @@ public class DebuggerCompiler extends TestCompiler {
     private List<Controller> getControllers(SamplePackage test) throws NoSuchFieldException, IllegalAccessException {
         Field field = SamplePackage.class.getDeclaredField("controllers");
         if (!field.isAccessible()) {
-            log.debug("Making field accessable: " + field);
             field.setAccessible(true);
         }
         //noinspection unchecked
