@@ -26,6 +26,7 @@ public class DebuggerMenuItem extends JMenuItem implements ActionListener {
         dialog.setVisible(true);
     }
 
+    // many from http://www.veryicon.com/icons/system/fugue/
     public static ImageIcon getBugIcon() {
         return new ImageIcon(DebuggerMenuItem.class.getResource("/com/blazemeter/jmeter/debugger/bug.png"));
     }
@@ -44,5 +45,9 @@ public class DebuggerMenuItem extends JMenuItem implements ActionListener {
 
     public static ImageIcon getLogoIcon() {
         return new ImageIcon(DebuggerMenuItem.class.getResource("/com/blazemeter/jmeter/debugger/logo.png"));
+    }
+
+    public static ImageIcon getBPIcon() {
+        return new ImageIcon(DebuggerMenuItem.class.getResource("/com/blazemeter/jmeter/debugger/breakpoint.png"));
     }
 }

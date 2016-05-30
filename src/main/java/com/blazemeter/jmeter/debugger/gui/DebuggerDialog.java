@@ -221,7 +221,12 @@ public class DebuggerDialog extends DebuggerDialogBase {
     @Override
     public void highlightNode(Component component, JMeterTreeNode node, TestElement mc) {
         component.setFont(component.getFont().deriveFont(~Font.BOLD).deriveFont(~Font.ITALIC));
-        if (engine != null && currentElement!=null) {
+
+        if (breakpoints.contains(node)) {
+            component.setForeground(Color.RED);
+        }
+
+        if (engine != null && currentElement != null) {
             if (mc.equals(currentElement) || mc.equals(currentElement.getWrappedElement())) {
                 component.setFont(component.getFont().deriveFont(Font.BOLD));
                 component.setForeground(Color.BLUE);

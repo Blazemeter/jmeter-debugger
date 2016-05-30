@@ -2,6 +2,7 @@ package com.blazemeter.jmeter.debugger.gui;
 
 import org.apache.jmeter.gui.LoggerPanel;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
+import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.gui.util.PowerTableModel;
 import org.apache.jmeter.testelement.TestStateListener;
 import org.apache.jmeter.threads.AbstractThreadGroup;
@@ -14,9 +15,12 @@ import javax.swing.*;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
 abstract public class DebuggerDialogBase extends JDialog implements ComponentListener, TestStateListener, NodeHiliter, TreeSelectionListener {
     private static final Logger log = LoggingManager.getLoggerForClass();
@@ -32,6 +36,7 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
     protected PowerTableModel propsTableModel;
     protected JPanel elementContainer;
     protected EvaluatePanel evaluatePanel;
+    protected Set<Object> breakpoints = new HashSet<>();
 
     public DebuggerDialogBase() {
         super((JFrame) null, "Step-by-Step Debugger", true);
@@ -188,7 +193,7 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
         tree.addTreeSelectionListener(this);
-
+        tree.addMouseListener(new TreeMouseListener());
         return tree;
     }
 
@@ -202,10 +207,76 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
 
     }
 
-
     @Override
     public void testEnded(String host) {
 
     }
+
+    private class TreeMouseListener implements MouseListener {
+        @Override
+        public void mousePressed(MouseEvent e) {
+            int selRow = tree.getRowForLocation(e.getX(), e.getY());
+
+            if (tree.getPathForLocation(e.getX(), e.getY()) != null) {
+                log.debug("mouse pressed, updating currentPath");
+                final TreePath currentPath = tree.getPathForLocation(e.getX(), e.getY());
+
+                if (selRow != -1 && currentPath != null) {
+                    if (isRightClick(e)) {
+                        if (tree.getSelectionCount() < 2) {
+                            tree.setSelectionPath(currentPath);
+                        }
+                        log.debug("About to display pop-up");
+                        JPopupMenu popup = new JPopupMenu();
+                        JCheckBoxMenuItem item = new JCheckBoxMenuItem("Breakpoint", DebuggerMenuItem.getBPIcon());
+                        final JMeterTreeNode node = (JMeterTreeNode) currentPath.getLastPathComponent();
+                        item.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent actionEvent) {
+                                if (breakpoints.contains(node)) {
+                                    breakpoints.remove(node);
+                                } else {
+                                    breakpoints.add(node);
+                                }
+                                tree.repaint();
+                            }
+                        });
+
+                        item.setState(breakpoints.contains(node));
+                        popup.add(item);
+                        popup.pack();
+                        popup.show(tree, e.getX(), e.getY());
+                        popup.setVisible(true);
+                        popup.requestFocusInWindow();
+                    }
+                }
+            }
+        }
+
+        private boolean isRightClick(MouseEvent e) {
+            return e.isPopupTrigger() || (InputEvent.BUTTON2_MASK & e.getModifiers()) > 0 || (InputEvent.BUTTON3_MASK == e.getModifiers());
+        }
+
+        @Override
+        public void mouseClicked(MouseEvent mouseEvent) {
+
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent mouseEvent) {
+
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent mouseEvent) {
+
+        }
+
+        @Override
+        public void mouseExited(MouseEvent mouseEvent) {
+
+        }
+    }
+
 }
 
