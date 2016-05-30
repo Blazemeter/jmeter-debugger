@@ -12,9 +12,9 @@ import java.awt.*;
 
 
 public class FixedJMeterTreeCellRenderer extends JMeterCellRenderer {
-    private final NodeHiliter hiliter;
+    private final NodeHighlighter hiliter;
 
-    public FixedJMeterTreeCellRenderer(NodeHiliter hiliter) {
+    public FixedJMeterTreeCellRenderer(NodeHighlighter hiliter) {
         super();
         this.hiliter = hiliter;
     }

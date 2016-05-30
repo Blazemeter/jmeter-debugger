@@ -4,6 +4,7 @@ import org.apache.jmeter.gui.LoggerPanel;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.gui.util.PowerTableModel;
+import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.TestStateListener;
 import org.apache.jmeter.threads.AbstractThreadGroup;
 import org.apache.jorphan.gui.ComponentUtil;
@@ -22,7 +23,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
-abstract public class DebuggerDialogBase extends JDialog implements ComponentListener, TestStateListener, NodeHiliter, TreeSelectionListener {
+abstract public class DebuggerDialogBase extends JDialog implements ComponentListener, TestStateListener, NodeHighlighter, TreeSelectionListener {
     private static final Logger log = LoggingManager.getLoggerForClass();
 
     protected JComboBox<AbstractThreadGroup> tgCombo = new JComboBox<>();
@@ -31,13 +32,13 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
     protected JButton start = new JButton("Start");
     protected JButton step = new JButton("Step Over");
     protected JButton stop = new JButton("Stop");
-    protected JButton run = new JButton("Continue");
+    protected JButton pauseContinue = new JButton("Continue");
     protected LoggerPanel loggerPanel;
     protected PowerTableModel varsTableModel;
     protected PowerTableModel propsTableModel;
     protected JPanel elementContainer;
     protected EvaluatePanel evaluatePanel;
-    protected Set<Object> breakpoints = new HashSet<>();
+    protected Set<TestElement> breakpoints = new HashSet<>();
 
     public DebuggerDialogBase() {
         super((JFrame) null, "Step-by-Step Debugger", true);
@@ -177,16 +178,16 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
             }
         });
 
-        run.setIcon(DebuggerMenuItem.getContinueIcon());
-        res.add(run);
-        run.setEnabled(false);
+        pauseContinue.setIcon(DebuggerMenuItem.getContinueIcon());
+        res.add(pauseContinue);
+        pauseContinue.setEnabled(false);
         KeyStroke f9 = KeyStroke.getKeyStroke(KeyEvent.VK_F9, InputEvent.SHIFT_DOWN_MASK);
-        run.setToolTipText(f9.toString());
-        run.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(f9, f9);
-        run.getActionMap().put(f8, new AbstractAction() {
+        pauseContinue.setToolTipText(f9.toString());
+        pauseContinue.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(f9, f9);
+        pauseContinue.getActionMap().put(f8, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                run.doClick();
+                pauseContinue.doClick();
             }
         });
         return res;
@@ -240,7 +241,7 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
                             tree.setSelectionPath(currentPath);
                         }
                         final JMeterTreeNode node = (JMeterTreeNode) currentPath.getLastPathComponent();
-                        JPopupMenu popup = getPopup(node);
+                        JPopupMenu popup = getPopup((TestElement) node.getUserObject());
                         popup.pack();
                         popup.show(tree, e.getX(), e.getY());
                         popup.setVisible(true);
@@ -250,22 +251,23 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
             }
         }
 
-        private JPopupMenu getPopup(final JMeterTreeNode node) {
+        private JPopupMenu getPopup(final TestElement te) {
             JPopupMenu popup = new JPopupMenu();
             JCheckBoxMenuItem item = new JCheckBoxMenuItem("Breakpoint", DebuggerMenuItem.getBPIcon());
             item.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    if (breakpoints.contains(node)) {
-                        breakpoints.remove(node);
+                    log.debug("Toggle breakpoint on: " + te);
+                    if (breakpoints.contains(te)) {
+                        breakpoints.remove(te);
                     } else {
-                        breakpoints.add(node);
+                        breakpoints.add(te);
                     }
                     tree.repaint();
                 }
             });
 
-            item.setState(breakpoints.contains(node));
+            item.setState(breakpoints.contains(te));
             popup.add(item);
             return popup;
         }

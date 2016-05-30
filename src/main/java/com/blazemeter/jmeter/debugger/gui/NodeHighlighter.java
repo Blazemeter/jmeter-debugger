@@ -5,6 +5,6 @@ import org.apache.jmeter.testelement.TestElement;
 
 import java.awt.*;
 
-public interface NodeHiliter {
+public interface NodeHighlighter {
     void highlightNode(Component treeCellRendererComponent, JMeterTreeNode node, TestElement mc);
 }

@@ -11,12 +11,22 @@ public class TimerDebug extends AbstractDebugElement<Timer> implements Timer {
         super(te);
     }
 
+    private boolean isDelaying = false;
+
     @Override
     public long delay() {
         prepareBean();
         getHook().notify(this);
         long delay = wrapped.delay();
-        log.debug("Drop delay because of debug: " + delay);
-        return 0;
+        if (isDelaying) {
+            return delay;
+        } else {
+            log.debug("Drop delay because of debug: " + delay);
+            return 0;
+        }
+    }
+
+    public void setDelaying(boolean delaying) {
+        isDelaying = delaying;
     }
 }

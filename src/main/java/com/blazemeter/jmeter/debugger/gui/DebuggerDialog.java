@@ -1,6 +1,7 @@
 package com.blazemeter.jmeter.debugger.gui;
 
 import com.blazemeter.jmeter.debugger.ThreadGroupWrapper;
+import com.blazemeter.jmeter.debugger.elements.TimerDebug;
 import com.blazemeter.jmeter.debugger.elements.Wrapper;
 import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
 import com.blazemeter.jmeter.debugger.engine.SearchClass;
@@ -44,12 +45,14 @@ public class DebuggerDialog extends DebuggerDialogBase {
     private ThreadGroupSelector tgSelector = new ThreadGroupSelector(new HashTree());
     private boolean savedDirty = false;
     private Wrapper currentElement;
+    private boolean isContinuing = false;
 
     public DebuggerDialog() {
         super();
         start.addActionListener(new StartDebugging());
         stop.addActionListener(new StopDebugging());
         step.addActionListener(stepper);
+        pauseContinue.addActionListener(new PauseContinue());
         tgCombo.addItemListener(new ThreadGroupChoiceChanged());
     }
 
@@ -86,10 +89,7 @@ public class DebuggerDialog extends DebuggerDialogBase {
     private void start() {
         log.debug("Start debugging");
         loggerPanel.clear();
-        tgCombo.setEnabled(false);
-        start.setEnabled(false);
-        stop.setEnabled(true);
-        evaluatePanel.setEnabled(true);
+        toggleControls(false);
 
         HashTree hashTree = tgSelector.getSelectedTree();
         StandardJMeterEngine.register(this); // oh, dear, they use static field then clean it...
@@ -100,7 +100,7 @@ public class DebuggerDialog extends DebuggerDialogBase {
         try {
             engine.runTest();
         } catch (JMeterEngineException e) {
-            log.error("Failed to run debug", e);
+            log.error("Failed to pauseContinue debug", e);
             stop();
         }
     }
@@ -119,14 +119,19 @@ public class DebuggerDialog extends DebuggerDialogBase {
             }
         } finally {
             stepper.setStopping(false);
-            start.setEnabled(true);
-            stop.setEnabled(false);
-            tgCombo.setEnabled(true);
-            evaluatePanel.setEnabled(false);
+            toggleControls(true);
             elementContainer.removeAll();
             JMeterContextServiceAccessor.removeContext();
             setCurrentElement(null);
         }
+    }
+
+    private void toggleControls(boolean state) {
+        tgCombo.setEnabled(state);
+        start.setEnabled(state);
+        stop.setEnabled(!state);
+        pauseContinue.setEnabled(!state);
+        evaluatePanel.setEnabled(!state);
     }
 
     @Override
@@ -222,8 +227,10 @@ public class DebuggerDialog extends DebuggerDialogBase {
     public void highlightNode(Component component, JMeterTreeNode node, TestElement mc) {
         component.setFont(component.getFont().deriveFont(~Font.BOLD).deriveFont(~Font.ITALIC));
 
-        if (breakpoints.contains(node)) {
-            component.setForeground(Color.RED);
+        if (node.getUserObject() instanceof TestElement) {
+            if (breakpoints.contains(node.getUserObject())) {
+                component.setForeground(Color.RED);
+            }
         }
 
         if (engine != null && currentElement != null) {
@@ -264,6 +271,19 @@ public class DebuggerDialog extends DebuggerDialogBase {
         }
     }
 
+    public void continueRun() {
+        isContinuing = true;
+        pauseContinue.setText("Pause");
+        pauseContinue.setIcon(DebuggerMenuItem.getPauseIcon());
+        stepper.notifyAll();
+    }
+
+    public void pause() {
+        isContinuing = false;
+        pauseContinue.setText("Continue");
+        pauseContinue.setIcon(DebuggerMenuItem.getContinueIcon());
+    }
+
     private class ThreadGroupChoiceChanged implements ItemListener {
         @Override
         public void itemStateChanged(ItemEvent event) {
@@ -295,25 +315,41 @@ public class DebuggerDialog extends DebuggerDialogBase {
 
         @Override
         public void notify(Wrapper wrapper) {
-            step.setEnabled(true);
+            if (stopping) {
+                throw new JMeterStopThreadException();
+            }
+
             TestElement wrappedElement = (TestElement) wrapper.getWrappedElement();
-            log.debug("Stopping before: " + wrappedElement);
+
+            if (wrapper instanceof TimerDebug) {
+                ((TimerDebug) wrapper).setDelaying(isContinuing);
+            }
+
             setCurrentElement(wrapper);
-            selectTargetInTree(wrapper);
             refreshStatus();
-            if (!stopping) {
-                try {
-                    synchronized (this) {
-                        this.wait();
+
+            try {
+                synchronized (this) {
+                    if (isContinuing && breakpoints.contains(wrappedElement)) {
+                        pause();
                     }
-                } catch (InterruptedException e) {
-                    log.debug("Interrupted", e);
-                    throw new JMeterStopThreadException(e);
-                } finally {
+
+                    if (!isContinuing) {
+                        step.setEnabled(true);
+                        selectTargetInTree(wrapper);
+                        log.debug("Stopping before: " + wrappedElement);
+                        this.wait();
+                    } else {
+                        tree.repaint();
+                    }
+                }
+            } catch (InterruptedException e) {
+                log.debug("Interrupted", e);
+                throw new JMeterStopThreadException(e);
+            } finally {
+                if (step.isEnabled()) {
                     step.setEnabled(false);
                 }
-            } else {
-                throw new JMeterStopThreadException();
             }
         }
 
@@ -326,10 +362,25 @@ public class DebuggerDialog extends DebuggerDialogBase {
         }
     }
 
+    private class PauseContinue implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            synchronized (stepper) {
+                if (isContinuing) {
+                    pause();
+                } else {
+                    continueRun();
+                }
+            }
+        }
+
+    }
+
     private class StopDebugging implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             stop();
         }
     }
+
 }
