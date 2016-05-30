@@ -218,7 +218,6 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
             int selRow = tree.getRowForLocation(e.getX(), e.getY());
 
             if (tree.getPathForLocation(e.getX(), e.getY()) != null) {
-                log.debug("mouse pressed, updating currentPath");
                 final TreePath currentPath = tree.getPathForLocation(e.getX(), e.getY());
 
                 if (selRow != -1 && currentPath != null) {
@@ -226,24 +225,8 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
                         if (tree.getSelectionCount() < 2) {
                             tree.setSelectionPath(currentPath);
                         }
-                        log.debug("About to display pop-up");
-                        JPopupMenu popup = new JPopupMenu();
-                        JCheckBoxMenuItem item = new JCheckBoxMenuItem("Breakpoint", DebuggerMenuItem.getBPIcon());
                         final JMeterTreeNode node = (JMeterTreeNode) currentPath.getLastPathComponent();
-                        item.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent actionEvent) {
-                                if (breakpoints.contains(node)) {
-                                    breakpoints.remove(node);
-                                } else {
-                                    breakpoints.add(node);
-                                }
-                                tree.repaint();
-                            }
-                        });
-
-                        item.setState(breakpoints.contains(node));
-                        popup.add(item);
+                        JPopupMenu popup = getPopup(node);
                         popup.pack();
                         popup.show(tree, e.getX(), e.getY());
                         popup.setVisible(true);
@@ -251,6 +234,26 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
                     }
                 }
             }
+        }
+
+        private JPopupMenu getPopup(final JMeterTreeNode node) {
+            JPopupMenu popup = new JPopupMenu();
+            JCheckBoxMenuItem item = new JCheckBoxMenuItem("Breakpoint", DebuggerMenuItem.getBPIcon());
+            item.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    if (breakpoints.contains(node)) {
+                        breakpoints.remove(node);
+                    } else {
+                        breakpoints.add(node);
+                    }
+                    tree.repaint();
+                }
+            });
+
+            item.setState(breakpoints.contains(node));
+            popup.add(item);
+            return popup;
         }
 
         private boolean isRightClick(MouseEvent e) {
