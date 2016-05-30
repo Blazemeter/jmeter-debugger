@@ -2,8 +2,6 @@ package com.blazemeter.jmeter.debugger.gui;
 
 import org.apache.jmeter.gui.LoggerPanel;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
-import org.apache.jmeter.gui.util.JSyntaxTextArea;
-import org.apache.jmeter.gui.util.JTextScrollPane;
 import org.apache.jmeter.gui.util.PowerTableModel;
 import org.apache.jmeter.testelement.TestStateListener;
 import org.apache.jmeter.threads.AbstractThreadGroup;
@@ -19,7 +17,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.LinkedList;
 
-abstract public class DebuggerDialogBase extends JDialog implements ComponentListener, TestStateListener {
+abstract public class DebuggerDialogBase extends JDialog implements ComponentListener, TestStateListener, NodeHiliter {
     private static final Logger log = LoggingManager.getLoggerForClass();
 
     protected JComboBox<AbstractThreadGroup> tgCombo = new JComboBox<>();
@@ -70,7 +68,7 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
     }
 
     private Component getEvaluateTab() {
-        evaluatePanel=new EvaluatePanel();
+        evaluatePanel = new EvaluatePanel();
         evaluatePanel.setEnabled(false);
         return evaluatePanel;
     }
@@ -185,7 +183,7 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
     private JTree getTreeView() {
         treeModel = new JMeterTreeModel();
         tree = new JTree(treeModel);
-        tree.setCellRenderer(new FixedJMeterTreeCellRenderer());
+        tree.setCellRenderer(new FixedJMeterTreeCellRenderer(this));
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
 

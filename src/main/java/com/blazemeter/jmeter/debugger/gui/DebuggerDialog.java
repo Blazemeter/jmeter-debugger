@@ -22,7 +22,6 @@ import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterContextServiceAccessor;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.collections.HashTree;
-import org.apache.jorphan.collections.SearchByClass;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.jorphan.util.JMeterStopThreadException;
 import org.apache.log.Logger;
@@ -43,6 +42,7 @@ public class DebuggerDialog extends DebuggerDialogBase {
     private final StepOver stepper = new StepOver();
     private ThreadGroupSelector tgSelector = new ThreadGroupSelector(new HashTree());
     private boolean savedDirty = false;
+    private Wrapper currentElement;
 
     public DebuggerDialog() {
         super();
@@ -124,6 +124,7 @@ public class DebuggerDialog extends DebuggerDialogBase {
             evaluatePanel.setEnabled(false);
             elementContainer.removeAll();
             JMeterContextServiceAccessor.removeContext();
+            setCurrentElement(null);
         }
     }
 
@@ -155,10 +156,15 @@ public class DebuggerDialog extends DebuggerDialogBase {
         propsTableModel.fireTableDataChanged();
     }
 
-    private void selectTargetInTree(Wrapper dbgElm, Sampler currentSampler) {
+    private void setCurrentElement(Wrapper te) {
+        currentElement = te;
+    }
+
+    private void selectTargetInTree(Wrapper dbgElm) {
         TestElement wrpElm = (TestElement) dbgElm.getWrappedElement();
         TreePath treePath = getTreePathFor(wrpElm);
         if (treePath == null) {
+            // case for wrapped controllers
             treePath = getTreePathFor(dbgElm);
         }
 
@@ -167,7 +173,6 @@ public class DebuggerDialog extends DebuggerDialogBase {
         } else {
             tree.setSelectionPath(treePath);
         }
-        markCurrentSampler(currentSampler);
         tree.repaint();
 
         GuiPackage gui = GuiPackage.getInstance();
@@ -181,32 +186,6 @@ public class DebuggerDialog extends DebuggerDialogBase {
                 elementContainer.add((Component) egui, BorderLayout.CENTER);
             }
             elementContainer.updateUI();
-        }
-    }
-
-    private void markCurrentSampler(Sampler currentSampler) {
-        JMeterTreeModel model = (JMeterTreeModel) tree.getModel();
-
-        for (JMeterTreeNode jMeterTreeNode : model.getNodesOfType(Sampler.class)) {
-            if (jMeterTreeNode.getUserObject() instanceof Sampler) {
-                List<JMeterTreeNode> matchingNodes = jMeterTreeNode.getPathToThreadGroup();
-                for (JMeterTreeNode jMeterTreeNode2 : matchingNodes) {
-                    jMeterTreeNode2.setMarkedBySearch(false);
-                }
-            }
-        }
-
-        if (currentSampler != null) {
-            if (currentSampler instanceof Wrapper) {
-                currentSampler = (Sampler) ((Wrapper) currentSampler).getWrappedElement();
-            }
-
-            JMeterTreeNode treeNode = model.getNodeOf(currentSampler);
-            if (treeNode != null) {
-                treeNode.setMarkedBySearch(true);
-            } else {
-                log.warn("Failed to find tree node for " + currentSampler.getName());
-            }
         }
     }
 
@@ -247,7 +226,28 @@ public class DebuggerDialog extends DebuggerDialogBase {
             throw new RuntimeException(e);
         }
 
-        selectTargetInTree(new ThreadGroupWrapper(tgSelector.getThreadGroupClone()), null);
+        // select TG for visual convenience
+        selectTargetInTree(new ThreadGroupWrapper(tgSelector.getThreadGroupClone()));
+    }
+
+    @Override
+    public void highlightNode(Component component, JMeterTreeNode node, TestElement mc) {
+        component.setFont(component.getFont().deriveFont(~Font.BOLD).deriveFont(~Font.ITALIC));
+        if (engine != null) {
+            if (mc.equals(currentElement) || mc.equals(currentElement.getWrappedElement())) {
+                component.setFont(component.getFont().deriveFont(Font.BOLD));
+                component.setForeground(Color.BLUE);
+            } 
+            
+            Sampler currentSampler = engine.getCurrentSampler();
+            if (mc.equals(currentSampler)) { // can this ever happen?
+                component.setFont(component.getFont().deriveFont(Font.ITALIC));
+                component.setForeground(Color.BLUE);
+            } else if (currentSampler instanceof Wrapper && mc.equals(((Wrapper) currentSampler).getWrappedElement())) {
+                component.setFont(component.getFont().deriveFont(Font.ITALIC));
+                component.setForeground(Color.BLUE);
+            }
+        }
     }
 
     private class ThreadGroupChoiceChanged implements ItemListener {
@@ -280,11 +280,12 @@ public class DebuggerDialog extends DebuggerDialogBase {
         }
 
         @Override
-        public void notify(Wrapper t) {
+        public void notify(Wrapper wrapper) {
             step.setEnabled(true);
-            Object wrappedElement = t.getWrappedElement();
+            TestElement wrappedElement = (TestElement) wrapper.getWrappedElement();
             log.debug("Stopping before: " + wrappedElement);
-            selectTargetInTree(t, engine.getCurrentSampler());
+            setCurrentElement(wrapper);
+            selectTargetInTree(wrapper);
             refreshStatus();
             if (!stopping) {
                 try {

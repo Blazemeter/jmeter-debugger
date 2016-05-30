@@ -72,7 +72,7 @@ public class TreeClonerTG implements HashTreeTraverser {
         } else if (cloned instanceof Controller && isWrappable) {
             TestElement wrapped;
             if (cloned instanceof GenericController) {
-                if (cloned instanceof ReplaceableController) {
+                if (cloned instanceof ReplaceableController) {     // TODO: solve replaceable problem
                     log.warn("Not supported!: " + cloned);
                     wrapped = new ReplaceableGenericControllerDebug((GenericController) cloned);
                 } else {

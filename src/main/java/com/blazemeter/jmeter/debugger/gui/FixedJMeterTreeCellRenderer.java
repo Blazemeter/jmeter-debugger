@@ -12,6 +12,13 @@ import java.awt.*;
 
 
 public class FixedJMeterTreeCellRenderer extends JMeterCellRenderer {
+    private final NodeHiliter hiliter;
+
+    public FixedJMeterTreeCellRenderer(NodeHiliter hiliter) {
+        super();
+        this.hiliter = hiliter;
+    }
+
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean p_hasFocus) {
         JMeterTreeNode node = (JMeterTreeNode) value;
@@ -21,12 +28,7 @@ public class FixedJMeterTreeCellRenderer extends JMeterCellRenderer {
             mc.setProperty(new StringProperty(TestElement.GUI_CLASS, this.getClass().getName()));
         }
         Component treeCellRendererComponent = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, p_hasFocus);
-        if (node.isMarkedBySearch()) {
-            setBorder(null);
-            setFont(getFont().deriveFont(Font.BOLD | Font.ITALIC));
-        } else {
-            setFont(getFont().deriveFont(~Font.BOLD).deriveFont(~Font.ITALIC));
-        }
+        hiliter.highlightNode(treeCellRendererComponent, node, mc);
         return treeCellRendererComponent;
     }
 }
