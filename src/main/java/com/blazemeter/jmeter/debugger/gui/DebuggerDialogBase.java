@@ -1,12 +1,16 @@
 package com.blazemeter.jmeter.debugger.gui;
 
+import org.apache.jmeter.config.ConfigElement;
 import org.apache.jmeter.gui.LoggerPanel;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.gui.util.PowerTableModel;
 import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.testelement.TestPlan;
 import org.apache.jmeter.testelement.TestStateListener;
+import org.apache.jmeter.testelement.WorkBench;
 import org.apache.jmeter.threads.AbstractThreadGroup;
+import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jorphan.gui.ComponentUtil;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.LogTarget;
@@ -241,7 +245,12 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
                             tree.setSelectionPath(currentPath);
                         }
                         final JMeterTreeNode node = (JMeterTreeNode) currentPath.getLastPathComponent();
-                        JPopupMenu popup = getPopup((TestElement) node.getUserObject());
+                        TestElement te = (TestElement) node.getUserObject();
+                        if (te instanceof ConfigElement || te instanceof TestPlan || te instanceof ThreadGroup || te instanceof WorkBench) {
+                            log.debug("No breakpoint possible for " + te);
+                            return;
+                        }
+                        JPopupMenu popup = getPopup(te);
                         popup.pack();
                         popup.show(tree, e.getX(), e.getY());
                         popup.setVisible(true);
