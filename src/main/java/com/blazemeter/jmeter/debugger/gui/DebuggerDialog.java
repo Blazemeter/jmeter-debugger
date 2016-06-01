@@ -241,17 +241,17 @@ public class DebuggerDialog extends DebuggerDialogBase {
         }
 
         TestElement currentWrapped = (TestElement) currentElement.getWrappedElement();
-        if (mc.equals(currentElement) || mc.equals(currentWrapped)) {
+        if (mc == currentElement || mc == currentWrapped) {
             component.setFont(component.getFont().deriveFont(Font.BOLD));
             component.setForeground(Color.BLUE);
         }
 
         Sampler currentSampler = engine.getCurrentSampler();
         Font font = component.getFont();
-        if (mc.equals(currentSampler)) { // can this ever happen?
+        if (mc == currentSampler) { // can this ever happen?
             component.setFont(font.deriveFont(font.getStyle() | Font.ITALIC));
             component.setForeground(Color.BLUE);
-        } else if (currentSampler instanceof Wrapper && mc.equals(((Wrapper) currentSampler).getWrappedElement())) {
+        } else if (currentSampler instanceof Wrapper && mc == ((Wrapper) currentSampler).getWrappedElement()) {
             component.setFont(font.deriveFont(font.getStyle() | Font.ITALIC));
             component.setForeground(Color.BLUE);
         }

@@ -41,7 +41,7 @@ public class TreeClonerTG implements HashTreeTraverser {
     private boolean isIgnored(Object node) {
         if (node instanceof JMeterTreeNode) {
             Object te = ((JMeterTreeNode) node).getUserObject();
-            return te instanceof AbstractThreadGroup && !te.equals(onlyTG);
+            return te instanceof AbstractThreadGroup && te != onlyTG;
         }
         return false;
     }
