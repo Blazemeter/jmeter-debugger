@@ -4,24 +4,24 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>kg.apc</groupId>
+    <groupId>com.blazemeter</groupId>
     <artifactId>jmeter-debugger</artifactId>
     <version>0.0</version>
 
     <name>Step-by-Step Debugger for JMeter</name>
     <description>Step-by-Step Debugger for JMeter</description>
     <licenses>
-        <license>
+        <license>  <!-- TODO: use the right one -->
             <name>The Apache Software License, Version 2.0</name>
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
-    <url>http://jmeter-plugins.org/</url>
+    <url>http://blazemeter.com/</url>
     <scm>
-        <url>https://github.com/undera/jmeter-plugins</url>
-        <connection>https://github.com/undera/jmeter-plugins.git</connection>
-        <developerConnection>git@github.com:undera/jmeter-plugins.git</developerConnection>
+        <url>https://github.com/Blazemeter/jmeter-debugger</url>
+        <connection>https://github.com/Blazemeter/jmeter-debugger.git</connection>
+        <developerConnection>git@github.com:Blazemeter/jmeter-debugger.git</developerConnection>
     </scm>
     <developers>
         <developer>
