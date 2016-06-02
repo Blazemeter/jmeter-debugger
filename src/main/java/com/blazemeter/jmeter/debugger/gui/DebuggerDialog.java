@@ -1,15 +1,10 @@
 package com.blazemeter.jmeter.debugger.gui;
 
 import com.blazemeter.jmeter.debugger.ThreadGroupWrapper;
-import com.blazemeter.jmeter.debugger.elements.TimerDebug;
 import com.blazemeter.jmeter.debugger.elements.Wrapper;
-import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
 import com.blazemeter.jmeter.debugger.engine.SearchClass;
-import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import org.apache.jmeter.JMeter;
 import org.apache.jmeter.control.ReplaceableController;
-import org.apache.jmeter.engine.JMeterEngineException;
-import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.exceptions.IllegalUserActionException;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.gui.JMeterGUIComponent;
@@ -19,12 +14,9 @@ import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.threads.AbstractThreadGroup;
 import org.apache.jmeter.threads.JMeterContext;
-import org.apache.jmeter.threads.JMeterContextService;
-import org.apache.jmeter.threads.JMeterContextServiceAccessor;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.logging.LoggingManager;
-import org.apache.jorphan.util.JMeterStopThreadException;
 import org.apache.log.Logger;
 
 import javax.swing.event.TreeSelectionEvent;
@@ -37,21 +29,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class DebuggerDialog extends DebuggerDialogBase {
+public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFrontend {
     private static final Logger log = LoggingManager.getLoggerForClass();
-
-    protected DebuggerEngine engine;
-    private final StepOver stepper = new StepOver();
-    private ThreadGroupSelector tgSelector = new ThreadGroupSelector(new HashTree());
     private boolean savedDirty = false;
-    private Wrapper currentElement;
-    private boolean isContinuing = false;
 
     public DebuggerDialog() {
         super();
         start.addActionListener(new StartDebugging());
         stop.addActionListener(new StopDebugging());
-        step.addActionListener(stepper);
+        step.addActionListener(new StepOver());
         pauseContinue.addActionListener(new PauseContinue());
         tgCombo.addItemListener(new ThreadGroupChoiceChanged());
     }
@@ -63,9 +49,9 @@ public class DebuggerDialog extends DebuggerDialogBase {
             savedDirty = GuiPackage.getInstance().isDirty();
         }
         HashTree testTree = getTestTree();
-        this.tgSelector = new ThreadGroupSelector(testTree);
+        this.debugger = new Debugger(testTree, this);
         tgCombo.removeAllItems();
-        for (AbstractThreadGroup group : tgSelector.getThreadGroups()) {
+        for (AbstractThreadGroup group : debugger.getThreadGroups()) {
             tgCombo.addItem(group);
         }
         tgCombo.setEnabled(tgCombo.getItemCount() > 0);
@@ -75,55 +61,18 @@ public class DebuggerDialog extends DebuggerDialogBase {
     @Override
     public void componentHidden(ComponentEvent e) {
         log.debug("Closing dialog");
-        stop();
+        debugger.stop();
         if (GuiPackage.getInstance() != null) {
             GuiPackage.getInstance().setDirty(savedDirty);
         }
     }
 
+    /**
+     * Get test tree from JMeter
+     */
     protected HashTree getTestTree() {
         GuiPackage gui = GuiPackage.getInstance();
         return gui.getTreeModel().getTestPlan();
-    }
-
-    private void start() {
-        log.debug("Start debugging");
-        loggerPanel.clear();
-        toggleControls(false);
-
-        HashTree hashTree = tgSelector.getSelectedTree();
-        StandardJMeterEngine.register(this); // oh, dear, they use static field then clean it...
-        engine = new DebuggerEngine(JMeterContextService.getContext());
-        engine.setStepper(stepper);
-        JMeter.convertSubTree(hashTree);
-        engine.configure(hashTree);
-        try {
-            engine.runTest();
-        } catch (JMeterEngineException e) {
-            log.error("Failed to pauseContinue debug", e);
-            stop();
-        }
-    }
-
-    private void stop() {
-        log.debug("Stop debugging");
-
-        if (stepper.isStopping()) {
-            throw new IllegalStateException("Already stopping");
-        }
-
-        stepper.setStopping(true);
-        try {
-            if (engine != null && engine.isActive()) {
-                engine.stopTest(true);
-            }
-        } finally {
-            stepper.setStopping(false);
-            toggleControls(true);
-            elementContainer.removeAll();
-            JMeterContextServiceAccessor.removeContext();
-            setCurrentElement(null);
-        }
     }
 
     private void toggleControls(boolean state) {
@@ -132,18 +81,6 @@ public class DebuggerDialog extends DebuggerDialogBase {
         stop.setEnabled(!state);
         pauseContinue.setEnabled(!state);
         evaluatePanel.setEnabled(!state);
-    }
-
-    @Override
-    public void testEnded() {
-        stop();
-    }
-
-    private void refreshStatus() {
-        JMeterContext context = engine.getThreadContext();
-        refreshVars(context);
-        refreshProperties();
-        evaluatePanel.refresh(context);
     }
 
     private void refreshVars(JMeterContext context) {
@@ -160,10 +97,6 @@ public class DebuggerDialog extends DebuggerDialogBase {
             propsTableModel.addRow(new String[]{var.getKey().toString(), var.getValue().toString()});
         }
         propsTableModel.fireTableDataChanged();
-    }
-
-    private void setCurrentElement(Wrapper te) {
-        currentElement = te;
     }
 
     private void selectTargetInTree(Wrapper dbgElm) {
@@ -203,9 +136,9 @@ public class DebuggerDialog extends DebuggerDialogBase {
     }
 
     private void selectThreadGroup(AbstractThreadGroup tg) {
-        tgSelector.selectThreadGroup(tg);
+        debugger.selectThreadGroup(tg);
         treeModel.clearTestPlan();
-        HashTree selectedTree = tgSelector.getSelectedTree();
+        HashTree selectedTree = debugger.getSelectedTree();
 
         // Hack to resolve ModuleControllers from JMeter.java
         SearchClass<ReplaceableController> replaceableControllers = new SearchClass<>(ReplaceableController.class);
@@ -223,7 +156,7 @@ public class DebuggerDialog extends DebuggerDialogBase {
         }
 
         // select TG for visual convenience
-        selectTargetInTree(new ThreadGroupWrapper(tgSelector.getThreadGroupClone()));
+        selectTargetInTree(new ThreadGroupWrapper(debugger.getThreadGroupClone()));
     }
 
     @Override
@@ -232,11 +165,12 @@ public class DebuggerDialog extends DebuggerDialogBase {
 
         TestElement userObject = (TestElement) node.getUserObject();
 
-        if (breakpoints.contains(userObject)) {
+        if (debugger.isBreakpoint(userObject)) {
             component.setForeground(Color.RED);
         }
 
-        if (engine == null || currentElement == null) {
+        Wrapper currentElement = debugger.getCurrentElement();
+        if (currentElement == null) {
             return;
         }
 
@@ -246,7 +180,7 @@ public class DebuggerDialog extends DebuggerDialogBase {
             component.setForeground(Color.BLUE);
         }
 
-        Sampler currentSampler = engine.getCurrentSampler();
+        Sampler currentSampler = debugger.getCurrentSampler();
         Font font = component.getFont();
         if (mc == currentSampler) { // can this ever happen?
             component.setFont(font.deriveFont(font.getStyle() | Font.ITALIC));
@@ -282,17 +216,50 @@ public class DebuggerDialog extends DebuggerDialogBase {
         }
     }
 
-    public void continueRun() {
-        isContinuing = true;
-        pauseContinue.setText("Pause");
-        pauseContinue.setIcon(DebuggerMenuItem.getPauseIcon());
-        stepper.notifyAll();
+    @Override
+    public void clear() {
+        loggerPanel.clear();
     }
 
-    public void pause() {
-        isContinuing = false;
+    @Override
+    public void started() {
+        toggleControls(false);
+    }
+
+    @Override
+    public void stopped() {
+        toggleControls(true);
+        elementContainer.removeAll();
+    }
+
+    @Override
+    public void frozenAt(Wrapper wrapper) {
+        step.setEnabled(true);
+        selectTargetInTree(wrapper);
+    }
+
+    @Override
+    public void positionChanged() {
+        tree.repaint();
+    }
+
+    @Override
+    public void statusRefresh(JMeterContext context) {
+        refreshVars(context);
+        refreshProperties();
+        evaluatePanel.refresh(context);
+    }
+
+    @Override
+    public void paused() {
         pauseContinue.setText("Continue");
         pauseContinue.setIcon(DebuggerMenuItem.getContinueIcon());
+    }
+
+    @Override
+    public void continuing() {
+        pauseContinue.setText("Pause");
+        pauseContinue.setIcon(DebuggerMenuItem.getPauseIcon());
     }
 
     private class ThreadGroupChoiceChanged implements ItemListener {
@@ -310,87 +277,34 @@ public class DebuggerDialog extends DebuggerDialogBase {
     private class StartDebugging implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            start();
+            debugger.start();
         }
     }
 
-    private class StepOver implements ActionListener, StepTrigger {
-        private boolean stopping;
-
+    private class StepOver implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             synchronized (this) {
                 this.notifyAll();
             }
         }
-
-        @Override
-        public void notify(Wrapper wrapper) {
-            if (stopping) {
-                throw new JMeterStopThreadException();
-            }
-
-            TestElement wrappedElement = (TestElement) wrapper.getWrappedElement();
-
-            if (wrapper instanceof TimerDebug) {
-                ((TimerDebug) wrapper).setDelaying(isContinuing);
-            }
-
-            setCurrentElement(wrapper);
-            refreshStatus();
-
-            try {
-                synchronized (this) {
-                    if (isContinuing && breakpoints.contains(wrappedElement)) {
-                        pause();
-                    }
-
-                    if (!isContinuing) {
-                        step.setEnabled(true);
-                        selectTargetInTree(wrapper);
-                        log.debug("Stopping before: " + wrappedElement);
-                        this.wait();
-                    } else {
-                        tree.repaint();
-                    }
-                }
-            } catch (InterruptedException e) {
-                log.debug("Interrupted", e);
-                throw new JMeterStopThreadException(e);
-            } finally {
-                if (step.isEnabled()) {
-                    step.setEnabled(false);
-                }
-            }
-        }
-
-        public void setStopping(boolean stopping) {
-            this.stopping = stopping;
-        }
-
-        public boolean isStopping() {
-            return stopping;
-        }
     }
 
     private class PauseContinue implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            synchronized (stepper) {
-                if (isContinuing) {
-                    pause();
-                } else {
-                    continueRun();
-                }
+            if (debugger.isContinuing()) {
+                debugger.pause();
+            } else {
+                debugger.continueRun();
             }
         }
-
     }
 
     private class StopDebugging implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            stop();
+            debugger.stop();
         }
     }
 

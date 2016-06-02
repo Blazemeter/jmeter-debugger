@@ -7,7 +7,6 @@ import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.gui.util.PowerTableModel;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.TestPlan;
-import org.apache.jmeter.testelement.TestStateListener;
 import org.apache.jmeter.testelement.WorkBench;
 import org.apache.jmeter.threads.AbstractThreadGroup;
 import org.apache.jmeter.threads.ThreadGroup;
@@ -23,11 +22,9 @@ import javax.swing.table.TableRowSorter;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Set;
 
-abstract public class DebuggerDialogBase extends JDialog implements ComponentListener, TestStateListener, NodeHighlighter, TreeSelectionListener {
+abstract public class DebuggerDialogBase extends JDialog implements ComponentListener, NodeHighlighter, TreeSelectionListener {
     private static final Logger log = LoggingManager.getLoggerForClass();
 
     protected JComboBox<AbstractThreadGroup> tgCombo = new JComboBox<>();
@@ -42,7 +39,7 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
     protected PowerTableModel propsTableModel;
     protected JPanel elementContainer;
     protected EvaluatePanel evaluatePanel;
-    protected Set<TestElement> breakpoints = new HashSet<>();
+    protected Debugger debugger;
 
     public DebuggerDialogBase() {
         super((JFrame) null, "Step-by-Step Debugger", true);
@@ -63,7 +60,7 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
 
     private Component getMainPane() {
         JSplitPane topAndDown = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-        topAndDown.setResizeWeight(.5);
+        topAndDown.setResizeWeight(.75);
         topAndDown.setDividerSize(5);
         topAndDown.setTopComponent(new JScrollPane(getElementPane()));
         topAndDown.setBottomComponent(getStatusPane());
@@ -113,7 +110,7 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
 
     private Component getLogTab() {
         loggerPanel = new LoggerPanelWrapping();
-        loggerPanel.setMinimumSize(new Dimension(0, 100));
+        loggerPanel.setMinimumSize(new Dimension(0, 50));
         loggerPanel.setPreferredSize(new Dimension(0, 150));
         LoggingManager.addLogTargetToRootLogger(new LogTarget[]{loggerPanel,});
         return loggerPanel;
@@ -216,20 +213,6 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
         return tree;
     }
 
-    @Override
-    public void testStarted() {
-
-    }
-
-    @Override
-    public void testStarted(String host) {
-
-    }
-
-    @Override
-    public void testEnded(String host) {
-
-    }
 
     private class TreeMouseListener implements MouseListener {
         @Override
@@ -267,16 +250,16 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     log.debug("Toggle breakpoint on: " + te);
-                    if (breakpoints.contains(te)) {
-                        breakpoints.remove(te);
+                    if (debugger.isBreakpoint(te)) {
+                        debugger.removeBreakpoint(te);
                     } else {
-                        breakpoints.add(te);
+                        debugger.addBreakpoint(te);
                     }
                     tree.repaint();
                 }
             });
 
-            item.setState(breakpoints.contains(te));
+            item.setState(debugger.isBreakpoint(te));
             popup.add(item);
             return popup;
         }
