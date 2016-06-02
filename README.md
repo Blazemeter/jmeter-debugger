@@ -1,5 +1,11 @@
 # Step-by-step debugger for Apache JMeter
 
+## Installation
+
+## Usage
+
+## Known Limitations 
+
 ## Roadmap
 
  - double run erases names
