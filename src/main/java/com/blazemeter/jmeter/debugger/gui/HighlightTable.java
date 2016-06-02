@@ -11,13 +11,16 @@ public class HighlightTable extends JTable {
     public HighlightTable(TableModel model) {
         super(model);
         setDefaultEditor(Object.class, null);
+        // setSorter(model); FIXME  produces exceptions on "continue" => TODO: sync with model updates
+    }
 
-        TableRowSorter<TableModel> sorter = new SyncTableRowSorter(model);
+    private void setSorter(TableModel model) {
+        TableRowSorter<TableModel> sorter = new TableRowSorter<>(model);
         sorter.setSortsOnUpdates(true);
         LinkedList<RowSorter.SortKey> sortKeys = new LinkedList<>();
         sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
         sorter.setSortKeys(sortKeys);
-        //sorter.sort();
+        sorter.sort();
         setRowSorter(sorter);
     }
 
@@ -26,30 +29,12 @@ public class HighlightTable extends JTable {
         Component comp = super.prepareRenderer(renderer, row, column);
         if (getModel() instanceof HighlightTableModel) {
             HighlightTableModel model = (HighlightTableModel) getModel();
-            int mdlRow = getRowSorter().convertRowIndexToModel(row);
-            Object valueAt = model.getValueAt(mdlRow, 0);
-            if (valueAt != null && model.isRowHighlighted(valueAt.toString(), model.getValueAt(mdlRow, 1))) {
+            if (model.isRowHighlighted(getValueAt(row, 0).toString(), getValueAt(row, 1))) {
                 comp.setFont(comp.getFont().deriveFont(Font.BOLD));
             } else {
                 comp.setFont(comp.getFont().deriveFont(~Font.BOLD));
             }
         }
         return comp;
-    }
-
-    private class SyncTableRowSorter extends TableRowSorter<TableModel> {
-        public SyncTableRowSorter(TableModel model) {
-            super(model);
-        }
-
-        @Override
-        public synchronized int convertRowIndexToModel(int index) {
-            return super.convertRowIndexToModel(index);
-        }
-
-        @Override
-        public synchronized void sort() {
-            super.sort();
-        }
     }
 }
