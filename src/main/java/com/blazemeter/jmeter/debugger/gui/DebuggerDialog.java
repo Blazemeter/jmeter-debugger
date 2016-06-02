@@ -164,7 +164,6 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
         component.setFont(component.getFont().deriveFont(~Font.BOLD).deriveFont(~Font.ITALIC));
 
         TestElement userObject = (TestElement) node.getUserObject();
-
         if (debugger.isBreakpoint(userObject)) {
             component.setForeground(Color.RED);
         }
@@ -217,12 +216,8 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
     }
 
     @Override
-    public void clear() {
-        loggerPanel.clear();
-    }
-
-    @Override
     public void started() {
+        loggerPanel.clear();
         toggleControls(false);
     }
 
@@ -234,32 +229,31 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
 
     @Override
     public void frozenAt(Wrapper wrapper) {
+        pauseContinue.setText("Continue");
+        pauseContinue.setIcon(DebuggerMenuItem.getContinueIcon());
+
         step.setEnabled(true);
         selectTargetInTree(wrapper);
-    }
-
-    @Override
-    public void positionChanged() {
-        tree.repaint();
     }
 
     @Override
     public void statusRefresh(JMeterContext context) {
         refreshVars(context);
         refreshProperties();
-        evaluatePanel.refresh(context);
-    }
-
-    @Override
-    public void paused() {
-        pauseContinue.setText("Continue");
-        pauseContinue.setIcon(DebuggerMenuItem.getContinueIcon());
+        evaluatePanel.refresh(context, debugger.isContinuing());
+        tree.repaint();
     }
 
     @Override
     public void continuing() {
+        // to prevent buttons "jumping"
+        pauseContinue.setMinimumSize(pauseContinue.getSize());
+        pauseContinue.setPreferredSize(pauseContinue.getSize());
+        pauseContinue.setSize(pauseContinue.getSize());
+        
         pauseContinue.setText("Pause");
         pauseContinue.setIcon(DebuggerMenuItem.getPauseIcon());
+        step.setEnabled(false);
     }
 
     private class ThreadGroupChoiceChanged implements ItemListener {
@@ -285,7 +279,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
         @Override
         public void actionPerformed(ActionEvent e) {
             synchronized (this) {
-                this.notifyAll();
+                debugger.proceed();
             }
         }
     }

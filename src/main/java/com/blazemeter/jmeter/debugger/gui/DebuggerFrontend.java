@@ -4,17 +4,11 @@ import com.blazemeter.jmeter.debugger.elements.Wrapper;
 import org.apache.jmeter.threads.JMeterContext;
 
 public interface DebuggerFrontend {
-    void clear();
-
     void started();
 
     void stopped();
 
     void continuing();
-
-    void paused();
-
-    void positionChanged();
 
     void frozenAt(Wrapper wrapper);
 

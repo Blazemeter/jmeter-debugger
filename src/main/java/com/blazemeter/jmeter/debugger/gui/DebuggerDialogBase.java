@@ -1,5 +1,6 @@
 package com.blazemeter.jmeter.debugger.gui;
 
+import com.blazemeter.jmeter.debugger.elements.Wrapper;
 import org.apache.jmeter.config.ConfigElement;
 import org.apache.jmeter.gui.LoggerPanel;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
@@ -9,7 +10,9 @@ import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.TestPlan;
 import org.apache.jmeter.testelement.WorkBench;
 import org.apache.jmeter.threads.AbstractThreadGroup;
+import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.ThreadGroup;
+import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.gui.ComponentUtil;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.LogTarget;
@@ -39,7 +42,7 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
     protected PowerTableModel propsTableModel;
     protected JPanel elementContainer;
     protected EvaluatePanel evaluatePanel;
-    protected Debugger debugger;
+    protected Debugger debugger = new Debugger(new HashTree(), new DummyFrontend());
 
     public DebuggerDialogBase() {
         super((JFrame) null, "Step-by-Step Debugger", true);
@@ -85,28 +88,15 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
     private Component getVariablesTab() {
         varsTableModel = new HighlightTableModel(new String[]{"Name", "Value"}, new Class[]{String.class, String.class});
         JTable table = new HighlightTable(varsTableModel);
-        table.setDefaultEditor(Object.class, null); // TODO: allow editing vars
-        setTableSorted(table);
         return new JScrollPane(table);
     }
 
     private Component getPropertiesTab() {
         propsTableModel = new HighlightTableModel(new String[]{"Name", "Value"}, new Class[]{String.class, String.class});
         JTable table = new HighlightTable(propsTableModel);
-        table.setDefaultEditor(Object.class, null); // TODO: allow editing props
-        setTableSorted(table);
         return new JScrollPane(table);
     }
 
-    private void setTableSorted(JTable table) {
-        TableRowSorter<TableModel> sorter = new TableRowSorter<>(table.getModel());
-        sorter.setSortsOnUpdates(true);
-        LinkedList<RowSorter.SortKey> sortKeys = new LinkedList<>();
-        sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
-        sorter.setSortKeys(sortKeys);
-        sorter.sort();
-        table.setRowSorter(sorter);
-    }
 
     private Component getLogTab() {
         loggerPanel = new LoggerPanelWrapping();
@@ -289,5 +279,31 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
         }
     }
 
+    private class DummyFrontend implements DebuggerFrontend {
+        @Override
+        public void started() {
+
+        }
+
+        @Override
+        public void stopped() {
+
+        }
+
+        @Override
+        public void continuing() {
+
+        }
+
+        @Override
+        public void frozenAt(Wrapper wrapper) {
+
+        }
+
+        @Override
+        public void statusRefresh(JMeterContext context) {
+
+        }
+    }
 }
 

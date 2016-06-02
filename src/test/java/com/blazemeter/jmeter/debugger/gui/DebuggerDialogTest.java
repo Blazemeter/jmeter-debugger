@@ -11,6 +11,7 @@ import org.apache.jmeter.functions.TimeFunction;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.save.SaveService;
+import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.collections.HashTree;
@@ -114,7 +115,7 @@ public class DebuggerDialogTest {
         JMeterTreeModel mdl = new JMeterTreeModel();
         mdl.addSubTree(getHashTree(), (JMeterTreeNode) mdl.getRoot());
 
-        ThreadGroupSelector sel = new ThreadGroupSelector(mdl.getTestPlan());
+        Debugger sel = new Debugger(mdl.getTestPlan(), new FrontendMock());
         HashTree hashTree = sel.getSelectedTree();
         JMeter.convertSubTree(hashTree);
 
@@ -136,6 +137,33 @@ public class DebuggerDialogTest {
         public void notify(Wrapper t) {
             log.warn("Stop before: " + t.getWrappedElement());
             cnt += 1;
+        }
+    }
+
+    private class FrontendMock implements DebuggerFrontend {
+        @Override
+        public void started() {
+
+        }
+
+        @Override
+        public void stopped() {
+
+        }
+
+        @Override
+        public void continuing() {
+            
+        }
+
+        @Override
+        public void frozenAt(Wrapper wrapper) {
+
+        }
+
+        @Override
+        public void statusRefresh(JMeterContext context) {
+
         }
     }
 }

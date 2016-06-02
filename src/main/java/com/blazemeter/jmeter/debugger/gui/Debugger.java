@@ -49,10 +49,6 @@ public class Debugger implements StepTrigger, TestStateListener {
         }
     }
 
-    private void setCurrentElement(Wrapper te) {
-        currentElement = te;
-    }
-
     public AbstractThreadGroup[] getThreadGroups() {
         SearchClass<AbstractThreadGroup> searcher = new SearchClass<>(AbstractThreadGroup.class);
         tree.traverse(searcher);
@@ -79,7 +75,6 @@ public class Debugger implements StepTrigger, TestStateListener {
 
     public void start() {
         log.debug("Start debugging");
-        frontend.clear();
         frontend.started();
 
         HashTree hashTree = getSelectedTree();
@@ -112,12 +107,12 @@ public class Debugger implements StepTrigger, TestStateListener {
             stopping = false;
             frontend.stopped();
             JMeterContextServiceAccessor.removeContext();
-            setCurrentElement(null);
+            currentElement = null;
         }
     }
 
     @Override
-    public void notify(Wrapper wrapper) {
+    public synchronized void notify(Wrapper wrapper) {
         if (stopping) {
             throw new JMeterStopThreadException();
         }
@@ -128,43 +123,34 @@ public class Debugger implements StepTrigger, TestStateListener {
             ((TimerDebug) wrapper).setDelaying(isContinuing);
         }
 
-        setCurrentElement(wrapper);
+        currentElement = wrapper;
         JMeterContext context = engine.getThreadContext();
         frontend.statusRefresh(context);
 
         try {
-            synchronized (this) {
-                if (isContinuing && breakpoints.contains(wrappedElement)) {
-                    pause();
-                }
+            if (isContinuing && breakpoints.contains(wrappedElement)) {
+                pause();
+            }
 
-                if (!isContinuing) {
-                    frontend.frozenAt(wrapper);
-                    log.debug("Stopping before: " + wrappedElement);
-                    this.wait();
-                } else {
-                    frontend.positionChanged();
-                }
+            if (!isContinuing) {
+                frontend.frozenAt(wrapper);
+                log.debug("Stopping before: " + wrappedElement);
+                this.wait();
+                frontend.continuing();
             }
         } catch (InterruptedException e) {
             log.debug("Interrupted", e);
             throw new JMeterStopThreadException(e);
-        } finally {
-            if (step.isEnabled()) {
-                step.setEnabled(false);
-            }
         }
     }
 
     public void pause() {
         isContinuing = false;
-        frontend.paused();
     }
 
     public void continueRun() {
         isContinuing = true;
-        frontend.continuing();
-        notifyAll();
+        proceed();
     }
 
 
@@ -177,7 +163,7 @@ public class Debugger implements StepTrigger, TestStateListener {
     }
 
     public boolean isContinuing() {
-        return false; // TODO
+        return isContinuing;
     }
 
     @Override
@@ -210,5 +196,9 @@ public class Debugger implements StepTrigger, TestStateListener {
 
     public void addBreakpoint(TestElement te) {
         breakpoints.add(te);
+    }
+
+    public synchronized void proceed() {
+        notifyAll();
     }
 }

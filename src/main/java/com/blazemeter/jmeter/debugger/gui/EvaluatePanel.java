@@ -41,16 +41,17 @@ public class EvaluatePanel extends JPanel implements ActionListener {
         doBtn.addActionListener(this);
     }
 
-    public void refresh(JMeterContext ctx) {
+    public void refresh(JMeterContext ctx, boolean continuing) {
         result.clear();
-        doBtn.doClick();
+        doBtn.setEnabled(!continuing);
+        actionPerformed(new ActionEvent(this, 0, ""));
         this.context = ctx;
     }
 
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
-        exprField.setEditable(enabled);
+        //exprField.setEditable(enabled);
         result.setEnabled(enabled);
         doBtn.setEnabled(enabled);
     }
