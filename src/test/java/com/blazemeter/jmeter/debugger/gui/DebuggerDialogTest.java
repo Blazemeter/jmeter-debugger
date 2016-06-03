@@ -1,7 +1,9 @@
 package com.blazemeter.jmeter.debugger.gui;
 
 import com.blazemeter.jmeter.debugger.elements.Wrapper;
+import com.blazemeter.jmeter.debugger.engine.Debugger;
 import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
+import com.blazemeter.jmeter.debugger.engine.DebuggerFrontend;
 import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import kg.apc.emulators.TestJMeterUtils;
 import org.apache.jmeter.JMeter;

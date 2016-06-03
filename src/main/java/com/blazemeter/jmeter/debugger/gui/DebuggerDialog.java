@@ -2,9 +2,12 @@ package com.blazemeter.jmeter.debugger.gui;
 
 import com.blazemeter.jmeter.debugger.ThreadGroupWrapper;
 import com.blazemeter.jmeter.debugger.elements.Wrapper;
+import com.blazemeter.jmeter.debugger.engine.Debugger;
+import com.blazemeter.jmeter.debugger.engine.DebuggerFrontend;
 import com.blazemeter.jmeter.debugger.engine.SearchClass;
 import org.apache.jmeter.JMeter;
 import org.apache.jmeter.control.ReplaceableController;
+import org.apache.jmeter.engine.TreeCloner;
 import org.apache.jmeter.exceptions.IllegalUserActionException;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.gui.JMeterGUIComponent;
@@ -49,7 +52,9 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
             savedDirty = GuiPackage.getInstance().isDirty();
         }
         HashTree testTree = getTestTree();
-        this.debugger = new Debugger(testTree, this);
+        TreeCloner cloner = new TreeCloner();  // clone to not modify original JMX
+        testTree.traverse(cloner);
+        this.debugger = new Debugger(cloner.getClonedTree(), this);
         tgCombo.removeAllItems();
         for (AbstractThreadGroup group : debugger.getThreadGroups()) {
             tgCombo.addItem(group);
@@ -250,7 +255,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
         pauseContinue.setMinimumSize(pauseContinue.getSize());
         pauseContinue.setPreferredSize(pauseContinue.getSize());
         pauseContinue.setSize(pauseContinue.getSize());
-        
+
         pauseContinue.setText("Pause");
         pauseContinue.setIcon(DebuggerMenuItem.getPauseIcon());
         step.setEnabled(false);

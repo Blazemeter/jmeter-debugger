@@ -1,4 +1,4 @@
-package com.blazemeter.jmeter.debugger.gui;
+package com.blazemeter.jmeter.debugger.engine;
 
 import com.blazemeter.jmeter.debugger.elements.Wrapper;
 import org.apache.jmeter.threads.JMeterContext;

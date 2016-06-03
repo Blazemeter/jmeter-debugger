@@ -1,12 +1,8 @@
-package com.blazemeter.jmeter.debugger.gui;
+package com.blazemeter.jmeter.debugger.engine;
 
 
 import com.blazemeter.jmeter.debugger.elements.TimerDebug;
 import com.blazemeter.jmeter.debugger.elements.Wrapper;
-import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
-import com.blazemeter.jmeter.debugger.engine.SearchClass;
-import com.blazemeter.jmeter.debugger.engine.StepTrigger;
-import com.blazemeter.jmeter.debugger.engine.TreeClonerTG;
 import org.apache.jmeter.JMeter;
 import org.apache.jmeter.engine.JMeterEngineException;
 import org.apache.jmeter.engine.StandardJMeterEngine;
@@ -25,7 +21,7 @@ import org.apache.log.Logger;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Debugger implements StepTrigger, TestStateListener {
+public class Debugger implements StepTrigger {
     private static final Logger log = LoggingManager.getLoggerForClass();
     private final HashTree tree;
     private final DebuggerFrontend frontend;
@@ -34,7 +30,7 @@ public class Debugger implements StepTrigger, TestStateListener {
     private Wrapper currentElement;
     private boolean isContinuing = false;
     protected DebuggerEngine engine;
-    private Sampler currentSampler;
+    private Sampler currentSampler = null;
     protected Set<TestElement> breakpoints = new HashSet<>();
 
     public Debugger(HashTree testTree, DebuggerFrontend frontend) {
@@ -78,7 +74,7 @@ public class Debugger implements StepTrigger, TestStateListener {
         frontend.started();
 
         HashTree hashTree = getSelectedTree();
-        StandardJMeterEngine.register(this); // oh, dear, they use static field then clean it...
+        StandardJMeterEngine.register(new StateListener()); // oh, dear, they use static field then clean it...
         engine = new DebuggerEngine(JMeterContextService.getContext());
         engine.setStepper(this);
         JMeter.convertSubTree(hashTree);
@@ -166,25 +162,6 @@ public class Debugger implements StepTrigger, TestStateListener {
         return isContinuing;
     }
 
-    @Override
-    public void testEnded() {
-        stop();
-    }
-
-    @Override
-    public void testStarted() {
-
-    }
-
-    @Override
-    public void testStarted(String host) {
-
-    }
-
-    @Override
-    public void testEnded(String host) {
-
-    }
 
     public boolean isBreakpoint(TestElement userObject) {
         return breakpoints.contains(userObject);
@@ -200,5 +177,27 @@ public class Debugger implements StepTrigger, TestStateListener {
 
     public synchronized void proceed() {
         notifyAll();
+    }
+
+    private class StateListener implements TestStateListener {
+        @Override
+        public void testEnded() {
+            stop();
+        }
+
+        @Override
+        public void testStarted() {
+
+        }
+
+        @Override
+        public void testStarted(String host) {
+
+        }
+
+        @Override
+        public void testEnded(String host) {
+
+        }
     }
 }

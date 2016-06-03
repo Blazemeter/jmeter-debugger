@@ -1,6 +1,8 @@
 package com.blazemeter.jmeter.debugger.gui;
 
 import com.blazemeter.jmeter.debugger.elements.Wrapper;
+import com.blazemeter.jmeter.debugger.engine.Debugger;
+import com.blazemeter.jmeter.debugger.engine.DebuggerFrontend;
 import org.apache.jmeter.config.ConfigElement;
 import org.apache.jmeter.gui.LoggerPanel;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
@@ -20,12 +22,9 @@ import org.apache.log.Logger;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.LinkedList;
 
 abstract public class DebuggerDialogBase extends JDialog implements ComponentListener, NodeHighlighter, TreeSelectionListener {
     private static final Logger log = LoggingManager.getLoggerForClass();

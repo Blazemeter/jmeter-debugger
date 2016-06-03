@@ -10,8 +10,8 @@
 
  - double run erases names
  - original jmx modified
+ 
  - choose license
-
  - Maximize on Windows / Non modal window 
  - expand sampler path in tree to reveal it
  - logic to stop on Sampler bp
