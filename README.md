@@ -1,4 +1,6 @@
-# Step-by-step debugger for Apache JMeter
+# Step-by-step debugger for Apache JMeter [[/src/main/resources/com/blazemeter/jmeter/debugger/logo.png|alt=logo]]
+
+Implemented by [BlazeMeter.com](http://blazemeter.com/)
 
 ## Features
  - step over single component
