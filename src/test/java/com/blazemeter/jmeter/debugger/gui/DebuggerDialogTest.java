@@ -11,6 +11,8 @@ import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.exceptions.IllegalUserActionException;
 import org.apache.jmeter.functions.TimeFunction;
 import org.apache.jmeter.gui.GuiPackage;
+import org.apache.jmeter.gui.MainFrame;
+import org.apache.jmeter.gui.action.ActionRouter;
 import org.apache.jmeter.gui.tree.JMeterTreeListener;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
@@ -30,6 +32,8 @@ import org.junit.Test;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -57,13 +61,22 @@ public class DebuggerDialogTest {
 
             JMeterTreeModel mdl = new JMeterTreeModel();
             JMeterTreeListener a = new JMeterTreeListener();
+            a.setActionHandler(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    log.debug("Action " + actionEvent);
+                }
+            });
             a.setModel(mdl);
             try {
                 mdl.addSubTree(getHashTree(), (JMeterTreeNode) mdl.getRoot());
             } catch (IllegalUserActionException e) {
                 throw new RuntimeException(e);
-            }            
+            }
+
             GuiPackage.getInstance(a, mdl);
+            JMeterUtils.setProperty("search_paths", ActionRouter.class.getProtectionDomain().getCodeSource().getLocation().getFile());
+            MainFrame mf = new MainFrame(mdl, a);
 
             new TimeFunction();
             long now = System.currentTimeMillis();

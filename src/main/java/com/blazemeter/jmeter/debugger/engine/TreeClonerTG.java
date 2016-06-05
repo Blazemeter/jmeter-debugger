@@ -9,6 +9,7 @@ import org.apache.jmeter.processor.PreProcessor;
 import org.apache.jmeter.samplers.SampleListener;
 import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.testelement.property.NullProperty;
 import org.apache.jmeter.threads.AbstractThreadGroup;
 import org.apache.jmeter.timers.Timer;
 import org.apache.jorphan.collections.HashTree;
@@ -62,13 +63,57 @@ public class TreeClonerTG implements HashTreeTraverser {
     }
 
     private JMeterTreeNode getClonedNode(JMeterTreeNode node) {
-        TestElement orig = (TestElement) (node).getUserObject();
+        TestElement orig = getOriginalObject(node);
         TestElement cloned = (TestElement) orig.clone();
+        TestElement altered = getAlteredElement(cloned);
+
+        if (altered instanceof Wrapper) {
+            Wrapper wrp = (Wrapper) altered;
+            wrp.setWrappedElement(cloned);
+        }
+
+        if (altered instanceof OriginalLink) {
+            OriginalLink link = (OriginalLink) altered;
+            link.setOriginal(orig);
+        } else {
+            log.debug("Not linking original: " + altered);
+        }
+
+        JMeterTreeNode res = new JMeterTreeNode();
+        altered.setName(cloned.getName());
+        altered.setEnabled(cloned.isEnabled());
+        if (altered.getProperty(TestElement.GUI_CLASS) instanceof NullProperty) {
+            altered.setProperty(TestElement.GUI_CLASS, ControllerDebugGui.class.getCanonicalName());
+        }
+        /*
+            JMeterProperty origGuiClass = orig.getProperty(TestElement.GUI_CLASS);
+            if (!origGuiClass.getStringValue().equals(TestBeanGUI.class.getCanonicalName())) {
+                altered.setProperty(TestElement.GUI_CLASS, origGuiClass.getStringValue());
+            }
+            
+            /*
+            if (origGuiClass instanceof NullProperty) {
+                altered.setProperty(TestElement.GUI_CLASS, ControllerDebugGui.class.getCanonicalName());
+            } else 
+                altered.setProperty(TestElement.GUI_CLASS, ControllerDebugGui.class.getCanonicalName());
+            } else {
+                altered.setProperty(TestElement.GUI_CLASS, orig.getPropertyAsString(TestElement.GUI_CLASS));
+            }
+            altered.setProperty(TestElement.GUI_CLASS, ControllerDebugGui.class.getCanonicalName());
+
+        }               
+        */
+        res.setUserObject(altered);
+        return res;
+    }
+
+    private TestElement getAlteredElement(TestElement cloned) {
         boolean isWrappable = !(cloned instanceof TransactionController) && !(cloned instanceof TestFragmentController);
 
         TestElement userObject = cloned;
         if (cloned instanceof AbstractThreadGroup) {
             userObject = new DebuggingThreadGroup();
+            userObject.setProperty(TestElement.GUI_CLASS, DebuggingThreadGroupGui.class.getCanonicalName());
         } else if (cloned instanceof Controller && isWrappable) {
             userObject = getController(cloned);
         } else if (cloned instanceof PreProcessor) {
@@ -86,23 +131,17 @@ public class TreeClonerTG implements HashTreeTraverser {
         } else {
             log.debug("Keeping element unwrapped: " + cloned);
         }
+        return userObject;
+    }
 
-        if (userObject instanceof Wrapper) {
-            Wrapper wrp = (Wrapper) userObject;
-            wrp.setWrappedElement(cloned);
+    private TestElement getOriginalObject(JMeterTreeNode node) {
+        Object obj = (node).getUserObject();
+        if (obj instanceof OriginalLink) {
+            Object original = ((OriginalLink) obj).getOriginal();
+            return (TestElement) original;
+        } else {
+            return (TestElement) obj;
         }
-
-        if (userObject instanceof OriginalLink) {
-            OriginalLink link = (OriginalLink) userObject;
-            link.setOriginal(orig);
-        }
-
-        JMeterTreeNode res = new JMeterTreeNode();
-        userObject.setProperty(TestElement.GUI_CLASS, ControllerDebugGui.class.getCanonicalName());
-        userObject.setName(cloned.getName());
-        userObject.setEnabled(cloned.isEnabled());
-        res.setUserObject(userObject);
-        return res;
     }
 
     private TestElement getController(TestElement cloned) {

@@ -1,5 +1,6 @@
 package com.blazemeter.jmeter.debugger.gui;
 
+import com.blazemeter.jmeter.debugger.elements.Wrapper;
 import org.apache.jmeter.gui.tree.JMeterCellRenderer;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.testelement.TestElement;
@@ -27,7 +28,14 @@ public class FixedJMeterTreeCellRenderer extends JMeterCellRenderer {
         if (property == null || property instanceof NullProperty) {
             mc.setProperty(new StringProperty(TestElement.GUI_CLASS, this.getClass().getName()));
         }
-        Component treeCellRendererComponent = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, p_hasFocus);
+
+        JMeterTreeNode fakeNode = (JMeterTreeNode) node.clone();
+        if (mc instanceof Wrapper) {
+            fakeNode.setUserObject(((Wrapper) mc).getWrappedElement());
+        } else {
+            fakeNode.setUserObject(mc);
+        }
+        Component treeCellRendererComponent = super.getTreeCellRendererComponent(tree, fakeNode, sel, expanded, leaf, row, p_hasFocus);
         hiliter.highlightNode(treeCellRendererComponent, node, mc);
         return treeCellRendererComponent;
     }
