@@ -1,5 +1,6 @@
 package com.blazemeter.jmeter.debugger.gui;
 
+import com.blazemeter.jmeter.debugger.elements.DebuggingThreadGroup;
 import com.blazemeter.jmeter.debugger.elements.ThreadGroupWrapper;
 import com.blazemeter.jmeter.debugger.elements.Wrapper;
 import com.blazemeter.jmeter.debugger.engine.Debugger;
@@ -20,6 +21,7 @@ import org.apache.jmeter.threads.AbstractThreadGroup;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.collections.HashTree;
+import org.apache.jorphan.collections.SearchByClass;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
 
@@ -162,9 +164,13 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
         }
 
         // select TG for visual convenience
-        ThreadGroupWrapper dbgElm = new ThreadGroupWrapper();
-        dbgElm.setOriginal(tg);
-        selectTargetInTree(dbgElm);
+        SearchByClass<DebuggingThreadGroup> tgs = new SearchByClass<>(DebuggingThreadGroup.class);
+        selectedTree.traverse(tgs);
+        for (DebuggingThreadGroup forSel : tgs.getSearchResults()) {
+            Wrapper<AbstractThreadGroup> wtg = new ThreadGroupWrapper();
+            wtg.setWrappedElement(forSel);
+            selectTargetInTree(wtg);
+        }
     }
 
     @Override
@@ -238,7 +244,6 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
     public void stopped() {
         toggleControls(true);
         elementContainer.removeAll();
-        selectThreadGroup((AbstractThreadGroup) tgCombo.getSelectedItem());
     }
 
     @Override
@@ -252,8 +257,12 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
 
     @Override
     public void statusRefresh(JMeterContext context) {
-        refreshVars(context);
-        refreshProperties();
+        try {
+            refreshVars(context);
+            refreshProperties();
+        } catch (Throwable e) {
+            log.warn("Problem refreshing status pane", e);
+        }
         evaluatePanel.refresh(context, debugger.isContinuing());
         SwingUtilities.invokeLater(new Runnable() {
             @Override

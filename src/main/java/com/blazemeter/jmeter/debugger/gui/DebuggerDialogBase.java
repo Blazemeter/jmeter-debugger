@@ -143,7 +143,7 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
         start.getActionMap().put(f5, toggle);
 
         stop.setVisible(false);
-        /*
+        /* TODO: revive it
         stop.setIcon(DebuggerMenuItem.getStopIcon());
         res.add(stop);
         stop.setEnabled(false);

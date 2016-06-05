@@ -46,6 +46,5 @@ Install it through [JMeter Plugins Manager](http://jmeter-plugins.org/wiki/Plugi
  - shortcut to toggle BP
  - shortcut to invoke debugger
  - add icon on toolbar?
- - restore thread group preselect in tree
  - revive Stop button
  
