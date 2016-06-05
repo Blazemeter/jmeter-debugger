@@ -142,12 +142,15 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
         start.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(f5, f5);
         start.getActionMap().put(f5, toggle);
 
+        stop.setVisible(false);
+        /*
         stop.setIcon(DebuggerMenuItem.getStopIcon());
         res.add(stop);
         stop.setEnabled(false);
         stop.setToolTipText(f5.toString());
         stop.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(f5, f5);
         stop.getActionMap().put(f5, toggle);
+        */
 
         res.addSeparator();
 

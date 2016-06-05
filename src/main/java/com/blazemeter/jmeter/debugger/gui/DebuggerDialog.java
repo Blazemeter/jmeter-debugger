@@ -1,9 +1,11 @@
 package com.blazemeter.jmeter.debugger.gui;
 
+import com.blazemeter.jmeter.debugger.elements.ThreadGroupWrapper;
 import com.blazemeter.jmeter.debugger.elements.Wrapper;
 import com.blazemeter.jmeter.debugger.engine.Debugger;
 import com.blazemeter.jmeter.debugger.engine.DebuggerFrontend;
 import com.blazemeter.jmeter.debugger.engine.SearchClass;
+import com.blazemeter.jmeter.debugger.engine.TestTreeProvider;
 import org.apache.jmeter.JMeter;
 import org.apache.jmeter.control.ReplaceableController;
 import org.apache.jmeter.engine.TreeCloner;
@@ -32,7 +34,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFrontend {
+public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFrontend, TestTreeProvider {
     private static final Logger log = LoggingManager.getLoggerForClass();
     private boolean savedDirty = false;
     protected Debugger debugger = null;
@@ -52,10 +54,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
         if (GuiPackage.getInstance() != null) {
             savedDirty = GuiPackage.getInstance().isDirty();
         }
-        HashTree testTree = getTestTree();
-        TreeCloner cloner = new TreeCloner();  // clone to not modify original JMX
-        testTree.traverse(cloner);
-        this.debugger = new Debugger(cloner.getClonedTree(), this);
+        this.debugger = new Debugger(this, this);
         tgCombo.removeAllItems();
         for (AbstractThreadGroup group : debugger.getThreadGroups()) {
             tgCombo.addItem(group);
@@ -73,10 +72,8 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
         }
     }
 
-    /**
-     * Get test tree from JMeter
-     */
-    protected HashTree getTestTree() {
+    @Override
+    public HashTree getTestTree() {
         GuiPackage gui = GuiPackage.getInstance();
         return gui.getTreeModel().getTestPlan();
     }
@@ -144,7 +141,10 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
     private void selectThreadGroup(AbstractThreadGroup tg) {
         debugger.selectThreadGroup(tg);
         treeModel.clearTestPlan();
-        HashTree selectedTree = debugger.getSelectedTree();
+        HashTree origTree = debugger.getSelectedTree();
+        TreeCloner cloner = new TreeCloner();
+        origTree.traverse(cloner);
+        HashTree selectedTree = cloner.getClonedTree();
 
         // Hack to resolve ModuleControllers from JMeter.java
         SearchClass<ReplaceableController> replaceableControllers = new SearchClass<>(ReplaceableController.class);
@@ -162,7 +162,9 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
         }
 
         // select TG for visual convenience
-        // TODO selectTargetInTree(new ThreadGroupWrapper(debugger.getThreadGroupClone()));
+        ThreadGroupWrapper dbgElm = new ThreadGroupWrapper();
+        dbgElm.setOriginal(tg);
+        selectTargetInTree(dbgElm);
     }
 
     @Override
@@ -236,6 +238,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
     public void stopped() {
         toggleControls(true);
         elementContainer.removeAll();
+        selectThreadGroup((AbstractThreadGroup) tgCombo.getSelectedItem());
     }
 
     @Override

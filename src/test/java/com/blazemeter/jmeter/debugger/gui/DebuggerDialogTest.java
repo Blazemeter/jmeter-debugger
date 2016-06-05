@@ -1,10 +1,7 @@
 package com.blazemeter.jmeter.debugger.gui;
 
 import com.blazemeter.jmeter.debugger.elements.Wrapper;
-import com.blazemeter.jmeter.debugger.engine.Debugger;
-import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
-import com.blazemeter.jmeter.debugger.engine.DebuggerFrontend;
-import com.blazemeter.jmeter.debugger.engine.StepTrigger;
+import com.blazemeter.jmeter.debugger.engine.*;
 import kg.apc.emulators.TestJMeterUtils;
 import org.apache.jmeter.JMeter;
 import org.apache.jmeter.engine.StandardJMeterEngine;
@@ -43,7 +40,7 @@ import java.util.Date;
 import java.util.Properties;
 
 
-public class DebuggerDialogTest {
+public class DebuggerDialogTest implements TestTreeProvider {
     private static final Logger log = LoggingManager.getLoggerForClass();
 
     @BeforeClass
@@ -70,7 +67,7 @@ public class DebuggerDialogTest {
             });
             a.setModel(mdl);
             try {
-                mdl.addSubTree(getHashTree(), (JMeterTreeNode) mdl.getRoot());
+                mdl.addSubTree(getTestTree(), (JMeterTreeNode) mdl.getRoot());
             } catch (IllegalUserActionException e) {
                 throw new RuntimeException(e);
             }
@@ -98,7 +95,8 @@ public class DebuggerDialogTest {
         }
     }
 
-    private HashTree getHashTree() {
+    @Override
+    public HashTree getTestTree() {
         File file = new File(this.getClass().getResource("/com/blazemeter/jmeter/debugger/sample1.jmx").getFile());
         String basedir = TestJMeterUtils.fixWinPath(file.getParentFile().getAbsolutePath());
 
@@ -118,7 +116,7 @@ public class DebuggerDialogTest {
         }
 
         @Override
-        protected HashTree getTestTree() {
+        public HashTree getTestTree() {
             return mdl.getTestPlan();
         }
     }
@@ -127,7 +125,7 @@ public class DebuggerDialogTest {
     public void runRealEngine() throws Exception {
         TestJMeterUtils.createJmeterEnv();
 
-        HashTree hashTree = getHashTree();
+        HashTree hashTree = getTestTree();
         JMeter.convertSubTree(hashTree);
 
         StandardJMeterEngine engine = new StandardJMeterEngine();
@@ -143,9 +141,9 @@ public class DebuggerDialogTest {
         TestJMeterUtils.createJmeterEnv();
 
         JMeterTreeModel mdl = new JMeterTreeModel();
-        mdl.addSubTree(getHashTree(), (JMeterTreeNode) mdl.getRoot());
+        mdl.addSubTree(getTestTree(), (JMeterTreeNode) mdl.getRoot());
 
-        Debugger sel = new Debugger(mdl.getTestPlan(), new FrontendMock());
+        Debugger sel = new Debugger(this, new FrontendMock());
         HashTree hashTree = sel.getSelectedTree();
         JMeter.convertSubTree(hashTree);
 
