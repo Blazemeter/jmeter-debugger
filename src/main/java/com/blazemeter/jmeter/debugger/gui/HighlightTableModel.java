@@ -19,7 +19,7 @@ public class HighlightTableModel extends PowerTableModel {
         }
 
         Object oldValue = oldData.get(curName);
-        return !curValue.equals(oldValue);
+        return curValue != null && !curValue.equals(oldValue);
     }
 
     @Override
@@ -30,7 +30,10 @@ public class HighlightTableModel extends PowerTableModel {
             oldData = new HashMap<>();
             for (int row = 0; row < getRowCount(); row++) {
                 Object[] rowData = getRowData(row);
-                oldData.put(rowData[0].toString(), rowData[1]);
+                Object o = rowData[0];
+                if (o != null) {
+                    oldData.put(o.toString(), rowData[1]);
+                }
             }
             super.clearData();
         }

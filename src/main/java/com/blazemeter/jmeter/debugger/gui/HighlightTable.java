@@ -1,5 +1,8 @@
 package com.blazemeter.jmeter.debugger.gui;
 
+import org.apache.jorphan.logging.LoggingManager;
+import org.apache.log.Logger;
+
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
@@ -8,6 +11,8 @@ import java.awt.*;
 import java.util.LinkedList;
 
 public class HighlightTable extends JTable {
+    private static final Logger log = LoggingManager.getLoggerForClass();
+
     public HighlightTable(TableModel model) {
         super(model);
         setDefaultEditor(Object.class, null);
@@ -29,10 +34,15 @@ public class HighlightTable extends JTable {
         Component comp = super.prepareRenderer(renderer, row, column);
         if (getModel() instanceof HighlightTableModel) {
             HighlightTableModel model = (HighlightTableModel) getModel();
-            if (model.isRowHighlighted(getValueAt(row, 0).toString(), getValueAt(row, 1))) {
-                comp.setFont(comp.getFont().deriveFont(Font.BOLD));
-            } else {
-                comp.setFont(comp.getFont().deriveFont(~Font.BOLD));
+            Object valueAt = getValueAt(row, 0);
+            try {
+                if (valueAt != null && model.isRowHighlighted(valueAt.toString(), getValueAt(row, 1))) {
+                    comp.setFont(comp.getFont().deriveFont(Font.BOLD));
+                } else {
+                    comp.setFont(comp.getFont().deriveFont(~Font.BOLD));
+                }
+            } catch (IndexOutOfBoundsException e) {
+                log.debug("Problems rendering ", e);
             }
         }
         return comp;
