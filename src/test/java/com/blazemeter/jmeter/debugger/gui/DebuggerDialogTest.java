@@ -10,6 +10,8 @@ import org.apache.jmeter.JMeter;
 import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.exceptions.IllegalUserActionException;
 import org.apache.jmeter.functions.TimeFunction;
+import org.apache.jmeter.gui.GuiPackage;
+import org.apache.jmeter.gui.tree.JMeterTreeListener;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.save.SaveService;
@@ -53,6 +55,16 @@ public class DebuggerDialogTest {
         if (!GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance()) {
             TestJMeterUtils.createJmeterEnv();
 
+            JMeterTreeModel mdl = new JMeterTreeModel();
+            JMeterTreeListener a = new JMeterTreeListener();
+            a.setModel(mdl);
+            try {
+                mdl.addSubTree(getHashTree(), (JMeterTreeNode) mdl.getRoot());
+            } catch (IllegalUserActionException e) {
+                throw new RuntimeException(e);
+            }            
+            GuiPackage.getInstance(a, mdl);
+
             new TimeFunction();
             long now = System.currentTimeMillis();
             JMeterUtils.setProperty("START.MS", Long.toString(now));
@@ -60,7 +72,7 @@ public class DebuggerDialogTest {
             JMeterUtils.setProperty("START.YMD", new SimpleDateFormat("yyyyMMdd").format(today));
             JMeterUtils.setProperty("START.HMS", new SimpleDateFormat("HHmmss").format(today));
 
-            DebuggerDialogMock frame = new DebuggerDialogMock();
+            DebuggerDialogMock frame = new DebuggerDialogMock(mdl);
 
             frame.setPreferredSize(new Dimension(800, 600));
             frame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
@@ -83,14 +95,14 @@ public class DebuggerDialogTest {
     }
 
     private class DebuggerDialogMock extends DebuggerDialog {
+        private final JMeterTreeModel mdl;
+
+        public DebuggerDialogMock(JMeterTreeModel b) {
+            mdl = b;
+        }
+
         @Override
         protected HashTree getTestTree() {
-            JMeterTreeModel mdl = new JMeterTreeModel();
-            try {
-                mdl.addSubTree(getHashTree(), (JMeterTreeNode) mdl.getRoot());
-            } catch (IllegalUserActionException e) {
-                throw new RuntimeException(e);
-            }
             return mdl.getTestPlan();
         }
     }
@@ -155,7 +167,7 @@ public class DebuggerDialogTest {
 
         @Override
         public void continuing() {
-            
+
         }
 
         @Override

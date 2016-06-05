@@ -63,6 +63,7 @@ public class DebuggingThreadTest {
             engine.setStepper(hook);
             context.setEngine(engine);
             DebuggingThread thread = new DebuggingThread(tgTree, monitor, note, context);
+            thread.setThreadName("Test");
             thread.setThreadGroup(tg);
             thread.run();
         }

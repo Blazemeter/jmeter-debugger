@@ -10,8 +10,9 @@ import org.apache.jmeter.testelement.AbstractTestElement;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.threads.JMeterContextService;
 
-public abstract class AbstractDebugElement<T> extends AbstractTestElement implements Wrapper<T> {
+public abstract class AbstractDebugElement<T> extends AbstractTestElement implements Wrapper<T>, OriginalLink<T> {
     protected T wrapped;
+    private T original;
 
     @Override
     public void setWrappedElement(T wrapped) {
@@ -42,5 +43,15 @@ public abstract class AbstractDebugElement<T> extends AbstractTestElement implem
             //noinspection deprecation
             TestBeanHelper.prepare((TestElement) wrapped); // the deprecation reason is not sufficient
         }
+    }
+
+    @Override
+    public void setOriginal(T orig) {
+        original = orig;
+    }
+
+    @Override
+    public T getOriginal() {
+        return original;
     }
 }
