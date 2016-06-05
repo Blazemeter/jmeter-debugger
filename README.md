@@ -15,7 +15,7 @@ Implemented by [BlazeMeter.com](http://blazemeter.com/)
 
 ## Installation
 
-Install it through [JMeter Plugins Manager](http://jmeter-plugins.org/wiki/PluginsManager/)
+Install it through [JMeter Plugins Manager](http://jmeter-plugins.org/wiki/PluginsManager/). Or checkout the source and build with `mvn clean package`, then take JAR from `target` directory.
 
 ## Usage
 
