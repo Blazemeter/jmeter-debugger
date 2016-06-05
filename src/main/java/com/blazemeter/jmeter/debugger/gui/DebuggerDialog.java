@@ -215,11 +215,11 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
         if (wrpElm instanceof Wrapper) {
             wrpElm = (TestElement) ((Wrapper) wrpElm).getWrappedElement();
         }
-
+        
         displayElementGui(wrpElm);
     }
 
-    private void displayElementGui(TestElement wrpElm) {
+    private synchronized void displayElementGui(TestElement wrpElm) {
         GuiPackage gui = GuiPackage.getInstance();
         if (gui != null) {
             JMeterGUIComponent egui = gui.getGui(wrpElm);

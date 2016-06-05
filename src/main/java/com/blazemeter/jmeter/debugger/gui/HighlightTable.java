@@ -29,8 +29,8 @@ public class HighlightTable extends JTable {
         setRowSorter(sorter);
     }
 
-    @Override
-    public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+    //@Override TODO: restore it
+    public Component prepareRenderer1(TableCellRenderer renderer, int row, int column) {
         Component comp = super.prepareRenderer(renderer, row, column);
         if (getModel() instanceof HighlightTableModel) {
             HighlightTableModel model = (HighlightTableModel) getModel();

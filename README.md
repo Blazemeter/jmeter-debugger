@@ -47,4 +47,7 @@ Install it through [JMeter Plugins Manager](http://jmeter-plugins.org/wiki/Plugi
  - shortcut to invoke debugger
  - add icon on toolbar?
  - revive Stop button
+ - revive variable change highlight
+ - fix disabled items appearing in tree
+ 
  
