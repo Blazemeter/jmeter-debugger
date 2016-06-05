@@ -4,13 +4,16 @@ package com.blazemeter.jmeter.debugger.elements;
 import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
 import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import org.apache.jmeter.engine.StandardJMeterEngine;
+import org.apache.jmeter.engine.event.LoopIterationEvent;
+import org.apache.jmeter.engine.event.LoopIterationListener;
 import org.apache.jmeter.testbeans.TestBean;
 import org.apache.jmeter.testbeans.TestBeanHelper;
 import org.apache.jmeter.testelement.AbstractTestElement;
 import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.testelement.TestIterationListener;
 import org.apache.jmeter.threads.JMeterContextService;
 
-public abstract class AbstractDebugElement<T> extends AbstractTestElement implements Wrapper<T>, OriginalLink<T> {
+public abstract class AbstractDebugElement<T> extends AbstractTestElement implements Wrapper<T>, OriginalLink<T>, LoopIterationListener, TestIterationListener {
     protected T wrapped;
     private T original;
 
@@ -53,5 +56,19 @@ public abstract class AbstractDebugElement<T> extends AbstractTestElement implem
     @Override
     public T getOriginal() {
         return original;
+    }
+
+    @Override
+    public void iterationStart(LoopIterationEvent iterEvent) {
+        if (wrapped instanceof LoopIterationListener) {
+            ((LoopIterationListener) wrapped).iterationStart(iterEvent);
+        }
+    }
+
+    @Override
+    public void testIterationStart(LoopIterationEvent event) {
+        if (wrapped instanceof TestIterationListener) {
+            ((TestIterationListener) wrapped).testIterationStart(event);
+        }
     }
 }
