@@ -1,10 +1,16 @@
 package com.blazemeter.jmeter.debugger.engine;
 
 import com.blazemeter.jmeter.debugger.elements.*;
+import org.apache.jmeter.assertions.Assertion;
 import org.apache.jmeter.control.*;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
+import org.apache.jmeter.processor.PostProcessor;
+import org.apache.jmeter.processor.PreProcessor;
+import org.apache.jmeter.samplers.SampleListener;
+import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.threads.AbstractThreadGroup;
+import org.apache.jmeter.timers.Timer;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.collections.HashTreeTraverser;
 import org.apache.jorphan.collections.ListedHashTree;
@@ -61,17 +67,25 @@ public class TreeClonerTG implements HashTreeTraverser {
         boolean isWrappable = !(cloned instanceof TransactionController) && !(cloned instanceof TestFragmentController);
 
         TestElement userObject = cloned;
-        if (orig instanceof AbstractThreadGroup) {
+        if (cloned instanceof AbstractThreadGroup) {
             userObject = new DebuggingThreadGroup();
         } else if (cloned instanceof Controller && isWrappable) {
             userObject = getController(cloned);
+        } else if (cloned instanceof PreProcessor) {
+            userObject = new PreProcessorDebug();
+        } else if (cloned instanceof Timer) {
+            userObject = new TimerDebug();
+        } else if (cloned instanceof Sampler) {
+            userObject = new SamplerDebug();
+        } else if (cloned instanceof PostProcessor) {
+            userObject = new PostProcessorDebug();
+        } else if (cloned instanceof Assertion) {
+            userObject = new AssertionDebug();
+        } else if (cloned instanceof SampleListener) {
+            userObject = new SampleListenerDebug();
+        } else {
+            log.debug("Keeping element unwrapped: " + cloned);
         }
-
-        JMeterTreeNode res = new JMeterTreeNode();
-        userObject.setProperty(TestElement.GUI_CLASS, ControllerDebugGui.class.getCanonicalName());
-        userObject.setName(cloned.getName());
-        userObject.setEnabled(cloned.isEnabled());
-        res.setUserObject(userObject);
 
         if (userObject instanceof Wrapper) {
             Wrapper wrp = (Wrapper) userObject;
@@ -83,6 +97,11 @@ public class TreeClonerTG implements HashTreeTraverser {
             link.setOriginal(orig);
         }
 
+        JMeterTreeNode res = new JMeterTreeNode();
+        userObject.setProperty(TestElement.GUI_CLASS, ControllerDebugGui.class.getCanonicalName());
+        userObject.setName(cloned.getName());
+        userObject.setEnabled(cloned.isEnabled());
+        res.setUserObject(userObject);
         return res;
     }
 

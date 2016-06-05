@@ -2,7 +2,6 @@ package com.blazemeter.jmeter.debugger.engine;
 
 import com.blazemeter.jmeter.debugger.elements.Wrapper;
 import org.apache.jmeter.engine.StandardJMeterEngine;
-import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jorphan.logging.LoggingManager;
@@ -24,10 +23,6 @@ public class DebuggerEngine extends StandardJMeterEngine {
 
     public DebuggerEngine(JMeterContext context) {
         this.context = context;
-    }
-
-    public Sampler getCurrentSampler() {
-        return target.getCurrentSampler();
     }
 
     public JMeterContext getThreadContext() {
