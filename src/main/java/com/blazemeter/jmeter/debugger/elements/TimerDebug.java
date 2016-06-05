@@ -7,9 +7,6 @@ import org.apache.log.Logger;
 public class TimerDebug extends AbstractDebugElement<Timer> implements Timer {
     private static final Logger log = LoggingManager.getLoggerForClass();
 
-    public TimerDebug(Timer te) {
-        super(te);
-    }
 
     private boolean isDelaying = false;
 

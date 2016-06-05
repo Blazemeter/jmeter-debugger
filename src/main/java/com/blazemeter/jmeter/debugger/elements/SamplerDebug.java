@@ -7,9 +7,6 @@ import org.apache.jmeter.threads.JMeterContext;
 
 
 public class SamplerDebug extends AbstractDebugElement<Sampler> implements Sampler {
-    public SamplerDebug(Sampler te) {
-        super(te);
-    }
 
     @Override
     public SampleResult sample(Entry e) {

@@ -1,15 +1,17 @@
 package com.blazemeter.jmeter.debugger.elements;
 
+import org.apache.jmeter.control.Controller;
 import org.apache.jmeter.control.gui.AbstractControllerGui;
 import org.apache.jmeter.gui.util.MenuFactory;
 import org.apache.jmeter.testelement.TestElement;
-import org.apache.jmeter.threads.gui.AbstractThreadGroupGui;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class ControllerDebugGui extends AbstractControllerGui {
+public class ControllerDebugGui extends AbstractControllerGui implements OriginalLink<Controller> {
+    private Controller original;
+
     @Override
     public String getLabelResource() {
         return getClass().getCanonicalName();
@@ -37,5 +39,15 @@ public class ControllerDebugGui extends AbstractControllerGui {
     @Override
     public Collection<String> getMenuCategories() {
         return new ArrayList<>();
+    }
+
+    @Override
+    public Controller getOriginal() {
+        return original;
+    }
+
+    @Override
+    public void setOriginal(Controller orig) {
+        original = orig;
     }
 }

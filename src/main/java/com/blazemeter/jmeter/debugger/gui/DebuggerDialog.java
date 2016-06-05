@@ -1,6 +1,6 @@
 package com.blazemeter.jmeter.debugger.gui;
 
-import com.blazemeter.jmeter.debugger.ThreadGroupWrapper;
+import com.blazemeter.jmeter.debugger.elements.ThreadGroupWrapper;
 import com.blazemeter.jmeter.debugger.elements.Wrapper;
 import com.blazemeter.jmeter.debugger.engine.Debugger;
 import com.blazemeter.jmeter.debugger.engine.DebuggerFrontend;
@@ -161,7 +161,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
         }
 
         // select TG for visual convenience
-        selectTargetInTree(new ThreadGroupWrapper(debugger.getThreadGroupClone()));
+        // TODO selectTargetInTree(new ThreadGroupWrapper(debugger.getThreadGroupClone()));
     }
 
     @Override

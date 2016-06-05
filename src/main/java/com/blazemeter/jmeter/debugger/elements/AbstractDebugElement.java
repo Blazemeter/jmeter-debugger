@@ -10,11 +10,12 @@ import org.apache.jmeter.testelement.AbstractTestElement;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.threads.JMeterContextService;
 
-public abstract class AbstractDebugElement<T> extends AbstractTestElement implements Wrapper {
-    protected final T wrapped;
+public abstract class AbstractDebugElement<T> extends AbstractTestElement implements Wrapper<T> {
+    protected T wrapped;
 
-    public AbstractDebugElement(T te) {
-        wrapped = te;
+    @Override
+    public void setWrappedElement(T wrapped) {
+        this.wrapped = wrapped;
     }
 
     public T getWrappedElement() {

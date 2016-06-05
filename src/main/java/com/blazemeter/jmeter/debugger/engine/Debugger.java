@@ -64,11 +64,6 @@ public class Debugger implements StepTrigger {
         return cloner.getClonedTree();
     }
 
-    public AbstractThreadGroup getThreadGroupClone() {
-        return cloner.getClonedTG();
-    }
-
-
     public void start() {
         log.debug("Start debugging");
         frontend.started();

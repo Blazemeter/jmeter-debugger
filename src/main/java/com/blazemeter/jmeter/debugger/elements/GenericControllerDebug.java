@@ -11,14 +11,9 @@ import org.apache.jmeter.testelement.TestStateListener;
 import org.apache.jmeter.threads.TestCompilerHelper;
 
 public class GenericControllerDebug extends GenericController implements FullController, Wrapper<GenericController> {
-    private final AbstractDebugElement<GenericController> helper;
-    protected final GenericController wrapped;
-
-    public GenericControllerDebug(GenericController te) {
-        helper = new AbstractDebugElement<GenericController>(te) {
-        };
-        this.wrapped = te;
-    }
+    private final AbstractDebugElement<GenericController> helper = new AbstractDebugElement<GenericController>() {
+    };
+    protected GenericController wrapped;
 
     @Override
     public Sampler next() {
@@ -108,5 +103,10 @@ public class GenericControllerDebug extends GenericController implements FullCon
     @Override
     public GenericController getWrappedElement() {
         return wrapped;
+    }
+
+    @Override
+    public void setWrappedElement(GenericController te) {
+        this.wrapped = te;
     }
 }

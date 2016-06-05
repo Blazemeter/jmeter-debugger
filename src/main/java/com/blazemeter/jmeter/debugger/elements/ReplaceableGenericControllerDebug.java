@@ -1,15 +1,11 @@
 package com.blazemeter.jmeter.debugger.elements;
 
-import org.apache.jmeter.control.GenericController;
 import org.apache.jmeter.control.ReplaceableController;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jorphan.collections.HashTree;
 
 @Deprecated
 public class ReplaceableGenericControllerDebug extends GenericControllerDebug implements ReplaceableController {
-    public ReplaceableGenericControllerDebug(GenericController te) {
-        super(te);
-    }
 
     @Override
     public HashTree getReplacementSubTree() {
@@ -32,6 +28,8 @@ public class ReplaceableGenericControllerDebug extends GenericControllerDebug im
         if (wrapped.getClass().getName().equals("org.apache.jmeter.control.ModuleController")) {
             return this;
         }
-        return new GenericControllerDebug(wrapped);
+        GenericControllerDebug gcd = new GenericControllerDebug();
+        gcd.setWrappedElement(wrapped);
+        return gcd;
     }
 }

@@ -39,7 +39,9 @@ public class DebuggerSamplerPackage extends SamplePackage {
     public List<PreProcessor> getPreProcessors() {
         List<PreProcessor> wrapped = new LinkedList<>();
         for (PreProcessor te : super.getPreProcessors()) {
-            wrapped.add(new PreProcessorDebug(te));
+            PreProcessorDebug elm = new PreProcessorDebug();
+            elm.setWrappedElement(te);
+            wrapped.add(elm);
         }
         return wrapped;
     }
@@ -48,7 +50,9 @@ public class DebuggerSamplerPackage extends SamplePackage {
     public List<PostProcessor> getPostProcessors() {
         List<PostProcessor> wrapped = new LinkedList<>();
         for (PostProcessor te : super.getPostProcessors()) {
-            wrapped.add(new PostProcessorDebug(te));
+            PostProcessorDebug elm = new PostProcessorDebug();
+            elm.setWrappedElement(te);
+            wrapped.add(elm);
         }
         return wrapped;
     }
@@ -57,7 +61,9 @@ public class DebuggerSamplerPackage extends SamplePackage {
     public List<Assertion> getAssertions() {
         List<Assertion> wrapped = new LinkedList<>();
         for (Assertion te : super.getAssertions()) {
-            wrapped.add(new AssertionDebug(te));
+            AssertionDebug elm = new AssertionDebug();
+            elm.setWrappedElement(te);
+            wrapped.add(elm);
         }
         return wrapped;
     }
@@ -66,7 +72,9 @@ public class DebuggerSamplerPackage extends SamplePackage {
     public List<Timer> getTimers() {
         List<Timer> wrapped = new LinkedList<>();
         for (Timer te : super.getTimers()) {
-            wrapped.add(new TimerDebug(te));
+            TimerDebug elm = new TimerDebug();
+            elm.setWrappedElement(te);
+            wrapped.add(elm);
         }
         return wrapped;
     }
@@ -75,13 +83,17 @@ public class DebuggerSamplerPackage extends SamplePackage {
     public List<SampleListener> getSampleListeners() {
         List<SampleListener> wrapped = new LinkedList<>();
         for (SampleListener te : super.getSampleListeners()) {
-            wrapped.add(new SampleListenerDebug(te));
+            SampleListenerDebug elm = new SampleListenerDebug();
+            elm.setWrappedElement(te);
+            wrapped.add(elm);
         }
         return wrapped;
     }
 
     @Override
     public Sampler getSampler() {
-        return new SamplerDebug(super.getSampler());
+        SamplerDebug elm = new SamplerDebug();
+        elm.setWrappedElement(super.getSampler());
+        return elm;
     }
 }

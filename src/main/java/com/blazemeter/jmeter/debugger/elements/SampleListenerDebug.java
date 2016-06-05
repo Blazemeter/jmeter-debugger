@@ -4,9 +4,6 @@ import org.apache.jmeter.samplers.SampleEvent;
 import org.apache.jmeter.samplers.SampleListener;
 
 public class SampleListenerDebug extends AbstractDebugElement<SampleListener> implements SampleListener {
-    public SampleListenerDebug(SampleListener te) {
-        super(te);
-    }
 
     @Override
     public void sampleOccurred(SampleEvent e) {

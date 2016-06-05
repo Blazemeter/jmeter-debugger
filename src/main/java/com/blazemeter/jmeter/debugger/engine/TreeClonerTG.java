@@ -20,7 +20,6 @@ public class TreeClonerTG implements HashTreeTraverser {
     private final ListedHashTree newTree = new ListedHashTree();
     private final LinkedList<Object> stack = new LinkedList<>();
     private boolean ignoring = false;
-    private AbstractThreadGroup clonedTG;
 
     public TreeClonerTG(AbstractThreadGroup tg) {
         this.onlyTG = tg;
@@ -57,42 +56,50 @@ public class TreeClonerTG implements HashTreeTraverser {
     }
 
     private JMeterTreeNode getClonedNode(JMeterTreeNode node) {
-        TestElement te = (TestElement) (node).getUserObject();
-        TestElement cloned = (TestElement) te.clone();
+        TestElement orig = (TestElement) (node).getUserObject();
+        TestElement cloned = (TestElement) orig.clone();
         boolean isWrappable = !(cloned instanceof TransactionController) && !(cloned instanceof TestFragmentController);
-        JMeterTreeNode res = new JMeterTreeNode();
 
-        if (cloned instanceof AbstractThreadGroup) {
-            AbstractThreadGroup wrapped = new DebuggingThreadGroup();
-            clonedTG = wrapped;
-            wrapped.setProperty(TestElement.GUI_CLASS, DebuggingThreadGroupGui.class.getCanonicalName());
-            wrapped.setName(cloned.getName());
-            wrapped.setEnabled(cloned.isEnabled());
-            res.setUserObject(wrapped);
+        TestElement userObject = cloned;
+        if (orig instanceof AbstractThreadGroup) {
+            userObject = new DebuggingThreadGroup();
         } else if (cloned instanceof Controller && isWrappable) {
-            TestElement wrapped;
-            if (cloned instanceof GenericController) {
-                if (cloned instanceof ReplaceableController) {     // TODO: solve replaceable problem
-                    log.warn("Not supported!: " + cloned);
-                    wrapped = new ReplaceableGenericControllerDebug((GenericController) cloned);
-                } else {
-                    wrapped = new GenericControllerDebug((GenericController) cloned);
-                }
-            } else {
-                if (cloned instanceof ReplaceableController) {
-                    log.warn("Controller+Replaceable is unsupported: " + cloned);
-                }
-                wrapped = new ControllerDebug((Controller) cloned);
-            }
-            wrapped.setProperty(TestElement.GUI_CLASS, ControllerDebugGui.class.getCanonicalName());
-            wrapped.setName(cloned.getName());
-            wrapped.setEnabled(cloned.isEnabled());
-            res.setUserObject(wrapped);
-        } else {
-            res.setUserObject(cloned);
+            userObject = getController(cloned);
+        }
+
+        JMeterTreeNode res = new JMeterTreeNode();
+        userObject.setProperty(TestElement.GUI_CLASS, ControllerDebugGui.class.getCanonicalName());
+        userObject.setName(cloned.getName());
+        userObject.setEnabled(cloned.isEnabled());
+        res.setUserObject(userObject);
+
+        if (userObject instanceof Wrapper) {
+            Wrapper wrp = (Wrapper) userObject;
+            wrp.setWrappedElement(cloned);
+        }
+
+        if (userObject instanceof OriginalLink) {
+            OriginalLink link = (OriginalLink) userObject;
+            link.setOriginal(orig);
         }
 
         return res;
+    }
+
+    private TestElement getController(TestElement cloned) {
+        if (cloned instanceof GenericController) {
+            if (cloned instanceof ReplaceableController) {     // TODO: solve replaceable problem
+                log.warn("Not supported!: " + cloned);
+                return new ReplaceableGenericControllerDebug();
+            } else {
+                return new GenericControllerDebug();
+            }
+        } else {
+            if (cloned instanceof ReplaceableController) {
+                log.warn("Controller+Replaceable is unsupported: " + cloned);
+            }
+            return new ControllerDebug();
+        }
     }
 
     @Override
@@ -109,9 +116,5 @@ public class TreeClonerTG implements HashTreeTraverser {
 
     public HashTree getClonedTree() {
         return newTree;
-    }
-
-    public AbstractThreadGroup getClonedTG() {
-        return clonedTG;
     }
 }
