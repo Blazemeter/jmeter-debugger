@@ -1,16 +1,34 @@
 # Step-by-step debugger for Apache JMeter
 
+## Features
+ - step over single component
+ - breakpoints and running until paused
+ - current values for variables and properties shown
+ - evaluate expressions pane 
+ - resolved execution tree displayed
+ - current element and current sampler scope highlighted in the tree
+ - element UI shown with resolved variables and functions
+
 ## Installation
+
+Install it through [JMeter Plugins Manager](http://jmeter-plugins.org/wiki/PluginsManager/)
 
 ## Usage
 
+ - Find it under "Run" item of main menu. 
+ - Choose the thread group to debug from combo-box. 
+ - Press "Start" to start debugging, "Stop" to abort it. 
+ - Use "Step Over" or "Continue/Pause" to perform debugging.
+ - Right-click on the element in tree allows to set breakpoint (if appliable to the element).
+ - Type expression on "Evaluate" tab and execute it, you can even set variables and properties by using appropriate JMeter functions.
+
 ## Known Limitations 
+ - Only one thread group at a time can be debugged (evaluate panel allows to mitigate the limitation)
 
 ## Roadmap
-
  - double run erases names
  - original jmx modified
- 
+  
  - choose license
  - Maximize on Windows / Non modal window 
  - expand sampler path in tree to reveal it
