@@ -30,7 +30,6 @@ public class Debugger implements StepTrigger {
     private Wrapper currentElement;
     private boolean isContinuing = false;
     protected DebuggerEngine engine;
-    private Sampler currentSampler = null;
     protected Set<TestElement> breakpoints = new HashSet<>();
 
     public Debugger(HashTree testTree, DebuggerFrontend frontend) {
@@ -150,7 +149,7 @@ public class Debugger implements StepTrigger {
     }
 
     public Sampler getCurrentSampler() {
-        return currentSampler;
+        return engine.getThreadContext().getCurrentSampler();
     }
 
     public boolean isContinuing() {

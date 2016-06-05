@@ -1,6 +1,5 @@
 package com.blazemeter.jmeter.debugger.gui;
 
-import com.blazemeter.jmeter.debugger.elements.ThreadGroupWrapper;
 import com.blazemeter.jmeter.debugger.elements.Wrapper;
 import com.blazemeter.jmeter.debugger.engine.Debugger;
 import com.blazemeter.jmeter.debugger.engine.DebuggerFrontend;
@@ -22,6 +21,7 @@ import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
 
+import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -246,7 +246,12 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
         refreshVars(context);
         refreshProperties();
         evaluatePanel.refresh(context, debugger.isContinuing());
-        tree.repaint();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                tree.repaint();
+            }
+        });
     }
 
     @Override

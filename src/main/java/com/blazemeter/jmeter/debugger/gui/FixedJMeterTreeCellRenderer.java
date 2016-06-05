@@ -24,11 +24,6 @@ public class FixedJMeterTreeCellRenderer extends JMeterCellRenderer {
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean p_hasFocus) {
         JMeterTreeNode node = (JMeterTreeNode) value;
         TestElement mc = node.getTestElement();
-        JMeterProperty property = mc.getProperty(TestElement.GUI_CLASS);
-        /*
-        if (property == null || property instanceof NullProperty) {
-            mc.setProperty(new StringProperty(TestElement.GUI_CLASS, this.getClass().getName()));
-        } */
 
         JMeterTreeNode fakeNode = (JMeterTreeNode) node.clone();
         if (mc instanceof Wrapper) {
