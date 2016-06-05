@@ -1,8 +1,7 @@
 package com.blazemeter.jmeter.debugger.gui;
 
-import com.blazemeter.jmeter.debugger.elements.Wrapper;
+import com.blazemeter.jmeter.debugger.elements.OriginalLink;
 import com.blazemeter.jmeter.debugger.engine.Debugger;
-import com.blazemeter.jmeter.debugger.engine.DebuggerFrontend;
 import org.apache.jmeter.config.ConfigElement;
 import org.apache.jmeter.gui.LoggerPanel;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
@@ -12,9 +11,7 @@ import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.TestPlan;
 import org.apache.jmeter.testelement.WorkBench;
 import org.apache.jmeter.threads.AbstractThreadGroup;
-import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.ThreadGroup;
-import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.gui.ComponentUtil;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.LogTarget;
@@ -41,7 +38,6 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
     protected PowerTableModel propsTableModel;
     protected JPanel elementContainer;
     protected EvaluatePanel evaluatePanel;
-    protected Debugger debugger = new Debugger(new HashTree(), new DummyFrontend());
 
     public DebuggerDialogBase() {
         super((JFrame) null, "Step-by-Step Debugger", true);
@@ -239,16 +235,18 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     log.debug("Toggle breakpoint on: " + te);
-                    if (debugger.isBreakpoint(te)) {
-                        debugger.removeBreakpoint(te);
-                    } else {
-                        debugger.addBreakpoint(te);
+
+                    if (te instanceof OriginalLink) {
+                        TestElement orig = (TestElement) ((OriginalLink) te).getOriginal();
+                        boolean isBP = orig.getPropertyAsBoolean(Debugger.class.getCanonicalName(), false);
+                        orig.setProperty(Debugger.class.getCanonicalName(), !isBP);
                     }
+
                     tree.repaint();
                 }
             });
 
-            item.setState(debugger.isBreakpoint(te));
+            item.setState(Debugger.isBreakpoint(te));
             popup.add(item);
             return popup;
         }
@@ -274,33 +272,6 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
 
         @Override
         public void mouseExited(MouseEvent mouseEvent) {
-
-        }
-    }
-
-    private class DummyFrontend implements DebuggerFrontend {
-        @Override
-        public void started() {
-
-        }
-
-        @Override
-        public void stopped() {
-
-        }
-
-        @Override
-        public void continuing() {
-
-        }
-
-        @Override
-        public void frozenAt(Wrapper wrapper) {
-
-        }
-
-        @Override
-        public void statusRefresh(JMeterContext context) {
 
         }
     }

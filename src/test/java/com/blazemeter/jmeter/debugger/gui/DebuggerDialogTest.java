@@ -20,6 +20,7 @@ import org.apache.jmeter.save.SaveService;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.util.JMeterUtils;
+import org.apache.jmeter.visualizers.RenderAsHTML;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.LogTarget;
@@ -75,7 +76,9 @@ public class DebuggerDialogTest {
             }
 
             GuiPackage.getInstance(a, mdl);
-            JMeterUtils.setProperty("search_paths", ActionRouter.class.getProtectionDomain().getCodeSource().getLocation().getFile());
+            String actions = ActionRouter.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+            String renderers = RenderAsHTML.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+            JMeterUtils.setProperty("search_paths", actions + ";" + renderers);
             MainFrame mf = new MainFrame(mdl, a);
 
             new TimeFunction();

@@ -35,6 +35,7 @@ import java.util.Map;
 public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFrontend {
     private static final Logger log = LoggingManager.getLoggerForClass();
     private boolean savedDirty = false;
+    protected Debugger debugger = null;
 
     public DebuggerDialog() {
         super();
@@ -169,8 +170,12 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
         component.setFont(component.getFont().deriveFont(~Font.BOLD).deriveFont(~Font.ITALIC));
 
         TestElement userObject = (TestElement) node.getUserObject();
-        if (debugger.isBreakpoint(userObject)) {
+        if (Debugger.isBreakpoint(userObject)) {
             component.setForeground(Color.RED);
+        }
+
+        if (debugger == null) {
+            return;
         }
 
         Wrapper currentElement = debugger.getCurrentElement();
@@ -211,6 +216,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
         if (gui != null) {
             JMeterGUIComponent egui = gui.getGui(wrpElm);
             egui.configure(wrpElm);
+            egui.modifyTestElement(wrpElm);
             elementContainer.removeAll();
             if (egui instanceof Component) {
                 egui.setEnabled(false);

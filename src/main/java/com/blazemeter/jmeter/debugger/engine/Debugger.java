@@ -1,6 +1,8 @@
 package com.blazemeter.jmeter.debugger.engine;
 
 
+import com.blazemeter.jmeter.debugger.elements.OriginalLink;
+import com.blazemeter.jmeter.debugger.elements.SampleListenerDebug;
 import com.blazemeter.jmeter.debugger.elements.TimerDebug;
 import com.blazemeter.jmeter.debugger.elements.Wrapper;
 import org.apache.jmeter.JMeter;
@@ -18,9 +20,6 @@ import org.apache.jorphan.logging.LoggingManager;
 import org.apache.jorphan.util.JMeterStopThreadException;
 import org.apache.log.Logger;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public class Debugger implements StepTrigger {
     private static final Logger log = LoggingManager.getLoggerForClass();
     private final HashTree tree;
@@ -30,7 +29,6 @@ public class Debugger implements StepTrigger {
     private Wrapper currentElement;
     private boolean isContinuing = false;
     protected DebuggerEngine engine;
-    protected Set<TestElement> breakpoints = new HashSet<>();
 
     public Debugger(HashTree testTree, DebuggerFrontend frontend) {
         tree = testTree;
@@ -111,6 +109,8 @@ public class Debugger implements StepTrigger {
 
         if (wrapper instanceof TimerDebug) {
             ((TimerDebug) wrapper).setDelaying(isContinuing);
+        } else if (wrapper instanceof SampleListenerDebug) {
+            ((SampleListenerDebug) wrapper).setStopBefore(!isContinuing);
         }
 
         currentElement = wrapper;
@@ -118,7 +118,7 @@ public class Debugger implements StepTrigger {
         frontend.statusRefresh(context);
 
         try {
-            if (isContinuing && breakpoints.contains(wrappedElement)) {
+            if (isContinuing && isBreakpoint(wrappedElement)) {
                 pause();
             }
 
@@ -156,17 +156,13 @@ public class Debugger implements StepTrigger {
         return isContinuing;
     }
 
-
-    public boolean isBreakpoint(TestElement userObject) {
-        return breakpoints.contains(userObject);
-    }
-
-    public void removeBreakpoint(TestElement te) {
-        breakpoints.remove(te);
-    }
-
-    public void addBreakpoint(TestElement te) {
-        breakpoints.add(te);
+    public static boolean isBreakpoint(TestElement te) {
+        if (te instanceof OriginalLink) {
+            TestElement orig = (TestElement) ((OriginalLink) te).getOriginal();
+            return orig.getPropertyAsBoolean(Debugger.class.getCanonicalName(), false);
+        } else {
+            return te.getPropertyAsBoolean(Debugger.class.getCanonicalName(), false);
+        }
     }
 
     public synchronized void proceed() {

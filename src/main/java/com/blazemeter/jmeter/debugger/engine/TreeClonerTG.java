@@ -85,24 +85,6 @@ public class TreeClonerTG implements HashTreeTraverser {
         if (altered.getProperty(TestElement.GUI_CLASS) instanceof NullProperty) {
             altered.setProperty(TestElement.GUI_CLASS, ControllerDebugGui.class.getCanonicalName());
         }
-        /*
-            JMeterProperty origGuiClass = orig.getProperty(TestElement.GUI_CLASS);
-            if (!origGuiClass.getStringValue().equals(TestBeanGUI.class.getCanonicalName())) {
-                altered.setProperty(TestElement.GUI_CLASS, origGuiClass.getStringValue());
-            }
-            
-            /*
-            if (origGuiClass instanceof NullProperty) {
-                altered.setProperty(TestElement.GUI_CLASS, ControllerDebugGui.class.getCanonicalName());
-            } else 
-                altered.setProperty(TestElement.GUI_CLASS, ControllerDebugGui.class.getCanonicalName());
-            } else {
-                altered.setProperty(TestElement.GUI_CLASS, orig.getPropertyAsString(TestElement.GUI_CLASS));
-            }
-            altered.setProperty(TestElement.GUI_CLASS, ControllerDebugGui.class.getCanonicalName());
-
-        }               
-        */
         res.setUserObject(altered);
         return res;
     }

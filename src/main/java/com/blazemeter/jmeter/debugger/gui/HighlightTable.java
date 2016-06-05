@@ -34,8 +34,8 @@ public class HighlightTable extends JTable {
         Component comp = super.prepareRenderer(renderer, row, column);
         if (getModel() instanceof HighlightTableModel) {
             HighlightTableModel model = (HighlightTableModel) getModel();
-            Object valueAt = getValueAt(row, 0);
             try {
+                Object valueAt = getValueAt(row, 0);
                 if (valueAt != null && model.isRowHighlighted(valueAt.toString(), getValueAt(row, 1))) {
                     comp.setFont(comp.getFont().deriveFont(Font.BOLD));
                 } else {
