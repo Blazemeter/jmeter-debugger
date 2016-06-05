@@ -1,6 +1,8 @@
-# Step-by-step debugger for Apache JMeter [[/src/main/resources/com/blazemeter/jmeter/debugger/logo.png|alt=logo]]
+# Step-by-step debugger for Apache JMeter 
 
-Implemented by [BlazeMeter.com](http://blazemeter.com/)
+![logo](/src/main/resources/com/blazemeter/jmeter/debugger/logo.png) 
+
+Implemented by [BlazeMeter.com](http://blazemeter.com/) 
 
 ## Features
  - step over single component
@@ -26,6 +28,7 @@ Install it through [JMeter Plugins Manager](http://jmeter-plugins.org/wiki/Plugi
 
 ## Known Limitations 
  - Only one thread group at a time can be debugged (evaluate panel allows to mitigate the limitation)
+ - Module Controllers and Include Controllers are not supported
 
 ## Roadmap
  - double run erases names
