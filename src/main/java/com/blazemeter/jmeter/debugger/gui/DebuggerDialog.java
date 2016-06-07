@@ -63,6 +63,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
         }
         tgCombo.setEnabled(tgCombo.getItemCount() > 0);
         start.setEnabled(tgCombo.getItemCount() > 0);
+        start.requestFocus();
     }
 
     @Override

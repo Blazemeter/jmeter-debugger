@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 public class DebuggerMenuItem extends JMenuItem implements ActionListener {
     private static final Logger log = LoggingManager.getLoggerForClass();
     private static DebuggerDialog dialog;
+    private static Icon helpIcon;
 
     public DebuggerMenuItem() {
         super("Step-by-Step Debugger", getBugIcon());
@@ -58,4 +59,9 @@ public class DebuggerMenuItem extends JMenuItem implements ActionListener {
     public static ImageIcon getPauseIcon() {
         return new ImageIcon(DebuggerMenuItem.class.getResource("/com/blazemeter/jmeter/debugger/pause.png"));
     }
+
+    public static Icon getHelpIcon() {
+        return new ImageIcon(DebuggerMenuItem.class.getResource("/com/blazemeter/jmeter/debugger/help.png"));
+    }
+
 }

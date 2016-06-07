@@ -25,10 +25,14 @@ Install it through [JMeter Plugins Manager](http://jmeter-plugins.org/wiki/Plugi
  - Use "Step Over" or "Continue/Pause" to perform debugging.
  - Right-click on the element in tree allows to set breakpoint (if appliable to the element).
  - Type expression on "Evaluate" tab and execute it, you can even set variables and properties by using appropriate JMeter functions.
-
+ 
 ## Known Limitations 
  - Only one thread group at a time can be debugged (evaluate panel allows to mitigate the limitation)
  - Module Controllers and Include Controllers are not supported
+
+## Support
+
+The best place to report issues and discuss the debugger is jmeter-plugins [support forums](https://groups.google.com/forum/#!forum/jmeter-plugins/).
 
 ## Roadmap
  - choose license

@@ -22,6 +22,9 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 abstract public class DebuggerDialogBase extends JDialog implements ComponentListener, NodeHighlighter, TreeSelectionListener {
     private static final Logger log = LoggingManager.getLoggerForClass();
@@ -119,7 +122,7 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
         JLabel logo = new BlazeMeterLogo();
         res.add(logo);
         res.addSeparator(new Dimension(32, 26));
-        res.add(new JLabel("Choose Thread Group: "));
+        res.add(new JLabel("Choose: "));
 
         res.add(tgCombo);
         tgCombo.setRenderer(new ThreadGroupItemRenderer(tgCombo.getRenderer()));
@@ -179,6 +182,22 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
                 pauseContinue.doClick();
             }
         });
+
+        res.addSeparator();
+        JButton help = new JButton("Help", DebuggerMenuItem.getHelpIcon());
+        help.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        help.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (java.awt.Desktop.isDesktopSupported()) {
+                    try {
+                        java.awt.Desktop.getDesktop().browse(new URI("https://github.com/Blazemeter/jmeter-debugger"));
+                    } catch (IOException | URISyntaxException ignored) {
+                    }
+                }
+            }
+        });
+        res.add(help);
         return res;
     }
 
