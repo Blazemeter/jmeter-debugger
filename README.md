@@ -2,7 +2,7 @@
 
 ![logo](/src/main/resources/com/blazemeter/jmeter/debugger/logo.png) 
 
-Implemented by [BlazeMeter.com](http://blazemeter.com/) 
+Implemented by [BlazeMeter.com](http://blazemeter.com/), released under Apache 2.0 License 
 
 ## Features
  - step over single component
@@ -19,7 +19,7 @@ Install it through [JMeter Plugins Manager](http://jmeter-plugins.org/wiki/Plugi
 
 ## Usage
 
- - Find it under "Run" item of main menu. 
+ - Find it under "Run" item of main menu. Consider saving your JMX before starting debugger.
  - Choose the thread group to debug from combo-box. 
  - Press "Start" to start debugging, "Stop" to abort it. 
  - Use "Step Over" or "Continue/Pause" to perform debugging.
@@ -31,15 +31,14 @@ Install it through [JMeter Plugins Manager](http://jmeter-plugins.org/wiki/Plugi
  - Module Controllers and Include Controllers are not supported
 
 ## Roadmap
- - double run erases names
- - original jmx modified
-  
  - choose license
- - Maximize on Windows / Non modal window 
+
+ - fix freeze after continue + pause
+ - choose TG from context of tree and show debugger started?
+ - Maximize on Windows / Non modal window (what to do with all the collision cases) 
  - expand sampler path in tree to reveal it
  - logic to stop on Sampler bp
  - logic to stop on Listener bp only once after sample 
- - choose TG from context of tree and show debugger started?
  
  - remove controls from DBG TG UI (action on error)
  - italic font in tree not shown on Mac
