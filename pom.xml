@@ -6,12 +6,12 @@
 
     <groupId>com.blazemeter</groupId>
     <artifactId>jmeter-debugger</artifactId>
-    <version>0.0</version>
+    <version>0.1</version>
 
     <name>Step-by-Step Debugger for JMeter</name>
     <description>Step-by-Step Debugger for JMeter</description>
     <licenses>
-        <license>  <!-- TODO: use the right one -->
+        <license>
             <name>The Apache Software License, Version 2.0</name>
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>

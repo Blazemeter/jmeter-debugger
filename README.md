@@ -15,7 +15,7 @@ Implemented by [BlazeMeter.com](http://blazemeter.com/), released under Apache 2
 
 ## Installation
 
-Install it through [JMeter Plugins Manager](http://jmeter-plugins.org/wiki/PluginsManager/). Or checkout the source and build with `mvn clean package`, then take JAR from `target` directory.
+Install it through [JMeter Plugins Manager](http://jmeter-plugins.org/wiki/PluginsManager/). Or checkout the source and build with `mvn clean package`, then take the JAR from `target` directory.
 
 ## Usage
 
@@ -35,22 +35,20 @@ Install it through [JMeter Plugins Manager](http://jmeter-plugins.org/wiki/Plugi
 The best place to report issues and discuss the debugger is jmeter-plugins [support forums](https://groups.google.com/forum/#!forum/jmeter-plugins/).
 
 ## Roadmap
- - choose license
-
- - fix freeze after continue + pause
+ - fix deadlock freeze after continue + pause
  - choose TG from context of tree and show debugger started?
- - Maximize on Windows / Non modal window (what to do with all the collision cases) 
+ - Maximize on Windows / Non modal window (what to do with all the collision cases?) 
  - expand sampler path in tree to reveal it
  - logic to stop on Sampler bp
  - logic to stop on Listener bp only once after sample 
+ - revive variable change highlight
+ - fix disabled items appearing in tree
+ - revive Stop button?
  
  - remove controls from DBG TG UI (action on error)
  - italic font in tree not shown on Mac
  - shortcut to toggle BP
  - shortcut to invoke debugger
  - add icon on toolbar?
- - revive Stop button
- - revive variable change highlight
- - fix disabled items appearing in tree
  
  
