@@ -1,9 +1,11 @@
 package com.blazemeter.jmeter.debugger.gui;
 
+import com.blazemeter.jmeter.debugger.elements.DebuggingThreadGroup;
 import com.blazemeter.jmeter.debugger.elements.Wrapper;
 import com.blazemeter.jmeter.debugger.engine.*;
 import kg.apc.emulators.TestJMeterUtils;
 import org.apache.jmeter.JMeter;
+import org.apache.jmeter.control.LoopController;
 import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.exceptions.IllegalUserActionException;
 import org.apache.jmeter.functions.TimeFunction;
@@ -14,6 +16,7 @@ import org.apache.jmeter.gui.tree.JMeterTreeListener;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.save.SaveService;
+import org.apache.jmeter.threads.AbstractThreadGroup;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.util.JMeterUtils;
@@ -25,6 +28,7 @@ import org.apache.log.Logger;
 import org.apache.log.format.PatternFormatter;
 import org.apache.log.output.io.WriterTarget;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -36,12 +40,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Properties;
 
 
 public class DebuggerDialogTest implements TestTreeProvider {
     private static final Logger log = LoggingManager.getLoggerForClass();
+    private HashTree tree;
 
     @BeforeClass
     public static void setUp() {
@@ -50,13 +56,25 @@ public class DebuggerDialogTest implements TestTreeProvider {
         Properties props = new Properties();
         props.setProperty(LoggingManager.LOG_FILE, "");
         LoggingManager.initializeLogging(props);
+        TestJMeterUtils.createJmeterEnv();
+    }
+
+    @Before
+    public void setUpMethod() {
+        File file = new File(this.getClass().getResource("/com/blazemeter/jmeter/debugger/sample1.jmx").getFile());
+        String basedir = TestJMeterUtils.fixWinPath(file.getParentFile().getAbsolutePath());
+
+        File f = new File(basedir + "/sample1.jmx");
+        try {
+            tree = SaveService.loadTree(f);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed", e);
+        }
     }
 
     @Test
     public void displayGUI() throws InterruptedException, IOException {
         if (!GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance()) {
-            TestJMeterUtils.createJmeterEnv();
-
             JMeterTreeModel mdl = new JMeterTreeModel();
             JMeterTreeListener a = new JMeterTreeListener();
             a.setActionHandler(new ActionListener() {
@@ -97,29 +115,9 @@ public class DebuggerDialogTest implements TestTreeProvider {
 
     @Override
     public HashTree getTestTree() {
-        File file = new File(this.getClass().getResource("/com/blazemeter/jmeter/debugger/sample1.jmx").getFile());
-        String basedir = TestJMeterUtils.fixWinPath(file.getParentFile().getAbsolutePath());
-
-        File f = new File(basedir + "/sample1.jmx");
-        try {
-            return SaveService.loadTree(f);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed", e);
-        }
+        return tree;
     }
 
-    private class DebuggerDialogMock extends DebuggerDialog {
-        private final JMeterTreeModel mdl;
-
-        public DebuggerDialogMock(JMeterTreeModel b) {
-            mdl = b;
-        }
-
-        @Override
-        public HashTree getTestTree() {
-            return mdl.getTestPlan();
-        }
-    }
 
     @Test
     public void runRealEngine() throws Exception {
@@ -138,24 +136,38 @@ public class DebuggerDialogTest implements TestTreeProvider {
 
     @Test
     public void runDebugEngine() throws Exception {
-        TestJMeterUtils.createJmeterEnv();
-
         JMeterTreeModel mdl = new JMeterTreeModel();
         mdl.addSubTree(getTestTree(), (JMeterTreeNode) mdl.getRoot());
+        tree = mdl.getTestPlan();
 
         Debugger sel = new Debugger(this, new FrontendMock());
-        HashTree hashTree = sel.getSelectedTree();
-        JMeter.convertSubTree(hashTree);
+        AbstractThreadGroup tg = getFirstTG(getTestTree());
+        sel.selectThreadGroup(tg);
+        HashTree testTree = sel.getSelectedTree();
+
+        DebuggingThreadGroup tg2 = (DebuggingThreadGroup) getFirstTG(testTree);
+        LoopController samplerController = (LoopController) tg2.getSamplerController();
+        samplerController.setLoops(1);
+        samplerController.setContinueForever(false);
+
+        JMeter.convertSubTree(testTree);
 
         DebuggerEngine engine = new DebuggerEngine(JMeterContextService.getContext());
         StepTriggerCounter hook = new StepTriggerCounter();
         engine.setStepper(hook);
-        engine.configure(hashTree);
+        engine.configure(testTree);
         engine.runTest();
         while (engine.isActive()) {
             Thread.sleep(1000);
         }
-        Assert.assertEquals(32, hook.cnt);
+        Assert.assertEquals(92, hook.cnt);
+    }
+
+    private AbstractThreadGroup getFirstTG(HashTree tree) {
+        SearchClass<AbstractThreadGroup> searcher = new SearchClass<>(AbstractThreadGroup.class);
+        tree.traverse(searcher);
+        Collection<AbstractThreadGroup> searchResults = searcher.getSearchResults();
+        return searchResults.toArray(new AbstractThreadGroup[0])[0];
     }
 
     private class StepTriggerCounter implements StepTrigger {
@@ -192,6 +204,19 @@ public class DebuggerDialogTest implements TestTreeProvider {
         @Override
         public void statusRefresh(JMeterContext context) {
 
+        }
+    }
+
+    private class DebuggerDialogMock extends DebuggerDialog {
+        private final JMeterTreeModel mdl;
+
+        public DebuggerDialogMock(JMeterTreeModel b) {
+            mdl = b;
+        }
+
+        @Override
+        public HashTree getTestTree() {
+            return mdl.getTestPlan();
         }
     }
 }
