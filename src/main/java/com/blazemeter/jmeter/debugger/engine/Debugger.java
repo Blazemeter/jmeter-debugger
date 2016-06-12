@@ -111,8 +111,11 @@ public class Debugger implements StepTrigger {
         }
 
         currentElement = wrapper;
-        JMeterContext context = engine.getThreadContext();
-        frontend.statusRefresh(context);
+
+        if (!isContinuing) {
+            JMeterContext context = engine.getThreadContext();
+            frontend.statusRefresh(context);
+        }
 
         try {
             if (isContinuing && isBreakpoint(wrappedElement)) {
