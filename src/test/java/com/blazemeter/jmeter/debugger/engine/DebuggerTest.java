@@ -4,7 +4,6 @@ import com.blazemeter.jmeter.debugger.FrontendMock;
 import com.blazemeter.jmeter.debugger.TestProvider;
 import kg.apc.emulators.TestJMeterUtils;
 import org.apache.jmeter.control.Controller;
-import org.apache.jmeter.samplers.Sampler;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -20,6 +19,7 @@ public class DebuggerTest {
 
         dbg.start();
         Thread.sleep(5000);
+        Assert.assertFalse(dbg.isContinuing());
         Assert.assertTrue(dbg.getCurrentElement() instanceof Controller);
         dbg.proceed();
         Thread.sleep(1000);
