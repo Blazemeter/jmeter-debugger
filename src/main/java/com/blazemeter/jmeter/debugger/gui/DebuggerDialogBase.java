@@ -258,11 +258,7 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
                 public void actionPerformed(ActionEvent actionEvent) {
                     log.debug("Toggle breakpoint on: " + te);
 
-                    if (te instanceof OriginalLink) {
-                        TestElement orig = (TestElement) ((OriginalLink) te).getOriginal();
-                        boolean isBP = orig.getPropertyAsBoolean(Debugger.class.getCanonicalName(), false);
-                        orig.setProperty(Debugger.class.getCanonicalName(), !isBP);
-                    }
+                    Debugger.toggleBreakpoint(te);
 
                     tree.repaint();
                 }

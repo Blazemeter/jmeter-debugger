@@ -94,7 +94,7 @@ public class DebuggerDialogTest implements TestTreeProvider {
             String actions = ActionRouter.class.getProtectionDomain().getCodeSource().getLocation().getFile();
             String renderers = RenderAsHTML.class.getProtectionDomain().getCodeSource().getLocation().getFile();
             JMeterUtils.setProperty("search_paths", actions + ";" + renderers);
-            MainFrame mf = new MainFrame(mdl, a);
+            new MainFrame(mdl, a); // does important stuff inside
 
             new TimeFunction();
             long now = System.currentTimeMillis();
@@ -109,7 +109,9 @@ public class DebuggerDialogTest implements TestTreeProvider {
             frame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
             frame.pack();
             frame.setVisible(true);
-            Thread.sleep(60000);
+            while (frame.isVisible()) {
+                Thread.sleep(1000);
+            }
         }
     }
 

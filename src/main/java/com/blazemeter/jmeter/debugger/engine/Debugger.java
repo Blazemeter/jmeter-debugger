@@ -118,7 +118,7 @@ public class Debugger implements StepTrigger {
         }
 
         try {
-            if (isContinuing && isBreakpoint(wrappedElement)) {
+            if (isContinuing && isBreakpoint(wrapper)) {
                 pause();
             }
 
@@ -158,11 +158,17 @@ public class Debugger implements StepTrigger {
 
     public static boolean isBreakpoint(TestElement te) {
         if (te instanceof OriginalLink) {
-            TestElement orig = (TestElement) ((OriginalLink) te).getOriginal();
-            return orig.getPropertyAsBoolean(Debugger.class.getCanonicalName(), false);
-        } else {
-            return te.getPropertyAsBoolean(Debugger.class.getCanonicalName(), false);
+            te = (TestElement) ((OriginalLink) te).getOriginal();
         }
+        return te.getPropertyAsBoolean(Debugger.class.getCanonicalName(), false);
+    }
+
+    public static void toggleBreakpoint(TestElement te) {
+        if (te instanceof OriginalLink) {
+            te = (TestElement) ((OriginalLink) te).getOriginal();
+        }
+        boolean isBP = te.getPropertyAsBoolean(Debugger.class.getCanonicalName(), false);
+        te.setProperty(Debugger.class.getCanonicalName(), !isBP);
     }
 
     public synchronized void proceed() {
