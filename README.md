@@ -34,7 +34,19 @@ Install it through [JMeter Plugins Manager](http://jmeter-plugins.org/wiki/Plugi
 
 The best place to report issues and discuss the debugger is jmeter-plugins [support forums](https://groups.google.com/forum/#!forum/jmeter-plugins/).
 
+# Changelog
+
+__v0.2__
+ - disable variables/properties/evaluate update on continue, to prevent deadlock
+ - fix breakpoint functioning
+
+__v0.1__, 7 jun 2016
+ - initial release 
+ - disabled variables change highlight
+
+
 ## Roadmap
+
 ![travis](https://img.shields.io/travis/Blazemeter/jmeter-debugger.svg)
 ![travis](https://img.shields.io/codecov/c/github/Blazemeter/jmeter-debugger.svg)
 
