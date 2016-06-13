@@ -19,6 +19,7 @@ import org.apache.log.LogTarget;
 import org.apache.log.Logger;
 import org.apache.log.format.PatternFormatter;
 import org.apache.log.output.io.WriterTarget;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -53,7 +54,11 @@ public class DebuggerDialogTest {
 
     @Test
     public void testGui() throws Exception {
-        TestProvider prov=new TestProvider();
+        if (GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance()) {
+            return;
+        }
+        
+        TestProvider prov = new TestProvider();
         DebuggerDialog obj = new DebuggerDialogMock(prov.getTreeModel());
         obj.componentShown(null);
         obj.started();
