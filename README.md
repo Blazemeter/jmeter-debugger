@@ -40,6 +40,7 @@ __v0.2__
  - disable variables/properties/evaluate update on continue, to prevent deadlock
  - fix breakpoint functioning
  - remove controls from DBG TG UI (action on error)
+ - add icon on toolbar (keyboard shortcut is not possible, sorry)
 
 __v0.1__, 7 jun 2016
  - initial release 
@@ -63,6 +64,5 @@ __v0.1__, 7 jun 2016
  - blue color for current element is blue-on-blue for Mac
  - shortcut to toggle BP
  - shortcut to invoke debugger
- - add icon on toolbar?
  
  

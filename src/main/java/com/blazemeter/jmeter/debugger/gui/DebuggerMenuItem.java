@@ -1,20 +1,63 @@
 package com.blazemeter.jmeter.debugger.gui;
 
+import org.apache.jmeter.gui.GuiPackage;
+import org.apache.jmeter.gui.MainFrame;
+import org.apache.jmeter.gui.action.ActionRouter;
+import org.apache.jmeter.gui.util.JMeterToolBar;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class DebuggerMenuItem extends JMenuItem implements ActionListener {
     private static final Logger log = LoggingManager.getLoggerForClass();
     private static DebuggerDialog dialog;
-    private static Icon helpIcon;
 
     public DebuggerMenuItem() {
-        super("Step-by-Step Debugger", getBugIcon());
+        super("Step-by-Step Debugger", getBugIcon(false));
         addActionListener(this);
+        addToolbarIcon();
+    }
+
+    private void addToolbarIcon() {
+        GuiPackage instance = GuiPackage.getInstance();
+        if (instance != null) {
+            final MainFrame mf = instance.getMainFrame();
+            final ComponentFinder<JMeterToolBar> finder = new ComponentFinder<>(JMeterToolBar.class);
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    JMeterToolBar toolbar = null;
+                    while (toolbar == null) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            log.debug("Did not add btn to toolbar", e);
+                        }
+                        log.debug("Searching for toolbar");
+                        toolbar = finder.findComponentIn(mf);
+                    }
+
+                    int pos = 21;
+                    Component toolbarButton = getToolbarButton();
+                    toolbarButton.setSize(toolbar.getComponent(pos).getSize());
+                    toolbar.add(toolbarButton, pos);
+                }
+            });
+        }
+    }
+
+    private Component getToolbarButton() {
+        JButton button = new JButton(getBugIcon(true));
+        button.setToolTipText("Step-by-step Debugger");
+        //button.setPressedIcon(new ImageIcon(imageURLPressed));
+        button.addActionListener(this);
+        //button.setActionCommand(iconBean.getActionNameResolve());
+        ActionRouter.getInstance().ad
+        return button;
     }
 
     @Override
@@ -24,12 +67,17 @@ public class DebuggerMenuItem extends JMenuItem implements ActionListener {
         }
 
         dialog.pack();
+
         dialog.setVisible(true);
     }
 
     // many from http://www.veryicon.com/icons/system/fugue/
-    public static ImageIcon getBugIcon() {
-        return new ImageIcon(DebuggerMenuItem.class.getResource("/com/blazemeter/jmeter/debugger/bug.png"));
+    public static ImageIcon getBugIcon(boolean large) {
+        if (large) {
+            return new ImageIcon(DebuggerMenuItem.class.getResource("/com/blazemeter/jmeter/debugger/bug22.png"));
+        } else {
+            return new ImageIcon(DebuggerMenuItem.class.getResource("/com/blazemeter/jmeter/debugger/bug.png"));
+        }
     }
 
     public static ImageIcon getStartIcon() {

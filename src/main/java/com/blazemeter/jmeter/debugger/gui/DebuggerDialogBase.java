@@ -1,6 +1,5 @@
 package com.blazemeter.jmeter.debugger.gui;
 
-import com.blazemeter.jmeter.debugger.elements.OriginalLink;
 import com.blazemeter.jmeter.debugger.engine.Debugger;
 import org.apache.jmeter.config.ConfigElement;
 import org.apache.jmeter.gui.LoggerPanel;
@@ -47,7 +46,7 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
         setLayout(new BorderLayout());
         setSize(new Dimension(800, 600));
         setPreferredSize(new Dimension(800, 600));
-        setIconImage(DebuggerMenuItem.getBugIcon().getImage());
+        setIconImage(DebuggerMenuItem.getBugIcon(false).getImage());
         ComponentUtil.centerComponentInWindow(this, 30);
         addComponentListener(this);
 

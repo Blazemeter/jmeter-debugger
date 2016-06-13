@@ -10,6 +10,7 @@ import org.apache.jmeter.gui.MainFrame;
 import org.apache.jmeter.gui.action.ActionRouter;
 import org.apache.jmeter.gui.tree.JMeterTreeListener;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
+import org.apache.jmeter.gui.util.JMeterToolBar;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jmeter.visualizers.RenderAsHTML;
@@ -19,7 +20,6 @@ import org.apache.log.LogTarget;
 import org.apache.log.Logger;
 import org.apache.log.format.PatternFormatter;
 import org.apache.log.output.io.WriterTarget;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -57,7 +57,7 @@ public class DebuggerDialogTest {
         if (GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance()) {
             return;
         }
-        
+
         TestProvider prov = new TestProvider();
         DebuggerDialog obj = new DebuggerDialogMock(prov.getTreeModel());
         obj.componentShown(null);
@@ -87,7 +87,10 @@ public class DebuggerDialogTest {
             String actions = ActionRouter.class.getProtectionDomain().getCodeSource().getLocation().getFile();
             String renderers = RenderAsHTML.class.getProtectionDomain().getCodeSource().getLocation().getFile();
             JMeterUtils.setProperty("search_paths", actions + ";" + renderers);
-            new MainFrame(mdl, a); // does important stuff inside
+            MainFrame mf = new MainFrame(mdl, a); // does important stuff inside
+            ComponentFinder<JMeterToolBar> finder = new ComponentFinder<>(JMeterToolBar.class);
+            JMeterToolBar tb = finder.findComponentIn(mf);
+            tb.add(new JButton("test"));
 
             new TimeFunction();
             long now = System.currentTimeMillis();
