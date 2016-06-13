@@ -143,7 +143,6 @@ public class Debugger implements StepTrigger {
         proceed();
     }
 
-
     public Wrapper getCurrentElement() {
         return currentElement;
     }
