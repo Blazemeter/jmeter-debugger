@@ -2,7 +2,6 @@ package com.blazemeter.jmeter.debugger.gui;
 
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.gui.MainFrame;
-import org.apache.jmeter.gui.action.ActionRouter;
 import org.apache.jmeter.gui.util.JMeterToolBar;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
@@ -56,7 +55,6 @@ public class DebuggerMenuItem extends JMenuItem implements ActionListener {
         //button.setPressedIcon(new ImageIcon(imageURLPressed));
         button.addActionListener(this);
         //button.setActionCommand(iconBean.getActionNameResolve());
-        ActionRouter.getInstance().ad
         return button;
     }
 

@@ -36,7 +36,7 @@ The best place to report issues and discuss the debugger is jmeter-plugins [supp
 
 # Changelog
 
-__v0.2__
+__v0.2__, 13 jun 2016
  - disable variables/properties/evaluate update on continue, to prevent deadlock
  - fix breakpoint functioning
  - remove controls from DBG TG UI (action on error)
@@ -63,6 +63,5 @@ __v0.1__, 7 jun 2016
  - italic font in tree not shown on Mac
  - blue color for current element is blue-on-blue for Mac
  - shortcut to toggle BP
- - shortcut to invoke debugger
  
  
