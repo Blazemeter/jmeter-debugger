@@ -39,6 +39,7 @@ The best place to report issues and discuss the debugger is jmeter-plugins [supp
 __v0.2__
  - disable variables/properties/evaluate update on continue, to prevent deadlock
  - fix breakpoint functioning
+ - remove controls from DBG TG UI (action on error)
 
 __v0.1__, 7 jun 2016
  - initial release 
@@ -50,7 +51,6 @@ __v0.1__, 7 jun 2016
 ![travis](https://img.shields.io/travis/Blazemeter/jmeter-debugger.svg)
 ![travis](https://img.shields.io/codecov/c/github/Blazemeter/jmeter-debugger.svg)
 
- - fix deadlock freeze after continue + pause
  - choose TG from context of tree and show debugger started?
  - Maximize on Windows / Non modal window (what to do with all the collision cases?) 
  - expand sampler path in tree to reveal it
@@ -60,8 +60,8 @@ __v0.1__, 7 jun 2016
  - fix disabled items appearing in tree
  - revive Stop button?
  
- - remove controls from DBG TG UI (action on error)
  - italic font in tree not shown on Mac
+ - blue color for current element is blue-on-blue for Mac
  - shortcut to toggle BP
  - shortcut to invoke debugger
  - add icon on toolbar?
