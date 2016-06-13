@@ -1,4 +1,4 @@
-package com.blazemeter.jmeter.debugger;
+package com.blazemeter.jmeter.debugger.engine;
 
 import com.blazemeter.jmeter.debugger.elements.Wrapper;
 import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;

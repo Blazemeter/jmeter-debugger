@@ -45,20 +45,19 @@ __v0.1__, 7 jun 2016
  - initial release 
  - disabled variables change highlight
 
-
 ## Roadmap
 
 ![travis](https://img.shields.io/travis/Blazemeter/jmeter-debugger.svg)
 ![travis](https://img.shields.io/codecov/c/github/Blazemeter/jmeter-debugger.svg)
 
- - choose TG from context of tree and show debugger started?
- - Maximize on Windows / Non modal window (what to do with all the collision cases?) 
  - expand sampler path in tree to reveal it
  - logic to stop on Sampler bp
  - logic to stop on Listener bp only once after sample 
- - revive variable change highlight
- - fix disabled items appearing in tree
+ - choose TG from context of tree and show debugger started? 
  - revive Stop button?
+ - Maximize on Windows / Non modal window (what to do with all the collision cases?) 
+ - revive variable/property change highlight
+ - fix disabled items appearing in tree
  
  - italic font in tree not shown on Mac
  - blue color for current element is blue-on-blue for Mac
