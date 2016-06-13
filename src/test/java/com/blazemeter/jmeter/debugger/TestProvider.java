@@ -16,27 +16,29 @@ import java.io.IOException;
 import java.util.Collection;
 
 public class TestProvider implements TestTreeProvider {
-    private HashTree tree;
+    private JMeterTreeModel mdl = new JMeterTreeModel();
 
     public TestProvider() throws IllegalUserActionException, IOException {
         File file = new File(this.getClass().getResource("/com/blazemeter/jmeter/debugger/sample1.jmx").getFile());
         String basedir = TestJMeterUtils.fixWinPath(file.getParentFile().getAbsolutePath());
 
         File f = new File(basedir + "/sample1.jmx");
-        JMeterTreeModel mdl = new JMeterTreeModel();
         mdl.addSubTree(SaveService.loadTree(f), (JMeterTreeNode) mdl.getRoot());
-        tree = mdl.getTestPlan();
     }
 
     @Override
     public HashTree getTestTree() {
-        return tree;
+        return mdl.getTestPlan();
     }
 
     public AbstractThreadGroup getTG(int i) {
         SearchClass<AbstractThreadGroup> searcher = new SearchClass<>(AbstractThreadGroup.class);
-        tree.traverse(searcher);
+        mdl.getTestPlan().traverse(searcher);
         Collection<AbstractThreadGroup> searchResults = searcher.getSearchResults();
         return searchResults.toArray(new AbstractThreadGroup[0])[i];
+    }
+
+    public JMeterTreeModel getTreeModel() {
+        return mdl;
     }
 }
