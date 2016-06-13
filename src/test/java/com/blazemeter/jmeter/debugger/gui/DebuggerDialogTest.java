@@ -1,6 +1,7 @@
 package com.blazemeter.jmeter.debugger.gui;
 
 import com.blazemeter.jmeter.debugger.TestProvider;
+import com.blazemeter.jmeter.debugger.elements.SamplerDebug;
 import kg.apc.emulators.TestJMeterUtils;
 import org.apache.jmeter.exceptions.IllegalUserActionException;
 import org.apache.jmeter.functions.TimeFunction;
@@ -9,6 +10,7 @@ import org.apache.jmeter.gui.MainFrame;
 import org.apache.jmeter.gui.action.ActionRouter;
 import org.apache.jmeter.gui.tree.JMeterTreeListener;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
+import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jmeter.visualizers.RenderAsHTML;
 import org.apache.jorphan.collections.HashTree;
@@ -47,6 +49,19 @@ public class DebuggerDialogTest {
 
     @Before
     public void setUpMethod() {
+    }
+
+    @Test
+    public void testGui() throws Exception {
+        TestProvider prov=new TestProvider();
+        DebuggerDialog obj = new DebuggerDialogMock(prov.getTreeModel());
+        obj.componentShown(null);
+        obj.started();
+        obj.statusRefresh(JMeterContextService.getContext());
+        obj.frozenAt(new SamplerDebug());
+        obj.continuing();
+        obj.stopped();
+        obj.componentHidden(null);
     }
 
     @Test
