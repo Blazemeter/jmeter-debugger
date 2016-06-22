@@ -36,6 +36,9 @@ The best place to report issues and discuss the debugger is jmeter-plugins [supp
 
 # Changelog
 
+__v0.3__
+ - handle Transaction Controller
+
 __v0.2__, 13 jun 2016
  - disable variables/properties/evaluate update on continue, to prevent deadlock
  - fix breakpoint functioning

@@ -47,7 +47,7 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
         setSize(new Dimension(800, 600));
         setPreferredSize(new Dimension(800, 600));
         setIconImage(DebuggerMenuItem.getBugIcon(false).getImage());
-        ComponentUtil.centerComponentInWindow(this, 30);
+        ComponentUtil.centerComponentInWindow(this);
         addComponentListener(this);
 
         add(getToolbar(), BorderLayout.NORTH);

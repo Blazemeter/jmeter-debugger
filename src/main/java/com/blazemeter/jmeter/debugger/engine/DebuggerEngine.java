@@ -51,6 +51,7 @@ public class DebuggerEngine extends StandardJMeterEngine {
         this.thread = thread;
     }
 
+
     @Override
     public synchronized void stopTest(boolean now) {
         super.stopTest(now);

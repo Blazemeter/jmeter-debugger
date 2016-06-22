@@ -69,11 +69,13 @@ public class TreeClonerTG implements HashTreeTraverser {
 
         if (altered instanceof Wrapper) {
             Wrapper wrp = (Wrapper) altered;
+            //noinspection unchecked
             wrp.setWrappedElement(cloned);
         }
 
         if (altered instanceof OriginalLink) {
             OriginalLink link = (OriginalLink) altered;
+            //noinspection unchecked
             link.setOriginal(orig);
         } else {
             log.debug("Not linking original: " + altered);
@@ -90,13 +92,15 @@ public class TreeClonerTG implements HashTreeTraverser {
     }
 
     private TestElement getAlteredElement(TestElement cloned) {
-        boolean isWrappable = !(cloned instanceof TransactionController) && !(cloned instanceof TestFragmentController);
+        boolean isWrappable = !(cloned instanceof TransactionController) && !(cloned instanceof TestFragmentController) && !(cloned instanceof ReplaceableController);
 
         TestElement userObject = cloned;
-        if (cloned instanceof AbstractThreadGroup) {
+        if (!isWrappable) {
+            log.debug("Forcing unwrapped: " + cloned);
+        } else if (cloned instanceof AbstractThreadGroup) {
             userObject = new DebuggingThreadGroup();
             userObject.setProperty(TestElement.GUI_CLASS, DebuggingThreadGroupGui.class.getCanonicalName());
-        } else if (cloned instanceof Controller && isWrappable) {
+        } else if (cloned instanceof Controller) {
             userObject = getController(cloned);
         } else if (cloned instanceof PreProcessor) {
             userObject = new PreProcessorDebug();

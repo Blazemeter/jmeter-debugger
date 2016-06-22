@@ -1,9 +1,9 @@
 package com.blazemeter.jmeter.debugger.engine;
 
 import com.blazemeter.jmeter.debugger.FrontendMock;
+import com.blazemeter.jmeter.debugger.StepTriggerCounter;
 import com.blazemeter.jmeter.debugger.TestProvider;
 import com.blazemeter.jmeter.debugger.elements.DebuggingThreadGroup;
-import com.blazemeter.jmeter.debugger.StepTriggerCounter;
 import kg.apc.emulators.TestJMeterUtils;
 import org.apache.jmeter.JMeter;
 import org.apache.jmeter.control.LoopController;
@@ -12,17 +12,20 @@ import org.apache.jmeter.threads.AbstractThreadGroup;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jorphan.collections.HashTree;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Collection;
 
 
 public class DebuggerEngineTest {
+    @BeforeClass
+    public static void setup() {
+        TestJMeterUtils.createJmeterEnv();
+    }
 
     @Test
     public void runRealEngine() throws Exception {
-        TestJMeterUtils.createJmeterEnv();
-
         TestTreeProvider prov = new TestProvider();
 
         HashTree hashTree = prov.getTestTree();
@@ -61,7 +64,7 @@ public class DebuggerEngineTest {
         while (engine.isActive()) {
             Thread.sleep(1000);
         }
-        Assert.assertEquals(92, hook.cnt);
+        Assert.assertEquals(89, hook.cnt);
     }
 
     private AbstractThreadGroup getFirstTG(HashTree tree) {

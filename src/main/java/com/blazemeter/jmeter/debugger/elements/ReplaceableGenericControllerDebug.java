@@ -4,7 +4,6 @@ import org.apache.jmeter.control.ReplaceableController;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jorphan.collections.HashTree;
 
-@Deprecated
 public class ReplaceableGenericControllerDebug extends GenericControllerDebug implements ReplaceableController {
 
     @Override
