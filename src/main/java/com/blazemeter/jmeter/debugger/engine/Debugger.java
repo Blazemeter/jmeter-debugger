@@ -28,6 +28,7 @@ public class Debugger implements StepTrigger {
     private Wrapper currentElement;
     private boolean isContinuing = false;
     protected DebuggerEngine engine;
+    private Sampler lastKnownSampler;
 
     public Debugger(TestTreeProvider treeProvider, DebuggerFrontend frontend) {
         this.treeProvider = treeProvider;
@@ -118,7 +119,8 @@ public class Debugger implements StepTrigger {
         }
 
         try {
-            if (isContinuing && isBreakpoint(wrapper)) {
+            boolean isBP = isBreakpoint(wrapper) || isSamplerBreakpoint();
+            if (isContinuing && isBP) {
                 pause();
             }
 
@@ -132,6 +134,16 @@ public class Debugger implements StepTrigger {
             log.debug("Interrupted", e);
             throw new JMeterStopThreadException(e);
         }
+    }
+
+    private boolean isSamplerBreakpoint() {
+        boolean res = false;
+        Sampler sampler = getCurrentSampler();
+        if (sampler != lastKnownSampler) {
+            res = isBreakpoint(sampler);
+            lastKnownSampler = sampler;
+        }
+        return res;
     }
 
     public void pause() {
