@@ -36,7 +36,7 @@ The best place to report issues and discuss the debugger is jmeter-plugins [supp
 
 # Changelog
 
-__v0.3__
+__v0.3__, 21 jun 2016
  - handle Transaction Controller
  - expand sampler path in tree to reveal it
  - logic to stop on first Sampler Scope element for Sampler Breakpoint
