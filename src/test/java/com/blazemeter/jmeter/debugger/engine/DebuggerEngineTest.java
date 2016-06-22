@@ -64,7 +64,7 @@ public class DebuggerEngineTest {
         while (engine.isActive()) {
             Thread.sleep(1000);
         }
-        Assert.assertEquals(89, hook.cnt);
+        Assert.assertEquals(88, hook.cnt);
     }
 
     private AbstractThreadGroup getFirstTG(HashTree tree) {
