@@ -1,6 +1,5 @@
 package com.blazemeter.jmeter.debugger.elements;
 
-import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import org.apache.jmeter.processor.PreProcessor;
 
 public class PreProcessorDebug extends AbstractDebugElement<PreProcessor> implements PreProcessor {
@@ -8,7 +7,7 @@ public class PreProcessorDebug extends AbstractDebugElement<PreProcessor> implem
     @Override
     public void process() {
         prepareBean();
-        getHook().notify(this);
+        getHook().stepOn(this);
         wrapped.process();
     }
 }

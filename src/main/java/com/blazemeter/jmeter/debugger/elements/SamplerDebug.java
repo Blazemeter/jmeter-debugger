@@ -11,7 +11,7 @@ public class SamplerDebug extends AbstractDebugElement<Sampler> implements Sampl
     @Override
     public SampleResult sample(Entry e) {
         prepareBean();
-        getHook().notify(this);
+        getHook().stepOn(this);
         return wrapped.sample(e);
     }
 

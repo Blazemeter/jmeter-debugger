@@ -121,6 +121,16 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
             }
             tree.setSelectionPath(treePath);
         }
+
+        Sampler sampler = debugger.getCurrentSampler();
+        if (sampler != null) {
+            TreePath samplerPath = getTreePathFor(sampler);
+            if (samplerPath != null) {
+                log.debug("Expanding: " + samplerPath);
+                tree.expandPath(samplerPath.getParentPath());
+            }
+        }
+        
         tree.repaint();
     }
 
@@ -216,7 +226,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
         if (wrpElm instanceof Wrapper) {
             wrpElm = (TestElement) ((Wrapper) wrpElm).getWrappedElement();
         }
-        
+
         displayElementGui(wrpElm);
     }
 

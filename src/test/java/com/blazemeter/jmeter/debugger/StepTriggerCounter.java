@@ -11,7 +11,7 @@ public class StepTriggerCounter implements StepTrigger {
     public int cnt;
 
     @Override
-    public void notify(Wrapper t) {
+    public void stepOn(Wrapper t) {
         log.warn("Stop before: " + t.getWrappedElement());
         cnt += 1;
     }

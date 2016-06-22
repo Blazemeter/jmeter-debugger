@@ -15,7 +15,7 @@ public class ControllerDebug extends AbstractDebugElement<Controller> implements
 
     @Override
     public Sampler next() {
-        getHook().notify(this);
+        getHook().stepOn(this);
         return wrapped.next();
     }
 

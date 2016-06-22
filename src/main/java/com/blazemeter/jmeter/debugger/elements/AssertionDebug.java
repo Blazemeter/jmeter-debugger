@@ -10,7 +10,7 @@ public class AssertionDebug extends AbstractDebugElement<Assertion> implements A
     @Override
     public AssertionResult getResult(SampleResult sampleResult) {
         prepareBean();
-        getHook().notify(this);
+        getHook().stepOn(this);
         return wrapped.getResult(sampleResult);
     }
 

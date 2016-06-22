@@ -99,7 +99,7 @@ public class Debugger implements StepTrigger {
     }
 
     @Override
-    public synchronized void notify(Wrapper wrapper) {
+    public synchronized void stepOn(Wrapper wrapper) {
         if (stopping) {
             throw new JMeterStopThreadException();
         }
@@ -148,7 +148,12 @@ public class Debugger implements StepTrigger {
     }
 
     public Sampler getCurrentSampler() {
-        return engine.getThreadContext().getCurrentSampler();
+        if (engine == null) {
+            return null;
+        }
+
+        JMeterContext threadContext = engine.getThreadContext();
+        return threadContext.getCurrentSampler();
     }
 
     public boolean isContinuing() {

@@ -1,9 +1,6 @@
 package com.blazemeter.jmeter.debugger.engine;
 
 import com.blazemeter.jmeter.debugger.elements.Wrapper;
-import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
-import com.blazemeter.jmeter.debugger.engine.DebuggingThread;
-import com.blazemeter.jmeter.debugger.engine.StepTrigger;
 import kg.apc.emulators.TestJMeterUtils;
 import org.apache.jmeter.save.SaveService;
 import org.apache.jmeter.threads.*;
@@ -23,7 +20,7 @@ public class DebuggingThreadTest {
     private static final Logger log = LoggingManager.getLoggerForClass();
     public static final StepTrigger hook = new StepTrigger() {
         @Override
-        public void notify(Wrapper o) {
+        public void stepOn(Wrapper o) {
             log.info(">>> Stopping before step: " + o.getWrappedElement() + " <<<");
             try {
                 Thread.sleep(1000);

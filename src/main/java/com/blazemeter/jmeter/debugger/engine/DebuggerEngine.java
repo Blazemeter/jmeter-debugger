@@ -16,7 +16,7 @@ public class DebuggerEngine extends StandardJMeterEngine {
     private DebuggingThread target;
     private StepTrigger stepper = new StepTrigger() {
         @Override
-        public void notify(Wrapper t) {
+        public void stepOn(Wrapper t) {
             throw new RuntimeException("Not initialized stepper");
         }
     };

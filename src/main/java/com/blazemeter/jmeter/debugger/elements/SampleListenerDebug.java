@@ -9,9 +9,9 @@ public class SampleListenerDebug extends AbstractDebugElement<SampleListener> im
     @Override
     public void sampleOccurred(SampleEvent e) {
         prepareBean();
-        getHook().notify(this);
+        getHook().stepOn(this);
         wrapped.sampleOccurred(e);
-        getHook().notify(this); // special case for reporters to see the result
+        getHook().stepOn(this); // special case for reporters to see the result
     }
 
     @Override

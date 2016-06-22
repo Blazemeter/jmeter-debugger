@@ -18,7 +18,7 @@ public class GenericControllerDebug extends GenericController implements FullCon
 
     @Override
     public Sampler next() {
-        helper.getHook().notify(this);
+        helper.getHook().stepOn(this);
         return wrapped.next();
     }
 

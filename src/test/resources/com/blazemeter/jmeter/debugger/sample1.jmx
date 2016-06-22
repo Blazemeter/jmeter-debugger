@@ -31,6 +31,24 @@
           <stringProp name="LoopController.loops">3</stringProp>
         </LoopController>
         <hashTree>
+          <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Transaction Controller" enabled="true">
+            <boolProp name="TransactionController.includeTimers">false</boolProp>
+            <boolProp name="TransactionController.parent">false</boolProp>
+          </TransactionController>
+          <hashTree>
+            <DebugSampler guiclass="TestBeanGUI" testclass="DebugSampler" testname="Sampler 2" enabled="true">
+              <boolProp name="displayJMeterProperties">true</boolProp>
+              <boolProp name="displayJMeterVariables">true</boolProp>
+              <boolProp name="displaySystemProperties">false</boolProp>
+            </DebugSampler>
+            <hashTree/>
+            <DebugSampler guiclass="TestBeanGUI" testclass="DebugSampler" testname="Sampler 2" enabled="true">
+              <boolProp name="displayJMeterProperties">true</boolProp>
+              <boolProp name="displayJMeterVariables">true</boolProp>
+              <boolProp name="displaySystemProperties">false</boolProp>
+            </DebugSampler>
+            <hashTree/>
+          </hashTree>
           <DebugSampler guiclass="TestBeanGUI" testclass="DebugSampler" testname="Debug Sampler 1" enabled="true">
             <boolProp name="displayJMeterProperties">false</boolProp>
             <boolProp name="displayJMeterVariables">true</boolProp>
@@ -55,24 +73,6 @@
             <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Constant Timer" enabled="true">
               <stringProp name="ConstantTimer.delay">300</stringProp>
             </ConstantTimer>
-            <hashTree/>
-          </hashTree>
-          <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Transaction Controller" enabled="true">
-            <boolProp name="TransactionController.includeTimers">false</boolProp>
-            <boolProp name="TransactionController.parent">false</boolProp>
-          </TransactionController>
-          <hashTree>
-            <DebugSampler guiclass="TestBeanGUI" testclass="DebugSampler" testname="Sampler 2" enabled="true">
-              <boolProp name="displayJMeterProperties">true</boolProp>
-              <boolProp name="displayJMeterVariables">true</boolProp>
-              <boolProp name="displaySystemProperties">false</boolProp>
-            </DebugSampler>
-            <hashTree/>
-            <DebugSampler guiclass="TestBeanGUI" testclass="DebugSampler" testname="Sampler 2" enabled="true">
-              <boolProp name="displayJMeterProperties">true</boolProp>
-              <boolProp name="displayJMeterVariables">true</boolProp>
-              <boolProp name="displaySystemProperties">false</boolProp>
-            </DebugSampler>
             <hashTree/>
           </hashTree>
           <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Constant Timer" enabled="true">

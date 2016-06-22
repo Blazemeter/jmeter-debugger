@@ -38,6 +38,7 @@ The best place to report issues and discuss the debugger is jmeter-plugins [supp
 
 __v0.3__
  - handle Transaction Controller
+ - expand sampler path in tree to reveal it
 
 __v0.2__, 13 jun 2016
  - disable variables/properties/evaluate update on continue, to prevent deadlock
@@ -54,7 +55,6 @@ __v0.1__, 7 jun 2016
 ![travis](https://img.shields.io/travis/Blazemeter/jmeter-debugger.svg)
 ![travis](https://img.shields.io/codecov/c/github/Blazemeter/jmeter-debugger.svg)
 
- - expand sampler path in tree to reveal it
  - logic to stop on Sampler bp
  - logic to stop on Listener bp only once after sample 
  - choose TG from context of tree and show debugger started? 
