@@ -77,44 +77,44 @@ public class DebuggerEngineTest {
     }
 
 
-//    @Test
-//    public void runVariablesDebugEngine() throws Exception {
-//        TestProvider prov = new TestProvider("/com/blazemeter/jmeter/debugger/vars.jmx", "vars.jmx");
-//
-//        Debugger sel = new Debugger(prov, new FrontendMock());
-//        AbstractThreadGroup tg = prov.getTG(0);
-//        sel.selectThreadGroup(tg);
-//        HashTree testTree = sel.getSelectedTree();
-//
-//        TestSampleListener listener = new TestSampleListener();
-//        testTree.add(testTree.getArray()[0], listener);
-//
-//        DebuggingThreadGroup tg2 = (DebuggingThreadGroup) getFirstTG(testTree);
-//        LoopController samplerController = (LoopController) tg2.getSamplerController();
-//        samplerController.setLoops(1);
-//        samplerController.setContinueForever(false);
-//
-//        JMeter.convertSubTree(testTree);
-//
-//        DebuggerEngine engine = new DebuggerEngine(JMeterContextService.getContext());
-//        StepTriggerCounter hook = new StepTriggerCounter();
-//        engine.setStepper(hook);
-//        engine.configure(testTree);
-//        engine.runTest();
-//        while (engine.isActive()) {
-//            Thread.sleep(1000);
-//        }
-//        assertEquals(8, hook.cnt);
-//
-//        assertEquals(3, listener.events.size());
-//        for (SampleEvent event : listener.events) {
-//            SampleResult res = event.getResult();
-//            String label = res.getSampleLabel();
-//            assertTrue("Label: " + label + " must end with '123'", label.endsWith("123"));
-//            assertFalse("Variable ${VAR} must be changed to '123' value. label: " + label, label.contains("${VAR}"));
-//            assertTrue("label: '" + label + "' response: '" + res.getResponseMessage() +"'", res.isSuccessful());
-//        }
-//    }
+    @Test
+    public void runVariablesDebugEngine() throws Exception {
+        TestProvider prov = new TestProvider("/com/blazemeter/jmeter/debugger/vars.jmx", "vars.jmx");
+
+        Debugger sel = new Debugger(prov, new FrontendMock());
+        AbstractThreadGroup tg = prov.getTG(0);
+        sel.selectThreadGroup(tg);
+        HashTree testTree = sel.getSelectedTree();
+
+        TestSampleListener listener = new TestSampleListener();
+        testTree.add(testTree.getArray()[0], listener);
+
+        DebuggingThreadGroup tg2 = (DebuggingThreadGroup) getFirstTG(testTree);
+        LoopController samplerController = (LoopController) tg2.getSamplerController();
+        samplerController.setLoops(1);
+        samplerController.setContinueForever(false);
+
+        JMeter.convertSubTree(testTree);
+
+        DebuggerEngine engine = new DebuggerEngine(JMeterContextService.getContext());
+        StepTriggerCounter hook = new StepTriggerCounter();
+        engine.setStepper(hook);
+        engine.configure(testTree);
+        engine.runTest();
+        while (engine.isActive()) {
+            Thread.sleep(1000);
+        }
+        assertEquals(8, hook.cnt);
+
+        assertEquals(3, listener.events.size());
+        for (SampleEvent event : listener.events) {
+            SampleResult res = event.getResult();
+            String label = res.getSampleLabel();
+            assertTrue("Label: " + label + " must end with '123'", label.endsWith("123"));
+            assertFalse("Variable ${VAR} must be changed to '123' value. label: " + label, label.contains("${VAR}"));
+            assertTrue("label: '" + label + "' response: '" + res.getResponseMessage() +"'", res.isSuccessful());
+        }
+    }
 
     public class TestSampleListener extends ResultCollector implements SampleListener {
         public List<SampleEvent> events = new ArrayList<>();
