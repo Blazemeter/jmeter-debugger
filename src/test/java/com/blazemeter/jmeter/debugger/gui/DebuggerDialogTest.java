@@ -72,7 +72,7 @@ public class DebuggerDialogTest {
     @Test
     public void displayGUI() throws InterruptedException, IOException, IllegalUserActionException {
         if (!GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance()) {
-            TestProvider prov = new TestProvider();
+            TestProvider prov = new TestProvider("/com/blazemeter/jmeter/debugger/vars.jmx", "vars.jmx");
             JMeterTreeModel mdl = prov.getTreeModel();
             JMeterTreeListener a = new JMeterTreeListener();
             a.setActionHandler(new ActionListener() {

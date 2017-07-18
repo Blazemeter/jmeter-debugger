@@ -9,7 +9,9 @@ import org.apache.jmeter.processor.PreProcessor;
 import org.apache.jmeter.samplers.SampleListener;
 import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.testelement.property.JMeterProperty;
 import org.apache.jmeter.testelement.property.NullProperty;
+import org.apache.jmeter.testelement.property.PropertyIterator;
 import org.apache.jmeter.threads.AbstractThreadGroup;
 import org.apache.jmeter.timers.Timer;
 import org.apache.jorphan.collections.HashTree;
@@ -71,6 +73,13 @@ public class TreeClonerTG implements HashTreeTraverser {
             Wrapper wrp = (Wrapper) altered;
             //noinspection unchecked
             wrp.setWrappedElement(cloned);
+            PropertyIterator iter = cloned.propertyIterator();
+            while (iter.hasNext()) {
+                JMeterProperty prop = iter.next();
+                if (!prop.getName().startsWith("TestElement")) {
+                    wrp.setProperty(prop.clone());
+                }
+            }
         }
 
         if (altered instanceof OriginalLink) {
