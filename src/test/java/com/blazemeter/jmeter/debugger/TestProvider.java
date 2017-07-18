@@ -26,6 +26,14 @@ public class TestProvider implements TestTreeProvider {
         mdl.addSubTree(SaveService.loadTree(f), (JMeterTreeNode) mdl.getRoot());
     }
 
+    public TestProvider(String path, String name) throws IllegalUserActionException, IOException {
+        File file = new File(this.getClass().getResource(path).getFile());
+        String basedir = TestJMeterUtils.fixWinPath(file.getParentFile().getAbsolutePath());
+
+        File f = new File(basedir + '/' + name);
+        mdl.addSubTree(SaveService.loadTree(f), (JMeterTreeNode) mdl.getRoot());
+    }
+
     @Override
     public HashTree getTestTree() {
         return mdl.getTestPlan();
