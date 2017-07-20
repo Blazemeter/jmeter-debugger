@@ -238,7 +238,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
             egui.modifyTestElement(wrpElm);
             elementContainer.removeAll();
             if (egui instanceof Component) {
-                egui.setEnabled(false);
+//                egui.setEnabled(false);
                 elementContainer.add((Component) egui, BorderLayout.CENTER);
             }
             elementContainer.updateUI();
