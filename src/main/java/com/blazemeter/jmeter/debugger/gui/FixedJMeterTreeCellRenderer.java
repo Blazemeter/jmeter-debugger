@@ -1,12 +1,9 @@
 package com.blazemeter.jmeter.debugger.gui;
 
-import com.blazemeter.jmeter.debugger.elements.Wrapper;
+import com.blazemeter.jmeter.debugger.elements.OriginalLink;
 import org.apache.jmeter.gui.tree.JMeterCellRenderer;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.testelement.TestElement;
-import org.apache.jmeter.testelement.property.JMeterProperty;
-import org.apache.jmeter.testelement.property.NullProperty;
-import org.apache.jmeter.testelement.property.StringProperty;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,8 +23,8 @@ public class FixedJMeterTreeCellRenderer extends JMeterCellRenderer {
         TestElement mc = node.getTestElement();
 
         JMeterTreeNode fakeNode = (JMeterTreeNode) node.clone();
-        if (mc instanceof Wrapper) {
-            fakeNode.setUserObject(((Wrapper) mc).getWrappedElement());
+        if (mc instanceof OriginalLink) {
+            fakeNode.setUserObject(((OriginalLink) mc).getOriginal());
         } else {
             fakeNode.setUserObject(mc);
         }
