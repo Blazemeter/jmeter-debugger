@@ -1,6 +1,7 @@
 package com.blazemeter.jmeter.debugger.gui;
 
 import com.blazemeter.jmeter.debugger.elements.DebuggingThreadGroup;
+import com.blazemeter.jmeter.debugger.elements.OriginalLink;
 import com.blazemeter.jmeter.debugger.elements.ThreadGroupWrapper;
 import com.blazemeter.jmeter.debugger.elements.Wrapper;
 import com.blazemeter.jmeter.debugger.engine.Debugger;
@@ -30,7 +31,11 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -223,8 +228,8 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
     public void valueChanged(TreeSelectionEvent treeSelectionEvent) {
         JMeterTreeNode node = (JMeterTreeNode) treeSelectionEvent.getPath().getLastPathComponent();
         TestElement wrpElm = node.getTestElement();
-        if (wrpElm instanceof Wrapper) {
-            wrpElm = (TestElement) ((Wrapper) wrpElm).getWrappedElement();
+        if (wrpElm instanceof OriginalLink) {
+            wrpElm = (TestElement) ((OriginalLink) wrpElm).getOriginal();
         }
 
         displayElementGui(wrpElm);
