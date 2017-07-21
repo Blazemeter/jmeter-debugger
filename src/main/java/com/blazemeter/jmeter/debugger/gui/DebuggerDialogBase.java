@@ -2,6 +2,7 @@ package com.blazemeter.jmeter.debugger.gui;
 
 import com.blazemeter.jmeter.debugger.engine.Debugger;
 import org.apache.jmeter.config.ConfigElement;
+import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.gui.LoggerPanel;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
@@ -99,7 +100,8 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
         loggerPanel = new LoggerPanelWrapping();
         loggerPanel.setMinimumSize(new Dimension(0, 50));
         loggerPanel.setPreferredSize(new Dimension(0, 150));
-        LoggingManager.addLogTargetToRootLogger(new LogTarget[]{loggerPanel,});
+//        LoggingManager.addLogTargetToRootLogger(new LogTarget[]{loggerPanel,});
+        GuiPackage.getInstance().getLogEventBus().registerEventListener(loggerPanel);
         return loggerPanel;
     }
 
