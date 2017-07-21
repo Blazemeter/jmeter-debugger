@@ -15,36 +15,25 @@ import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jmeter.visualizers.RenderAsHTML;
 import org.apache.jorphan.collections.HashTree;
-import org.apache.jorphan.logging.LoggingManager;
-import org.apache.log.LogTarget;
-import org.apache.log.Logger;
-import org.apache.log.format.PatternFormatter;
-import org.apache.log.output.io.WriterTarget;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Properties;
-
 
 public class DebuggerDialogTest {
-    private static final Logger log = LoggingManager.getLoggerForClass();
+    private static final Logger log = LoggerFactory.getLogger(DebuggerDialogTest.class);
 
     @BeforeClass
     public static void setUp() {
-        PrintWriter writer = new PrintWriter(System.out, true);
-        LoggingManager.addLogTargetToRootLogger(new LogTarget[]{new WriterTarget(writer, new PatternFormatter(LoggingManager.DEFAULT_PATTERN))});
-        Properties props = new Properties();
-        props.setProperty(LoggingManager.LOG_FILE, "");
-        LoggingManager.initializeLogging(props);
         TestJMeterUtils.createJmeterEnv();
     }
 
@@ -57,9 +46,20 @@ public class DebuggerDialogTest {
         if (GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance()) {
             return;
         }
-
+        JMeterTreeListener a = new JMeterTreeListener();
+        a.setActionHandler(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                log.debug("Action " + actionEvent);
+            }
+        });
         TestProvider prov = new TestProvider();
+        JMeterTreeModel mdl = prov.getTreeModel();
+        a.setModel(mdl);
+
+        GuiPackage.initInstance(a, mdl);
         DebuggerDialog obj = new DebuggerDialogMock(prov.getTreeModel());
+
         obj.componentShown(null);
         obj.started();
         obj.statusRefresh(JMeterContextService.getContext());
@@ -83,7 +83,7 @@ public class DebuggerDialogTest {
             });
             a.setModel(mdl);
 
-            GuiPackage.getInstance(a, mdl);
+            GuiPackage.initInstance(a, mdl);
             String actions = ActionRouter.class.getProtectionDomain().getCodeSource().getLocation().getFile();
             String renderers = RenderAsHTML.class.getProtectionDomain().getCodeSource().getLocation().getFile();
             JMeterUtils.setProperty("search_paths", actions + ";" + renderers);
