@@ -1,13 +1,14 @@
 package com.blazemeter.jmeter.debugger.gui;
 
 
-import org.apache.jorphan.logging.LoggingManager;
-import org.apache.log.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 
 public class ComponentFinder<T extends Component> {
-    private static final Logger log = LoggingManager.getLoggerForClass();
+    private static final Logger log = LoggerFactory.getLogger(ComponentFinder.class);
+
     private final Class<T> search;
 
     public ComponentFinder(Class<T> cls) {
