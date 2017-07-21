@@ -13,21 +13,28 @@ import org.apache.jmeter.testelement.WorkBench;
 import org.apache.jmeter.threads.AbstractThreadGroup;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jorphan.gui.ComponentUtil;
-import org.apache.jorphan.logging.LoggingManager;
-import org.apache.log.LogTarget;
-import org.apache.log.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 abstract public class DebuggerDialogBase extends JDialog implements ComponentListener, NodeHighlighter, TreeSelectionListener {
-    private static final Logger log = LoggingManager.getLoggerForClass();
+    private static final Logger log = LoggerFactory.getLogger(DebuggerDialogBase.class);
+
 
     protected JComboBox<AbstractThreadGroup> tgCombo = new JComboBox<>();
     protected JTree tree;

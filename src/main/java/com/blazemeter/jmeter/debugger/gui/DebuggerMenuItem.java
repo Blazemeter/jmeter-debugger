@@ -3,8 +3,8 @@ package com.blazemeter.jmeter.debugger.gui;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.gui.MainFrame;
 import org.apache.jmeter.gui.util.JMeterToolBar;
-import org.apache.jorphan.logging.LoggingManager;
-import org.apache.log.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,7 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class DebuggerMenuItem extends JMenuItem implements ActionListener {
-    private static final Logger log = LoggingManager.getLoggerForClass();
+    private static final Logger log = LoggerFactory.getLogger(DebuggerMenuItem.class);
+
     private static DebuggerDialog dialog;
 
     public DebuggerMenuItem() {

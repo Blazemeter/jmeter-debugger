@@ -1,11 +1,12 @@
 package com.blazemeter.jmeter.debugger.elements;
 
 import org.apache.jmeter.timers.Timer;
-import org.apache.jorphan.logging.LoggingManager;
-import org.apache.log.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TimerDebug extends AbstractDebugElement<Timer> implements Timer {
-    private static final Logger log = LoggingManager.getLoggerForClass();
+    private static final Logger log = LoggerFactory.getLogger(TimerDebug.class);
+
 
 
     private boolean isDelaying = false;

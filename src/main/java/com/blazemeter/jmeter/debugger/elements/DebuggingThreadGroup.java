@@ -10,11 +10,12 @@ import org.apache.jmeter.threads.ListenerNotifier;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.collections.ListedHashTree;
-import org.apache.jorphan.logging.LoggingManager;
-import org.apache.log.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DebuggingThreadGroup extends ThreadGroup implements OriginalLink<ThreadGroup> {
-    private static final Logger log = LoggingManager.getLoggerForClass();
+    private static final Logger log = LoggerFactory.getLogger(DebuggingThreadGroup.class);
+
     private Thread osThread;
     private DebuggingThread jmeterThread;
     private final long waitTime = JMeterUtils.getPropDefault("jmeterengine.threadstop.wait", 5 * 1000);

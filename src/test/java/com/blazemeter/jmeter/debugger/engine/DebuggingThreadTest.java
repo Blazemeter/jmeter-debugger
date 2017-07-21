@@ -3,21 +3,27 @@ package com.blazemeter.jmeter.debugger.engine;
 import com.blazemeter.jmeter.debugger.elements.Wrapper;
 import kg.apc.emulators.TestJMeterUtils;
 import org.apache.jmeter.save.SaveService;
-import org.apache.jmeter.threads.*;
+import org.apache.jmeter.threads.AbstractThreadGroup;
+import org.apache.jmeter.threads.JMeterContext;
+import org.apache.jmeter.threads.JMeterContextService;
+import org.apache.jmeter.threads.JMeterThread;
+import org.apache.jmeter.threads.JMeterThreadMonitor;
+import org.apache.jmeter.threads.ListenerNotifier;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.collections.ListedHashTree;
 import org.apache.jorphan.collections.SearchByClass;
-import org.apache.jorphan.logging.LoggingManager;
-import org.apache.log.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
 public class DebuggingThreadTest {
-    private static final Logger log = LoggingManager.getLoggerForClass();
+    private static final Logger log = LoggerFactory.getLogger(DebuggingThreadTest.class);
+
     public static final StepTrigger hook = new StepTrigger() {
         @Override
         public void stepOn(Wrapper o) {
