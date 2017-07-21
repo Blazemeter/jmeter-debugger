@@ -36,6 +36,14 @@ The best place to report issues and discuss the debugger is jmeter-plugins [supp
 
 # Changelog
 
+__v0.4__ (upcoming)
+ - migrate logging to SLF4J
+ - fix variables in TestElement.name
+ - fix variable in propMap
+ - fix disable original components
+ - fix changing tree model in debbugger after test started
+ - fix changing original tree model after closing debbugger
+
 __v0.3__, 21 jun 2016
  - handle Transaction Controller
  - expand sampler path in tree to reveal it
