@@ -68,8 +68,6 @@ __v0.1__, 7 jun 2016
  - choose TG from context of tree and show debugger started? 
  - revive Stop button?
  - Maximize on Windows / Non modal window (what to do with all the collision cases?) 
- - revive variable/property change highlight
- - fix disabled items appearing in tree
  
  - italic font in tree not shown on Mac
  - blue color for current element is blue-on-blue for Mac

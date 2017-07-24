@@ -17,7 +17,7 @@ public class HighlightTable extends JTable {
     public HighlightTable(TableModel model) {
         super(model);
         setDefaultEditor(Object.class, null);
-        // setSorter(model); FIXME  produces exceptions on "continue" => TODO: sync with model updates
+        setSorter(model);
     }
 
     private void setSorter(TableModel model) {
@@ -30,8 +30,8 @@ public class HighlightTable extends JTable {
         setRowSorter(sorter);
     }
 
-    //@Override TODO: restore it
-    public Component prepareRenderer1(TableCellRenderer renderer, int row, int column) {
+    @Override
+    public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
         Component comp = super.prepareRenderer(renderer, row, column);
         if (getModel() instanceof HighlightTableModel) {
             HighlightTableModel model = (HighlightTableModel) getModel();
