@@ -11,9 +11,10 @@ import org.apache.jmeter.testbeans.TestBeanHelper;
 import org.apache.jmeter.testelement.AbstractTestElement;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.TestIterationListener;
+import org.apache.jmeter.testelement.ThreadListener;
 import org.apache.jmeter.threads.JMeterContextService;
 
-public abstract class AbstractDebugElement<T> extends AbstractTestElement implements Wrapper<T>, OriginalLink<T>, LoopIterationListener, TestIterationListener {
+public abstract class AbstractDebugElement<T> extends AbstractTestElement implements Wrapper<T>, OriginalLink<T>, LoopIterationListener, TestIterationListener, ThreadListener {
     protected T wrapped;
     private T original;
 
@@ -69,6 +70,20 @@ public abstract class AbstractDebugElement<T> extends AbstractTestElement implem
     public void testIterationStart(LoopIterationEvent event) {
         if (wrapped instanceof TestIterationListener) {
             ((TestIterationListener) wrapped).testIterationStart(event);
+        }
+    }
+
+    @Override
+    public void threadStarted() {
+        if (wrapped instanceof ThreadListener) {
+            ((ThreadListener) wrapped).threadStarted();
+        }
+    }
+
+    @Override
+    public void threadFinished() {
+        if (wrapped instanceof ThreadListener) {
+            ((ThreadListener) wrapped).threadFinished();
         }
     }
 }
