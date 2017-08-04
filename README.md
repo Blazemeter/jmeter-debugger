@@ -36,7 +36,7 @@ The best place to report issues and discuss the debugger is jmeter-plugins [supp
 
 # Changelog
 
-__v0.4__ (upcoming)
+__v0.4__ 24 jul 2017
  - migrate logging to SLF4J
  - fix variables in TestElement.name
  - fix variable in propMap
