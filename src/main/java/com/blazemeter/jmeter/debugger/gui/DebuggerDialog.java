@@ -1,6 +1,7 @@
 package com.blazemeter.jmeter.debugger.gui;
 
 import com.blazemeter.jmeter.debugger.elements.DebuggingThreadGroup;
+import com.blazemeter.jmeter.debugger.elements.OriginalLink;
 import com.blazemeter.jmeter.debugger.elements.ThreadGroupWrapper;
 import com.blazemeter.jmeter.debugger.elements.Wrapper;
 import com.blazemeter.jmeter.debugger.engine.Debugger;
@@ -228,6 +229,12 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
     public void valueChanged(TreeSelectionEvent treeSelectionEvent) {
         JMeterTreeNode node = (JMeterTreeNode) treeSelectionEvent.getPath().getLastPathComponent();
         TestElement wrpElm = node.getTestElement();
+        if (wrpElm instanceof OriginalLink) {
+            TestElement te = (TestElement) ((OriginalLink) wrpElm).getOriginal();
+            if (!(te instanceof AbstractThreadGroup)) {
+                wrpElm = te;
+            }
+        }
 
         displayElementGui(wrpElm);
     }
