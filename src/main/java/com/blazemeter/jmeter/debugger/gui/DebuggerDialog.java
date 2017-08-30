@@ -1,7 +1,6 @@
 package com.blazemeter.jmeter.debugger.gui;
 
 import com.blazemeter.jmeter.debugger.elements.DebuggingThreadGroup;
-import com.blazemeter.jmeter.debugger.elements.OriginalLink;
 import com.blazemeter.jmeter.debugger.elements.ThreadGroupWrapper;
 import com.blazemeter.jmeter.debugger.elements.Wrapper;
 import com.blazemeter.jmeter.debugger.engine.Debugger;
@@ -229,9 +228,6 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
     public void valueChanged(TreeSelectionEvent treeSelectionEvent) {
         JMeterTreeNode node = (JMeterTreeNode) treeSelectionEvent.getPath().getLastPathComponent();
         TestElement wrpElm = node.getTestElement();
-        if (wrpElm instanceof OriginalLink) {
-            wrpElm = (TestElement) ((OriginalLink) wrpElm).getOriginal();
-        }
 
         displayElementGui(wrpElm);
     }
@@ -242,6 +238,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
             JMeterGUIComponent egui = gui.getGui(wrpElm);
             egui.configure(wrpElm);
             egui.modifyTestElement(wrpElm);
+
             elementContainer.removeAll();
             if (egui instanceof Component) {
 //                egui.setEnabled(false);
