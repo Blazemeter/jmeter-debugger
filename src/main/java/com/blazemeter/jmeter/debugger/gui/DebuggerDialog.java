@@ -230,7 +230,10 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
         JMeterTreeNode node = (JMeterTreeNode) treeSelectionEvent.getPath().getLastPathComponent();
         TestElement wrpElm = node.getTestElement();
         if (wrpElm instanceof OriginalLink) {
-            wrpElm = (TestElement) ((OriginalLink) wrpElm).getOriginal();
+            TestElement te = (TestElement) ((OriginalLink) wrpElm).getOriginal();
+            if (!(te instanceof AbstractThreadGroup)) {
+                wrpElm = te;
+            }
         }
 
         displayElementGui(wrpElm);
@@ -242,6 +245,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
             JMeterGUIComponent egui = gui.getGui(wrpElm);
             egui.configure(wrpElm);
             egui.modifyTestElement(wrpElm);
+
             elementContainer.removeAll();
             if (egui instanceof Component) {
 //                egui.setEnabled(false);
