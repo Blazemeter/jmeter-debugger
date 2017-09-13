@@ -67,9 +67,24 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
         for (AbstractThreadGroup group : debugger.getThreadGroups()) {
             tgCombo.addItem(group);
         }
+
+        AbstractThreadGroup selectedThreadGroup = debugger.getSelectedThreadGroup();
+        if (selectedThreadGroup != null) {
+            changeComboValue(selectedThreadGroup);
+        }
+
         tgCombo.setEnabled(tgCombo.getItemCount() > 0);
         start.setEnabled(tgCombo.getItemCount() > 0);
         start.requestFocus();
+    }
+
+    private void changeComboValue(AbstractThreadGroup selectedThreadGroup) {
+        ComboBoxModel<AbstractThreadGroup> model = this.tgCombo.getModel();
+        for (int i = 0; i < model.getSize(); i++) {
+            if (model.getElementAt(i).equals(selectedThreadGroup)) {
+                tgCombo.setSelectedIndex(i);
+            }
+        }
     }
 
     @Override

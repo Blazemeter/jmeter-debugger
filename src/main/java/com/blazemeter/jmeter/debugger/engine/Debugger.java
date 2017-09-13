@@ -7,6 +7,8 @@ import com.blazemeter.jmeter.debugger.elements.Wrapper;
 import org.apache.jmeter.JMeter;
 import org.apache.jmeter.engine.JMeterEngineException;
 import org.apache.jmeter.engine.StandardJMeterEngine;
+import org.apache.jmeter.gui.GuiPackage;
+import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.TestStateListener;
@@ -33,13 +35,26 @@ public class Debugger implements StepTrigger {
     public Debugger(TestTreeProvider treeProvider, DebuggerFrontend frontend) {
         this.treeProvider = treeProvider;
         this.frontend = frontend;
+    }
 
+    public AbstractThreadGroup getSelectedThreadGroup() {
         AbstractThreadGroup[] grps = getThreadGroups();
         if (grps.length > 0) {
-            selectThreadGroup(grps[0]);
+            return getSelectedThreadGroup(grps);
         } else {
             log.debug("Empty test plan");
+            return null;
         }
+    }
+
+    private AbstractThreadGroup getSelectedThreadGroup(AbstractThreadGroup[] grps) {
+        JMeterTreeNode currentElement = GuiPackage.getInstance().getCurrentNode();
+        if (currentElement != null) {
+            SearchParentClass<AbstractThreadGroup> searcher = new SearchParentClass(currentElement, AbstractThreadGroup.class);
+            treeProvider.getTestTree().traverse(searcher);
+            return searcher.hasResults() ? searcher.getSearchResults().get(0) : grps[0];
+        }
+        return grps[0];
     }
 
     public AbstractThreadGroup[] getThreadGroups() {
