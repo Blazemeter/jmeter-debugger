@@ -90,6 +90,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
     @Override
     public void componentHidden(ComponentEvent e) {
         log.debug("Closing dialog");
+        lastSamplerResult.clearData();
         debugger.stop();
         if (GuiPackage.getInstance() != null) {
             GuiPackage.getInstance().setDirty(savedDirty);
