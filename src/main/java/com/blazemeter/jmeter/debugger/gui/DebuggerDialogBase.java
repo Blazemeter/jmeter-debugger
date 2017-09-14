@@ -252,7 +252,7 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
         };
         lastSamplerResult.setName("Last Sampler Result");
         try {
-            Field mainSplitField = lastSamplerResult.getClass().getDeclaredField("mainSplit");
+            Field mainSplitField = lastSamplerResult.getClass().getSuperclass().getDeclaredField("mainSplit");
             mainSplitField.setAccessible(true);
             return (Component) mainSplitField.get(lastSamplerResult);
         } catch (Throwable ex) {
