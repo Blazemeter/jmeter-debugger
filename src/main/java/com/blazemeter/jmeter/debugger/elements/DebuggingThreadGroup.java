@@ -4,6 +4,7 @@ import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
 import com.blazemeter.jmeter.debugger.engine.DebuggingThread;
 import org.apache.jmeter.control.LoopController;
 import org.apache.jmeter.engine.StandardJMeterEngine;
+import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.ListenerNotifier;
@@ -21,6 +22,7 @@ public class DebuggingThreadGroup extends ThreadGroup implements OriginalLink<Th
     private final long waitTime = JMeterUtils.getPropDefault("jmeterengine.threadstop.wait", 5 * 1000);
     private boolean stopping = false;
     private ThreadGroup original;
+    private TestElement lastSamplerResult;
 
 
     public DebuggingThreadGroup() {
@@ -36,6 +38,7 @@ public class DebuggingThreadGroup extends ThreadGroup implements OriginalLink<Th
 
     @Override
     public void start(int groupCount, ListenerNotifier notifier, ListedHashTree threadGroupTree, StandardJMeterEngine engine) {
+        injectLastSamplerResultListener(threadGroupTree);
         JMeterContext context = JMeterContextService.getContext();
         DebuggingThread jmThread = makeThread(groupCount, notifier, threadGroupTree, engine, 0, context);
         Thread newThread = new Thread(jmThread, jmThread.getThreadName());
@@ -48,6 +51,16 @@ public class DebuggingThreadGroup extends ThreadGroup implements OriginalLink<Th
             this.osThread = newThread;
         }
         newThread.start();
+    }
+
+    private void injectLastSamplerResultListener(ListedHashTree threadGroupTree) {
+        if (lastSamplerResult != null) {
+            threadGroupTree.add(this, lastSamplerResult);
+        }
+    }
+
+    public void setLastSamplerResult(TestElement lastSamplerResult) {
+        this.lastSamplerResult = lastSamplerResult;
     }
 
     private DebuggingThread makeThread(int groupCount, ListenerNotifier notifier, ListedHashTree threadGroupTree, StandardJMeterEngine engine, int i, JMeterContext context) {

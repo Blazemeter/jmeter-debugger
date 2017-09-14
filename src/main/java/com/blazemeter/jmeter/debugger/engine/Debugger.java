@@ -9,6 +9,7 @@ import org.apache.jmeter.engine.JMeterEngineException;
 import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
+import org.apache.jmeter.reporters.ResultCollector;
 import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.TestStateListener;
@@ -31,10 +32,12 @@ public class Debugger implements StepTrigger {
     private boolean isContinuing = false;
     protected DebuggerEngine engine;
     private Sampler lastKnownSampler;
+    private final TestElement lastSamplerResult;
 
-    public Debugger(TestTreeProvider treeProvider, DebuggerFrontend frontend) {
+    public Debugger(TestTreeProvider treeProvider, DebuggerFrontend frontend, TestElement lastSamplerResult) {
         this.treeProvider = treeProvider;
         this.frontend = frontend;
+        this.lastSamplerResult = lastSamplerResult;
     }
 
     public AbstractThreadGroup getSelectedThreadGroup() {
@@ -65,7 +68,7 @@ public class Debugger implements StepTrigger {
 
     public void selectThreadGroup(AbstractThreadGroup tg) {
         log.debug("Selecting thread group " + tg.getName() + ": " + tg);
-        cloner = new TreeClonerTG(tg);
+        cloner = new TreeClonerTG(tg, lastSamplerResult);
         treeProvider.getTestTree().traverse(cloner);
     }
 

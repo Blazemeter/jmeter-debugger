@@ -7,6 +7,8 @@ import org.apache.jmeter.gui.LoggerPanel;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.gui.util.PowerTableModel;
+import org.apache.jmeter.reporters.ResultCollector;
+import org.apache.jmeter.samplers.SampleEvent;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.TestPlan;
 import org.apache.jmeter.testelement.WorkBench;
@@ -234,7 +236,21 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
     }
 
     public Component getLastSamplerResultTab() {
-        lastSamplerResult = new ViewResultsFullVisualizer();
+        lastSamplerResult = new ViewResultsFullVisualizer() {
+            @Override
+            public TestElement createTestElement() {
+                this.collector = new ResultCollector() {
+                    @Override
+                    public void sampleOccurred(SampleEvent event) {
+                        lastSamplerResult.clearData();
+                        getVisualizer().add(event.getResult());
+                    }
+                };
+                this.modifyTestElement(this.collector);
+                return collector;
+            }
+        };
+        lastSamplerResult.setName("Last Sampler Result");
         try {
             Field mainSplitField = lastSamplerResult.getClass().getDeclaredField("mainSplit");
             mainSplitField.setAccessible(true);

@@ -9,6 +9,7 @@ import org.apache.jmeter.processor.PreProcessor;
 import org.apache.jmeter.samplers.SampleListener;
 import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.testelement.TestPlan;
 import org.apache.jmeter.testelement.property.JMeterProperty;
 import org.apache.jmeter.testelement.property.NullProperty;
 import org.apache.jmeter.testelement.property.PropertyIterator;
@@ -25,13 +26,15 @@ import java.util.LinkedList;
 public class TreeClonerTG implements HashTreeTraverser {
     private static final Logger log = LoggerFactory.getLogger(TreeClonerTG.class);
     private AbstractThreadGroup onlyTG;
+    private final TestElement lastSamplerResult;
 
     private final ListedHashTree newTree = new ListedHashTree();
     private final LinkedList<Object> stack = new LinkedList<>();
     private boolean ignoring = false;
 
-    public TreeClonerTG(AbstractThreadGroup tg) {
+    public TreeClonerTG(AbstractThreadGroup tg, TestElement lastSamplerResult) {
         this.onlyTG = tg;
+        this.lastSamplerResult = lastSamplerResult;
     }
 
     @Override
@@ -109,6 +112,7 @@ public class TreeClonerTG implements HashTreeTraverser {
         } else if (cloned instanceof AbstractThreadGroup) {
             userObject = new DebuggingThreadGroup();
             userObject.setProperty(TestElement.GUI_CLASS, DebuggingThreadGroupGui.class.getCanonicalName());
+            ((DebuggingThreadGroup) userObject).setLastSamplerResult(lastSamplerResult);
         } else if (cloned instanceof Controller) {
             userObject = getController(cloned);
         } else if (cloned instanceof PreProcessor) {

@@ -62,7 +62,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
         if (GuiPackage.getInstance() != null) {
             savedDirty = GuiPackage.getInstance().isDirty();
         }
-        this.debugger = new Debugger(this, this);
+        this.debugger = new Debugger(this, this, lastSamplerResult.createTestElement());
         tgCombo.removeAllItems();
         for (AbstractThreadGroup group : debugger.getThreadGroups()) {
             tgCombo.addItem(group);

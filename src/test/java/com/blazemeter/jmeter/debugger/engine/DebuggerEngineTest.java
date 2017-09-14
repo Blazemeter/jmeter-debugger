@@ -53,7 +53,7 @@ public class DebuggerEngineTest {
     public void runDebugEngine() throws Exception {
         TestProvider prov = new TestProvider();
 
-        Debugger sel = new Debugger(prov, new FrontendMock());
+        Debugger sel = new Debugger(prov, new FrontendMock(), null);
         AbstractThreadGroup tg = prov.getTG(0);
         sel.selectThreadGroup(tg);
         HashTree testTree = sel.getSelectedTree();
@@ -81,7 +81,7 @@ public class DebuggerEngineTest {
     public void runVariablesDebugEngine() throws Exception {
         TestProvider prov = new TestProvider("/com/blazemeter/jmeter/debugger/vars.jmx", "vars.jmx");
 
-        Debugger sel = new Debugger(prov, new FrontendMock());
+        Debugger sel = new Debugger(prov, new FrontendMock(), null);
         AbstractThreadGroup tg = prov.getTG(0);
         sel.selectThreadGroup(tg);
         HashTree testTree = sel.getSelectedTree();
