@@ -12,7 +12,7 @@ public class DebuggerTest {
     public void testMain() throws Exception {
         TestJMeterUtils.createJmeterEnv();
         TestProvider treeProvider = new TestProvider();
-        Debugger dbg = new Debugger(treeProvider, new FrontendMock(), null);
+        Debugger dbg = new Debugger(treeProvider, new FrontendMock());
         dbg.selectThreadGroup(treeProvider.getTG(0));
 
         Debugger.toggleBreakpoint(treeProvider.getTG(0));

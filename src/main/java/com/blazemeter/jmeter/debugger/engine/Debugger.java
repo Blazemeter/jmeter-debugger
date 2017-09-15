@@ -32,12 +32,10 @@ public class Debugger implements StepTrigger {
     private boolean isContinuing = false;
     protected DebuggerEngine engine;
     private Sampler lastKnownSampler;
-    private final TestElement lastSamplerResult;
 
-    public Debugger(TestTreeProvider treeProvider, DebuggerFrontend frontend, TestElement lastSamplerResult) {
+    public Debugger(TestTreeProvider treeProvider, DebuggerFrontend frontend) {
         this.treeProvider = treeProvider;
         this.frontend = frontend;
-        this.lastSamplerResult = lastSamplerResult;
     }
 
     public AbstractThreadGroup getSelectedThreadGroup() {
@@ -68,7 +66,7 @@ public class Debugger implements StepTrigger {
 
     public void selectThreadGroup(AbstractThreadGroup tg) {
         log.debug("Selecting thread group " + tg.getName() + ": " + tg);
-        cloner = new TreeClonerTG(tg, lastSamplerResult);
+        cloner = new TreeClonerTG(tg);
         treeProvider.getTestTree().traverse(cloner);
     }
 

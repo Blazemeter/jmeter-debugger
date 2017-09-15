@@ -26,15 +26,13 @@ import java.util.LinkedList;
 public class TreeClonerTG implements HashTreeTraverser {
     private static final Logger log = LoggerFactory.getLogger(TreeClonerTG.class);
     private AbstractThreadGroup onlyTG;
-    private final TestElement lastSamplerResult;
 
     private final ListedHashTree newTree = new ListedHashTree();
     private final LinkedList<Object> stack = new LinkedList<>();
     private boolean ignoring = false;
 
-    public TreeClonerTG(AbstractThreadGroup tg, TestElement lastSamplerResult) {
+    public TreeClonerTG(AbstractThreadGroup tg) {
         this.onlyTG = tg;
-        this.lastSamplerResult = lastSamplerResult;
     }
 
     @Override
@@ -112,7 +110,6 @@ public class TreeClonerTG implements HashTreeTraverser {
         } else if (cloned instanceof AbstractThreadGroup) {
             userObject = new DebuggingThreadGroup();
             userObject.setProperty(TestElement.GUI_CLASS, DebuggingThreadGroupGui.class.getCanonicalName());
-            ((DebuggingThreadGroup) userObject).setLastSamplerResult(lastSamplerResult);
         } else if (cloned instanceof Controller) {
             userObject = getController(cloned);
         } else if (cloned instanceof PreProcessor) {

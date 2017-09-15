@@ -16,6 +16,8 @@ import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.gui.JMeterGUIComponent;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
+import org.apache.jmeter.reporters.ResultCollector;
+import org.apache.jmeter.samplers.SampleEvent;
 import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.threads.AbstractThreadGroup;
@@ -46,6 +48,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
 
     private boolean savedDirty = false;
     protected Debugger debugger = null;
+    protected ResultCollector lastResultListener;
 
     public DebuggerDialog() {
         super();
@@ -54,6 +57,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
         step.addActionListener(new StepOver());
         pauseContinue.addActionListener(new PauseContinue());
         tgCombo.addItemListener(new ThreadGroupChoiceChanged());
+        lastResultListener = (ResultCollector) lastSamplerResult.createTestElement();
     }
 
     @Override
@@ -62,7 +66,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
         if (GuiPackage.getInstance() != null) {
             savedDirty = GuiPackage.getInstance().isDirty();
         }
-        this.debugger = new Debugger(this, this, lastSamplerResult.createTestElement());
+        this.debugger = new Debugger(this, this);
         tgCombo.removeAllItems();
         for (AbstractThreadGroup group : debugger.getThreadGroups()) {
             tgCombo.addItem(group);
@@ -117,6 +121,9 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
             varsTableModel.addRow(new String[]{var.getKey(), var.getValue().toString()});
         }
         varsTableModel.fireTableDataChanged();
+        if (context.getPreviousResult() != null) {
+            lastResultListener.sampleOccurred(new SampleEvent(context.getPreviousResult(), context.getThreadGroup().getName()));
+        }
     }
 
     private void refreshProperties() {
