@@ -53,6 +53,9 @@ public class DebuggerDialogTest {
                 log.debug("Action " + actionEvent);
             }
         });
+        String actions = ActionRouter.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+        String renderers = RenderAsHTML.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+        JMeterUtils.setProperty("search_paths", actions + ";" + renderers);
         TestProvider prov = new TestProvider();
         JMeterTreeModel mdl = prov.getTreeModel();
         a.setModel(mdl);

@@ -7,11 +7,15 @@ import org.apache.jmeter.gui.LoggerPanel;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.gui.util.PowerTableModel;
+import org.apache.jmeter.reporters.ResultCollector;
+import org.apache.jmeter.samplers.SampleEvent;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.TestPlan;
 import org.apache.jmeter.testelement.WorkBench;
 import org.apache.jmeter.threads.AbstractThreadGroup;
 import org.apache.jmeter.threads.ThreadGroup;
+import org.apache.jmeter.visualizers.ViewResultsFullVisualizer;
+import org.apache.jmeter.visualizers.gui.AbstractVisualizer;
 import org.apache.jorphan.gui.ComponentUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +33,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -48,6 +53,7 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
     protected PowerTableModel propsTableModel;
     protected JPanel elementContainer;
     protected EvaluatePanel evaluatePanel;
+    protected AbstractVisualizer lastSamplerResult;
 
     public DebuggerDialogBase() {
         super((JFrame) null, "Step-by-Step Debugger", true);
@@ -79,6 +85,7 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
         JTabbedPane tabs = new JTabbedPane();
         tabs.add("Variables", getVariablesTab());
         tabs.add("JMeter Properties", getPropertiesTab());
+        tabs.add("Last Sample Result", getLastSamplerResultTab());
         tabs.add("Evaluate", getEvaluateTab());
         tabs.add("Log", getLogTab());
         return tabs;
@@ -226,6 +233,32 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
         tree.addTreeSelectionListener(this);
         tree.addMouseListener(new TreeMouseListener());
         return tree;
+    }
+
+    public Component getLastSamplerResultTab() {
+        lastSamplerResult = new ViewResultsFullVisualizer() {
+            @Override
+            public TestElement createTestElement() {
+                this.collector = new ResultCollector() {
+                    @Override
+                    public void sampleOccurred(SampleEvent event) {
+                        lastSamplerResult.clearData();
+                        getVisualizer().add(event.getResult());
+                    }
+                };
+                this.modifyTestElement(this.collector);
+                return collector;
+            }
+        };
+        lastSamplerResult.setName("Last Sampler Result");
+        try {
+            Field mainSplitField = lastSamplerResult.getClass().getSuperclass().getDeclaredField("mainSplit");
+            mainSplitField.setAccessible(true);
+            return (Component) mainSplitField.get(lastSamplerResult);
+        } catch (Throwable ex) {
+            log.warn("Failed to find 'mainSplit' field in visualizer");
+            return lastSamplerResult;
+        }
     }
 
 
