@@ -112,7 +112,6 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
 
     private void clearListeners() {
         GuiPackage guiPackage = GuiPackage.getInstance();
-        guiPackage.getMainFrame().clearData();
         for (JMeterTreeNode node : guiPackage.getTreeModel().getNodesOfType(Clearable.class)) {
             JMeterGUIComponent guiComp = guiPackage.getGui(node.getTestElement());
             if (guiComp instanceof Clearable){
