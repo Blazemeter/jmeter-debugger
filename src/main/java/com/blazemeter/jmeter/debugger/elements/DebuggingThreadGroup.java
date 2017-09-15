@@ -4,7 +4,6 @@ import com.blazemeter.jmeter.debugger.engine.DebuggerEngine;
 import com.blazemeter.jmeter.debugger.engine.DebuggingThread;
 import org.apache.jmeter.control.LoopController;
 import org.apache.jmeter.engine.StandardJMeterEngine;
-import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.ListenerNotifier;
