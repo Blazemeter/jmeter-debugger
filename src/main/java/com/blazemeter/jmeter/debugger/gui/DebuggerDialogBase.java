@@ -17,6 +17,8 @@ import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jmeter.visualizers.ViewResultsFullVisualizer;
 import org.apache.jmeter.visualizers.gui.AbstractVisualizer;
 import org.apache.jorphan.gui.ComponentUtil;
+import org.apache.jorphan.logging.LoggingManager;
+import org.apache.log.LogTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +35,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -114,9 +117,32 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
         loggerPanel = new LoggerPanelWrapping();
         loggerPanel.setMinimumSize(new Dimension(0, 50));
         loggerPanel.setPreferredSize(new Dimension(0, 150));
-//        LoggingManager.addLogTargetToRootLogger(new LogTarget[]{loggerPanel,});
-        GuiPackage.getInstance().getLogEventBus().registerEventListener(loggerPanel);
+        try {
+            if (!isJMeter32orLater()) {
+                LoggingManager.addLogTargetToRootLogger(new LogTarget[]{loggerPanel});
+            } else {
+                Class cls = Class.forName("com.blazemeter.jmeter.debugger.logging.LoggerPanelAppender");
+                Constructor constructor = cls.getConstructor(String.class, LoggerPanelWrapping.class);
+                constructor.newInstance("debugger-logging-appender", loggerPanel);
+            }
+        } catch (Throwable ex) {
+            log.error("Cannot hook into logging", ex);
+        }
         return loggerPanel;
+    }
+
+    public static boolean isJMeter32orLater() {
+        try {
+            Class<?> cls = DebuggerDialogBase.class.getClassLoader().loadClass("org.apache.jmeter.gui.logging.GuiLogEventBus");
+            if (cls != null) {
+                return true;
+            }
+        } catch (ClassNotFoundException ex) {
+            log.debug("Class 'org.apache.jmeter.gui.logging.GuiLogEventBus' not found", ex);
+        } catch (Throwable ex) {
+            log.warn("Fail to detect JMeter version", ex);
+        }
+        return false;
     }
 
     private Component getElementPane() {
