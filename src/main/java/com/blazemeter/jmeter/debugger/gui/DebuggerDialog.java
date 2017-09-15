@@ -17,6 +17,7 @@ import org.apache.jmeter.gui.JMeterGUIComponent;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
 import org.apache.jmeter.reporters.ResultCollector;
+import org.apache.jmeter.samplers.Clearable;
 import org.apache.jmeter.samplers.SampleEvent;
 import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.testelement.TestElement;
@@ -80,6 +81,7 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
         tgCombo.setEnabled(tgCombo.getItemCount() > 0);
         start.setEnabled(tgCombo.getItemCount() > 0);
         start.requestFocus();
+        clearListeners();
     }
 
     private void changeComboValue(AbstractThreadGroup selectedThreadGroup) {
@@ -99,12 +101,29 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
         if (GuiPackage.getInstance() != null) {
             GuiPackage.getInstance().setDirty(savedDirty);
         }
+        clearListeners();
     }
 
     @Override
     public HashTree getTestTree() {
         GuiPackage gui = GuiPackage.getInstance();
         return gui.getTreeModel().getTestPlan();
+    }
+
+    private void clearListeners() {
+        GuiPackage guiPackage = GuiPackage.getInstance();
+        guiPackage.getMainFrame().clearData();
+        for (JMeterTreeNode node : guiPackage.getTreeModel().getNodesOfType(Clearable.class)) {
+            JMeterGUIComponent guiComp = guiPackage.getGui(node.getTestElement());
+            if (guiComp instanceof Clearable){
+                Clearable item = (Clearable) guiComp;
+                try {
+                    item.clearData();
+                } catch (Exception ex) {
+                    log.error("Can't clear: {} {}", node, guiComp, ex);
+                }
+            }
+        }
     }
 
     private void toggleControls(boolean state) {
