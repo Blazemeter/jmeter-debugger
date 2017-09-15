@@ -46,6 +46,11 @@ public class DebuggerDialogTest {
         if (GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance()) {
             return;
         }
+        String actions = ActionRouter.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+        String renderers = RenderAsHTML.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+        JMeterUtils.setProperty("search_paths", actions + ";" + renderers);
+        TestProvider prov = new TestProvider();
+        JMeterTreeModel mdl = prov.getTreeModel();
         JMeterTreeListener a = new JMeterTreeListener();
         a.setActionHandler(new ActionListener() {
             @Override
@@ -53,16 +58,10 @@ public class DebuggerDialogTest {
                 log.debug("Action " + actionEvent);
             }
         });
-        String actions = ActionRouter.class.getProtectionDomain().getCodeSource().getLocation().getFile();
-        String renderers = RenderAsHTML.class.getProtectionDomain().getCodeSource().getLocation().getFile();
-        JMeterUtils.setProperty("search_paths", actions + ";" + renderers);
-        TestProvider prov = new TestProvider();
-        JMeterTreeModel mdl = prov.getTreeModel();
         a.setModel(mdl);
+        GuiPackage.getInstance(a, mdl);
 
-        GuiPackage.initInstance(a, mdl);
         DebuggerDialog obj = new DebuggerDialogMock(prov.getTreeModel());
-
         obj.componentShown(null);
         obj.started();
         obj.statusRefresh(JMeterContextService.getContext());
@@ -86,7 +85,7 @@ public class DebuggerDialogTest {
             });
             a.setModel(mdl);
 
-            GuiPackage.initInstance(a, mdl);
+            GuiPackage.getInstance(a, mdl);
             String actions = ActionRouter.class.getProtectionDomain().getCodeSource().getLocation().getFile();
             String renderers = RenderAsHTML.class.getProtectionDomain().getCodeSource().getLocation().getFile();
             JMeterUtils.setProperty("search_paths", actions + ";" + renderers);
