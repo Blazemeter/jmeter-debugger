@@ -94,6 +94,13 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
         return tabs;
     }
 
+    protected void clearStatusPane() {
+        lastSamplerResult.clearData();
+        varsTableModel.clearData();
+        propsTableModel.clearData();
+        loggerPanel.clear();
+    }
+
     private Component getEvaluateTab() {
         evaluatePanel = new EvaluatePanel();
         evaluatePanel.setEnabled(false);
