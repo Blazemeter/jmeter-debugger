@@ -76,11 +76,18 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
     }
 
     private Component getMainPane() {
-        JSplitPane topAndDown = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        final JSplitPane topAndDown = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         topAndDown.setResizeWeight(.75);
         topAndDown.setDividerSize(5);
         topAndDown.setTopComponent(new JScrollPane(getElementPane()));
         topAndDown.setBottomComponent(getStatusPane());
+
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                topAndDown.setDividerLocation(0.7);
+            }
+        });
         return topAndDown;
     }
 
