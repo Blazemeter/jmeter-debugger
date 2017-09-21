@@ -235,7 +235,6 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
     @Override
     public void highlightNode(Component component, JMeterTreeNode node, TestElement mc) {
         component.setFont(component.getFont().deriveFont(~Font.BOLD).deriveFont(~Font.ITALIC));
-
         TestElement userObject = (TestElement) node.getUserObject();
         if (Debugger.isBreakpoint(userObject)) {
             component.setForeground(Color.RED);
@@ -250,21 +249,32 @@ public class DebuggerDialog extends DebuggerDialogBase implements DebuggerFronte
             return;
         }
 
+        Font font = component.getFont();
         TestElement currentWrapped = (TestElement) currentElement.getWrappedElement();
         if (mc == currentElement || mc == currentWrapped) {
-            component.setFont(component.getFont().deriveFont(Font.BOLD));
-            component.setForeground(Color.BLUE);
+            setComponentStyle(component, font, Font.BOLD, Font.BOLD);
         }
 
         Sampler currentSampler = debugger.getCurrentSampler();
-        Font font = component.getFont();
         if (mc == currentSampler) { // can this ever happen?
-            component.setFont(font.deriveFont(font.getStyle() | Font.ITALIC));
-            component.setForeground(Color.BLUE);
+            setComponentStyle(component, font, Font.BOLD + Font.ITALIC, font.getStyle() | Font.ITALIC);
         } else if (currentSampler instanceof Wrapper && mc == ((Wrapper) currentSampler).getWrappedElement()) {
-            component.setFont(font.deriveFont(font.getStyle() | Font.ITALIC));
+            setComponentStyle(component, font, Font.BOLD + Font.ITALIC, font.getStyle() | Font.ITALIC);
+        }
+    }
+
+    private void setComponentStyle(Component component, Font font, int macStyle, int otherOsStyle) {
+        if (isMac()) {
+            component.setFont(new Font(font.getName(), macStyle, font.getSize()));
+            component.setForeground(Color.BLACK);
+        } else {
+            component.setFont(font.deriveFont(otherOsStyle));
             component.setForeground(Color.BLUE);
         }
+    }
+
+    public static boolean isMac() {
+        return (System.getProperty("os.name").toLowerCase().contains("mac"));
     }
 
     @Override
