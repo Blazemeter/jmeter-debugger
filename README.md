@@ -36,8 +36,14 @@ The best place to report issues and discuss the debugger is jmeter-plugins [supp
 
 # Changelog
 
-__v0.5__ (upcoming)
+__v0.5__ 22 sep 2017
+ - add last sampler result tab
+ - choose TG from context of tree
  - fix modification thread groups   
+ - fix italic font in tree not shown on Mac
+ - fix blue color for current element is blue-on-blue for Mac
+ - fix logging lab for old jmeter versions
+ - fix clear data in info tabs and listeners
 
 __v0.4__ 24 jul 2017
  - migrate logging to SLF4J
