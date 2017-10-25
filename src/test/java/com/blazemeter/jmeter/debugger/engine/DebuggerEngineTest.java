@@ -183,4 +183,35 @@ public class DebuggerEngineTest {
         assertNull(assertionRes.getFailureMessage());
     }
 
+    @Test
+    public void runVariablesInControllers() throws Exception {
+        TestProvider prov = new TestProvider("/com/blazemeter/jmeter/debugger/loops.jmx", "loops.jmx");
+
+        Debugger sel = new Debugger(prov, new FrontendMock());
+        AbstractThreadGroup tg = prov.getTG(0);
+        sel.selectThreadGroup(tg);
+        HashTree testTree = sel.getSelectedTree();
+
+        TestSampleListener listener = new TestSampleListener();
+        testTree.add(testTree.getArray()[0], listener);
+
+        DebuggingThreadGroup tg2 = (DebuggingThreadGroup) getFirstTG(testTree);
+        LoopController samplerController = (LoopController) tg2.getSamplerController();
+        samplerController.setLoops(1);
+        samplerController.setContinueForever(false);
+
+        JMeter.convertSubTree(testTree);
+
+        DebuggerEngine engine = new DebuggerEngine(JMeterContextService.getContext());
+        StepTriggerCounter hook = new StepTriggerCounter();
+        engine.setStepper(hook);
+        engine.configure(testTree);
+        engine.runTest();
+        while (engine.isActive()) {
+            Thread.sleep(1000);
+        }
+        assertEquals(12, hook.cnt);
+
+        assertEquals(3, listener.events.size());
+    }
 }
