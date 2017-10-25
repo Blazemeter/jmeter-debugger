@@ -7,6 +7,7 @@ import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.TestIterationListener;
 import org.apache.jmeter.testelement.TestStateListener;
+import org.apache.jmeter.testelement.property.JMeterProperty;
 import org.apache.jmeter.threads.TestCompilerHelper;
 
 
@@ -95,5 +96,11 @@ public class ControllerDebug extends AbstractDebugElement<Controller> implements
         if (wrapped instanceof TestStateListener) {
             ((TestStateListener) wrapped).testEnded(host);
         }
+    }
+
+    @Override
+    public void setProperty(JMeterProperty property) {
+        super.setProperty(property);
+        wrapped.setProperty(property);
     }
 }

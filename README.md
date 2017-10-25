@@ -36,6 +36,9 @@ The best place to report issues and discuss the debugger is jmeter-plugins [supp
 
 # Changelog
 
+__v0.6__ (upcoming)
+ - fix variables in assertions and controllers  
+
 __v0.5__ 22 sep 2017
  - add last sampler result tab
  - choose TG from context of tree
