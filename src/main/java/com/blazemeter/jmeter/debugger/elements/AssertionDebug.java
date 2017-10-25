@@ -12,7 +12,7 @@ public class AssertionDebug extends AbstractDebugElement<Assertion> implements A
     @Override
     public void setProperty(JMeterProperty property) {
         super.setProperty(property);
-        if (wrapped instanceof TestElement) {
+        if (wrapped != null && wrapped instanceof TestElement) {
             ((TestElement) wrapped).setProperty(property);
         }
     }
