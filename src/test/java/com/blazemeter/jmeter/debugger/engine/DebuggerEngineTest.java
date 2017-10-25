@@ -6,6 +6,7 @@ import com.blazemeter.jmeter.debugger.TestProvider;
 import com.blazemeter.jmeter.debugger.elements.DebuggingThreadGroup;
 import kg.apc.emulators.TestJMeterUtils;
 import org.apache.jmeter.JMeter;
+import org.apache.jmeter.assertions.AssertionResult;
 import org.apache.jmeter.control.LoopController;
 import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.reporters.ResultCollector;
@@ -24,6 +25,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 
@@ -140,6 +142,45 @@ public class DebuggerEngineTest {
         tree.traverse(searcher);
         Collection<AbstractThreadGroup> searchResults = searcher.getSearchResults();
         return searchResults.toArray(new AbstractThreadGroup[0])[0];
+    }
+
+    @Test
+    public void runVariablesInAssertions() throws Exception {
+        TestProvider prov = new TestProvider("/com/blazemeter/jmeter/debugger/debug.jmx", "debug.jmx");
+
+        Debugger sel = new Debugger(prov, new FrontendMock());
+        AbstractThreadGroup tg = prov.getTG(0);
+        sel.selectThreadGroup(tg);
+        HashTree testTree = sel.getSelectedTree();
+
+        TestSampleListener listener = new TestSampleListener();
+        testTree.add(testTree.getArray()[0], listener);
+
+        DebuggingThreadGroup tg2 = (DebuggingThreadGroup) getFirstTG(testTree);
+        LoopController samplerController = (LoopController) tg2.getSamplerController();
+        samplerController.setLoops(1);
+        samplerController.setContinueForever(false);
+
+        JMeter.convertSubTree(testTree);
+
+        DebuggerEngine engine = new DebuggerEngine(JMeterContextService.getContext());
+        StepTriggerCounter hook = new StepTriggerCounter();
+        engine.setStepper(hook);
+        engine.configure(testTree);
+        engine.runTest();
+        while (engine.isActive()) {
+            Thread.sleep(1000);
+        }
+        assertEquals(4, hook.cnt);
+
+        assertEquals(1, listener.events.size());
+        SampleEvent event = listener.events.get(0);
+        SampleResult result = event.getResult();
+        AssertionResult[] assertionResults = result.getAssertionResults();
+        assertEquals(1, assertionResults.length);
+
+        AssertionResult assertionRes = assertionResults[0];
+        assertNull(assertionRes.getFailureMessage());
     }
 
 }
