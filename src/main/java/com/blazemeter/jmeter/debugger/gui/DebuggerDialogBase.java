@@ -1,8 +1,8 @@
 package com.blazemeter.jmeter.debugger.gui;
 
+import com.blazemeter.jmeter.commons.BlazemeterLabsLogo;
 import com.blazemeter.jmeter.debugger.engine.Debugger;
 import org.apache.jmeter.config.ConfigElement;
-import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.gui.LoggerPanel;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
@@ -174,7 +174,7 @@ abstract public class DebuggerDialogBase extends JDialog implements ComponentLis
     private Component getToolbar() {
         JToolBar res = new JToolBar();
         res.setFloatable(false);
-        JLabel logo = new BlazeMeterLogo();
+        JLabel logo = new BlazemeterLabsLogo("https://blazemeter.com/", 115, 28);
         res.add(logo);
         res.addSeparator(new Dimension(32, 26));
         res.add(new JLabel("Choose: "));
