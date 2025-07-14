@@ -1,8 +1,12 @@
 # Step-by-step debugger for Apache JMeter 
+Implemented by
 
-![logo](/src/main/resources/com/blazemeter/jmeter/debugger/logo.png) 
+<picture>
+ <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Blazemeter/jmeter-bzm-commons/refs/heads/master/src/main/resources/dark-theme/blazemeter-by-perforce-logo.png">
+ <img src="https://raw.githubusercontent.com/Blazemeter/jmeter-bzm-commons/refs/heads/master/src/main/resources/light-theme/blazemeter-by-perforce-logo.png">
+</picture>
 
-Implemented by [BlazeMeter.com](http://blazemeter.com/), released under Apache 2.0 License 
+released under Apache 2.0 License 
 
 ## Features
  - step over single component
